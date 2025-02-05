@@ -1,0 +1,39 @@
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 50px;
+  margin-bottom: 0;
+  background: #224b74;
+  position: relative;
+  z-index: 10;
+}
+
+.hero-content {
+  max-width: 50%;
+}
+
+.hero h1 {
+  font-size: 48px;
+  font-weight: bold;
+  color: rgb(255, 255, 255);
+}
+
+.hero p {
+  font-size: 18px;
+  color: rgb(255, 255, 255);
+}
+@media (max-width: 768px) {
+  .hero {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .hero h1 {
+    font-size: 28px;
+  }
+
+  .hero p {
+    font-size: 14px;
+  }
+}

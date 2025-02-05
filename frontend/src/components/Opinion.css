@@ -1,0 +1,82 @@
+.opinion-section {
+  padding: 50px;
+  background: #0d0d2b;
+  color: #a4bce9;
+  margin-bottom: -50px;
+  border-radius: 10px;
+}
+
+.opinion-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.opinion-image img {
+  width: 300px;
+  border-radius: 10px;
+  padding-left: 130px;
+}
+
+.opinion-text {
+  padding-right: 350px;
+}
+
+.descreption,
+.opinion-text {
+  max-width: 300px;
+  color: #c8d9f9;
+}
+.testimonials {
+  margin-top: 50px;
+}
+
+.testimonials-container {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+}
+
+.testimonial-card {
+  background: white;
+  color: black;
+  padding: 20px;
+  border-radius: 10px;
+  min-width: 250px;
+  text-align: center;
+}
+
+@media (max-width: 1024px) {
+  .opinion-container {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .opinion-image img {
+    width: 250px;
+    padding-left: 0;
+  }
+
+  .opinion-text {
+    padding-right: 0;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .opinion-section {
+    padding: 30px;
+  }
+
+  .opinion-image img {
+    width: 200px;
+  }
+
+  .opinion-text h1 {
+    font-size: 22px;
+  }
+
+  .descreption {
+    font-size: 14px;
+  }
+}
