@@ -15,11 +15,6 @@ app.use(express.json());
 app.use(cors());
 app.use(morgan("dev"));
 
-// Serve static files
-app.use("/assets", express.static(path.join(__dirname, "../frontend/assets")));
-app.use("/css", express.static(path.join(__dirname, "../frontend/css")));
-app.use("/js", express.static(path.join(__dirname, "../frontend/js")));
-
 // API Routes
 app.use("/api/users", userRouter);
 
