@@ -1,62 +1,60 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import { Mail } from "lucide-react";
 import "./Footer.css";
-import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";
-import { Link } from "react-scroll";
 
+const scrollToSection = (id) => {
+  const section = document.getElementById(id);
+  if (section) {
+    section.scrollIntoView({ behavior: "smooth" });
+  }
+};
 const Footer = () => {
   return (
     <footer className="footer">
       <div className="footer-container">
-        <div className="footer-section about">
-          <h3>ABOUT US</h3>
+        <div className="footer-brand">
+          <div className="footer-title">MedLens</div>
           <p>
-            We are a team of innovators dedicated to enhancing healthcare
-            accessibility and efficiency using AI.
+            Revolutionizing healthcare with AI-powered solutions for better
+            patient care and medical diagnosis.
           </p>
         </div>
-        <div className="footer-section links">
-          <h3>USEFUL LINKS</h3>
+
+        <div className="footer-links">
+          <h3>Quick Links</h3>
           <ul>
             <li>
-              <Link to="" smooth={true} duration={800}>
-                Sign Up
-              </Link>
-            </li>
-            <li>
-              <Link to="" smooth={true} duration={800}>
-                Login
-              </Link>
-            </li>
-            <li>
-              <Link to="aboutSection" smooth={true} duration={800}>
+              <Link to="#" onClick={() => scrollToSection("roleSelection")}>
                 About Us
               </Link>
             </li>
             <li>
-              <Link to="serviceSection" smooth={true} duration={800}>
+              {" "}
+              <Link to="#" onClick={() => scrollToSection("features")}>
                 Services
               </Link>
             </li>
           </ul>
         </div>
 
-        <div className="footer-section services-F">
-          <h3>SERVICES</h3>
-          <p>Pharmacy Location</p>
-          <p>Clinic Management</p>
-          <p>Scan Analysis</p>
-          <p>Appointment</p>
+        <div className="footer-contact">
+          <h3>Contact</h3>
+          <p className="contact-item">
+            <Mail size={20} color="#9ca3af" />
+            contact@medlens.com
+          </p>
         </div>
       </div>
 
-      <div className="footer-social">
-        <FaFacebook />
-        <FaTwitter />
-        <FaInstagram />
-        <FaLinkedin />
+      <div className="footer-bottom">
+        <p>© 2024 MedLens. All rights reserved.</p>
+        <div className="footer-policies">
+          <Link to="/privacy-policy">Privacy Policy</Link>
+          <Link to="/terms-of-service">Terms of Service</Link>
+          <Link to="/cookie-policy">Cookie Policy</Link>
+        </div>
       </div>
-
-      <p className="footer-bottom">© 2025 Health Vision. All Rights Reserved</p>
     </footer>
   );
 };

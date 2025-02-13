@@ -1,0 +1,45 @@
+.stats-grid {
+  display: flex;
+  padding: 6rem 3rem;
+  background-color: #f9fafb;
+  text-align: center;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #2b53d5;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  color: #646971;
+}
+
+.state-container {
+  max-width: 100%;
+  margin: auto;
+}
+@media (max-width: 768px) {
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 50px;
+    text-align: start;
+    justify-content: center;
+    margin-left: 0;
+    width: 90%;
+  }
+
+  .stat-item {
+    text-align: center;
+  }
+
+  .state-container {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+}

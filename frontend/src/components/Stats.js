@@ -1,32 +1,27 @@
 import React from "react";
-import {
-  FaBrain,
-  FaBone,
-  FaLungs,
-  FaUserMd,
-  FaHeartbeat,
-} from "react-icons/fa";
+import { useSelector } from "react-redux";
 import "./Stats.css";
 
-const statsData = [
-  { id: 1, icon: <FaHeartbeat />, count: "2,437", percentage: "+23.1%" },
-  { id: 2, icon: <FaBrain />, count: "589", percentage: "+13.8%" },
-  { id: 3, icon: <FaBone />, count: "768", percentage: "+16.3%" },
-  { id: 4, icon: <FaLungs />, count: "325", percentage: "+7.8%" },
-  { id: 5, icon: <FaUserMd />, count: "627", percentage: "+14.1%" },
-];
-
 const Stats = () => {
+  const stats = useSelector((state) => state.stats);
+
   return (
-    <div className="stats-container">
-      {statsData.map((stat) => (
-        <div key={stat.id} className="stat-card">
-          <div className="icon">{stat.icon}</div>
-          <div className="count">{stat.count}</div>
-          <div className="percentage">{stat.percentage}</div>
+    <section className="stats">
+      <div className="stats-container">
+        <div className="stat">
+          <div className="value">{stats.diagnosisAccuracy}</div>
+          <div className="label">Diagnosis Accuracy</div>
         </div>
-      ))}
-    </div>
+        <div className="stat">
+          <div className="value">{stats.medicalProfessionals}</div>
+          <div className="label">Medical Professionals</div>
+        </div>
+        <div className="stat">
+          <div className="value">{stats.patientsHelped}</div>
+          <div className="label">Patients Helped</div>
+        </div>
+      </div>
+    </section>
   );
 };
 

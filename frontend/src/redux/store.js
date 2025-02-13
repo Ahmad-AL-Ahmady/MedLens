@@ -1,18 +1,24 @@
 import { configureStore } from "@reduxjs/toolkit";
-import sliderReducer from "./sliderSlice";
-import servicesReducer from "./servicesReducer";
-import aboutReducer from "./aboutSlice";
-import facilitiesReducer from "./facilitiesSlice";
-import opinionReducer from "./opinionSlice";
+import featuresReducer from "./featuresSlice";
+import heroReducer from "./heroSlice";
+import statsReducer from "./statsSlice";
+import testimonialsReducer from "./testimonialsSlice";
+import howItWorksReducer from "./howItWorksSlice";
+import faqReducer from "./faqSlice";
+import feedbackReducer from "./feedbackSlice";
+import overviewReducer from "./overviewSlice";
+import rolesReducer from "./rolesSlice";
 
 export const store = configureStore({
   reducer: {
-    slider: sliderReducer,
-    services: servicesReducer,
-    about: aboutReducer,
-    facilities: facilitiesReducer,
-    opinions: opinionReducer,
+    hero: heroReducer,
+    features: featuresReducer,
+    stats: statsReducer,
+    howItWorks: howItWorksReducer,
+    testimonials: testimonialsReducer,
+    faq: faqReducer,
+    feedback: feedbackReducer,
+    overview: overviewReducer,
+    roles: rolesReducer,
   },
 });
-
-export default store;
