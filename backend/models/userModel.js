@@ -21,16 +21,6 @@ const userSchema = new mongoose.Schema({
     minlength: 8,
     select: false,
   },
-  phone: {
-    type: String,
-    required: [true, "Please provide your phone number"],
-    validate: {
-      validator: function (v) {
-        return /^\d{11}$/.test(v);
-      },
-      message: "Phone number must be 11 digits",
-    },
-  },
   userType: {
     type: String,
     required: true,
@@ -50,6 +40,27 @@ const userSchema = new mongoose.Schema({
         return this.userType === "doctor" || this.userType === "pharmacy";
       },
     },
+  },
+  gender: {
+    type: String,
+    required: [true, "Please provide your gender"],
+    enum: ["male", "female"],
+  },
+  age: {
+    type: Number,
+    required: [true, "Please provide your age"],
+    min: 0,
+  },
+  // In userSchema
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true, // Allows null values for non-Google users
+  },
+  provider: {
+    type: String,
+    enum: ["local", "google"],
+    default: "local",
   },
 });
 
