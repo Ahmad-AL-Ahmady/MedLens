@@ -48,7 +48,7 @@ const Footer = () => {
       </div>
 
       <div className="footer-bottom">
-        <p>© 2024 MedLens. All rights reserved.</p>
+        <p>© 2025 MedLens. All rights reserved.</p>
         <div className="footer-policies">
           <Link to="/privacy-policy">Privacy Policy</Link>
           <Link to="/terms-of-service">Terms of Service</Link>
