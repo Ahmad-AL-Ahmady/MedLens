@@ -11,7 +11,8 @@ const signToken = (id) => {
 exports.signup = async (req, res) => {
   try {
     const newUser = await User.create({
-      username: req.body.username,
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
       email: req.body.email,
       password: req.body.password,
       userType: req.body.userType,

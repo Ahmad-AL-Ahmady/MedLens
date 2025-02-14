@@ -3,10 +3,15 @@ const validator = require("validator");
 const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema({
-  username: {
+  firstName: {
     type: String,
-    required: [true, "Please provide your username"],
-    minlength: 5,
+    required: [true, "Please provide your first name"],
+    minlength: 2,
+  },
+  lastName: {
+    type: String,
+    required: [true, "Please provide your last name"],
+    minlength: 2,
   },
   email: {
     type: String,
@@ -24,7 +29,7 @@ const userSchema = new mongoose.Schema({
   userType: {
     type: String,
     required: true,
-    enum: ["doctor", "pharmacy", "user"],
+    enum: ["Doctor", "Pharmacy", "Patient", "Admin"],
   },
   location: {
     type: {
@@ -51,11 +56,10 @@ const userSchema = new mongoose.Schema({
     required: [true, "Please provide your age"],
     min: 0,
   },
-  // In userSchema
   googleId: {
     type: String,
     unique: true,
-    sparse: true, // Allows null values for non-Google users
+    sparse: true,
   },
   provider: {
     type: String,
