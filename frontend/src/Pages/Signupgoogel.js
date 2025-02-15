@@ -59,9 +59,14 @@ function GoogleSignUpForm() {
                 </label>
               ))}
             </div>
-            <div class="dob-input-group">
-              <div class="dob-input-wrapper">
-                <input type="date" class="dob-input" id="birthdate" required />{" "}
+            <div className="dob-input-group">
+              <div className="dob-input-wrapper">
+                <input
+                  type="date"
+                  className="dob-input"
+                  id="birthdate"
+                  required
+                />{" "}
               </div>
             </div>
             {/* Gender Selection */}
