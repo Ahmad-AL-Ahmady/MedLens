@@ -1,37 +1,26 @@
-import React from "react";
-import { Provider } from "react-redux";
-import { store } from "./redux/store";
-import HeroSection from "./components/HeroSection";
-import FeaturesSection from "./components/FeaturesSection";
-import Navbar from "./components/Navbar";
-import Stats from "./components/Stats";
-import HowItWorks from "./components/HowItWorks";
-import Testimonials from "./components/Testimonials";
-import FAQ from "./components/FAQ";
-import BannerSection from "./components/BannerSection";
-import Feedback from "./components/Feedback";
-import Overview from "./components/Overview";
-import RoleSelection from "./components/RoleSelection";
-import Footer from "./components/Footer";
-
+// App.js
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import SignUpForm from "./Pages/Signup";
+import LoginForm from "./Pages/Login";
+import ForgotPassword from "./Pages/ForgotPassword";
+import ConfirmResetCode from "./Pages/ConfirmResetCode";
+import NewPassword from "./Pages/NewPassword";
+import GoogleSignUpForm from "./Pages/Signupgoogel";
 function App() {
   return (
-    <Provider store={store}>
-      <div>
-        <Navbar />
-        <HeroSection />
-        <FeaturesSection />
-        <Stats />
-        <HowItWorks />
-        <Testimonials />
-        <FAQ />
-        <BannerSection />
-        <Feedback />
-        <Overview />
-        <RoleSelection />
-        <Footer />
-      </div>
-    </Provider>
+    <Router>
+      <Routes>
+        {/* Authentication Routes */}
+        <Route path="/signup" element={<SignUpForm />} />
+        <Route path="/signup-google" element={<GoogleSignUpForm />} />
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/confirm-code" element={<ConfirmResetCode />} />
+        <Route path="/new-password" element={<NewPassword />} />
+
+        <Route path="/" element={<LoginForm />} />
+      </Routes>
+    </Router>
   );
 }
 

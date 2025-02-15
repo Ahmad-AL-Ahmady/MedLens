@@ -1,0 +1,416 @@
+.login-container {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  font-family: "Inter", sans-serif;
+}
+
+.login-left {
+  flex: 1;
+  padding: 60px;
+  background: #f9fafb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-form {
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+}
+
+.login-form h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #1a1a1a;
+}
+
+.login-form p {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.google-login {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #444;
+  transition: background 0.3s ease;
+}
+
+.google-login:hover {
+  background: #f5f5f5;
+}
+
+.icon {
+  margin-right: 10px;
+  font-size: 1.2rem;
+}
+
+.separator {
+  margin: 25px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.separator::before,
+.separator::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid #ddd;
+}
+
+.separator span {
+  background: #f9fafb;
+  padding: 0 10px;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+label {
+  font-size: 0.9rem;
+  color: #444;
+  font-weight: 500;
+  text-align: left;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 5px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #333;
+  transition: border-color 0.3s ease;
+}
+
+input:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.login-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0;
+  font-size: 0.9rem;
+}
+
+.login-options div {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.login-options p {
+  color: #2563eb;
+  cursor: pointer;
+  margin: 0;
+}
+.login-options a {
+  color: #1054da;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.submit-btn {
+  background: #2563eb;
+  color: white;
+  padding: 12px;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.submit-btn:hover {
+  background: #1d4ed8;
+}
+
+.login-form > p {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 20px;
+}
+
+.login-form > p p {
+  color: #2563eb;
+  cursor: pointer;
+  display: inline;
+  font-weight: 500;
+}
+
+.signup-link {
+  text-align: center;
+  margin-top: 1.5rem;
+  color: hsl(215, 14%, 34%);
+}
+.signup-link a {
+  color: #1054da;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+/* Unified Right Side Styles */
+.auth-side-container {
+  flex: 1;
+  position: relative;
+  background: url("https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-4.0.1&auto=format&fit=crop&w=2070&q=80")
+    center/cover;
+}
+
+.auth-side-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(37, 99, 235, 0.85), rgba(37, 99, 235, 0.85));
+}
+
+.auth-side-content {
+  position: relative;
+  padding: 60px;
+  color: white;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Logo Styles */
+.auth-side-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 40px;
+  justify-content: center;
+}
+
+.auth-side-logo img {
+  width: 50px;
+  height: auto;
+}
+
+.auth-side-logo-text {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--info-color);
+  font-family: "Cairo", sans-serif;
+}
+
+/* Content Styles */
+.auth-side-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+
+.auth-side-item {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.auth-side-icon {
+  width: 28px;
+  height: 28px;
+  color: #fff;
+}
+
+.auth-side-item h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.auth-side-item p {
+  font-size: 0.9rem;
+  color: #e0e0e0;
+}
+
+.features {
+  position: relative;
+  padding: 60px;
+  color: white;
+}
+
+.features h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+
+.feature-item {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  margin-top: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  border-radius: 1rem;
+  padding: 0.2rem;
+  padding-left: 0.5rem;
+}
+
+.feature-icon {
+  width: 28px;
+  height: 28px;
+  color: #fff;
+}
+
+.feature-item h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.feature-item p {
+  font-size: 0.9rem;
+  color: #e0e0e0;
+}
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 0.75rem; /* Adds spacing below the logo */
+}
+
+.info-logo {
+  width: 50px;
+  height: auto;
+}
+
+.logo-text {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #e7f1ff;
+  font-family: "Cairo", sans-serif;
+}
+.feature-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+  color: #e7f1ff;
+}
+
+.feature-list {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+}
+/* Responsive Styles */
+@media (max-width: 1024px) {
+  .auth-side-content {
+    padding: 40px;
+  }
+
+  .auth-side-logo-text {
+    font-size: 1.75rem;
+  }
+
+  .auth-side-title {
+    font-size: 1.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .login-container {
+    flex-direction: column;
+  }
+
+  .auth-side-container {
+    display: none;
+  }
+
+  .login-left {
+    padding: 2rem 1.5rem;
+    min-height: auto;
+  }
+
+  .login-form h1 {
+    font-size: 1.75rem;
+  }
+
+  .login-options {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-left {
+    padding: 1.5rem 1rem;
+  }
+
+  .login-form h1 {
+    font-size: 1.5rem;
+  }
+
+  .login-form p {
+    font-size: 0.8rem;
+  }
+
+  .google-login,
+  .submit-btn {
+    font-size: 0.85rem;
+    padding: 10px;
+  }
+
+  input {
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+
+  .feature-item {
+    padding: 1rem;
+  }
+
+  .auth-side-logo img {
+    width: 40px;
+  }
+
+  .auth-side-logo-text {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 375px) {
+  .login-form h1 {
+    font-size: 1.3rem;
+  }
+
+  .separator span {
+    font-size: 0.8rem;
+  }
+
+  .login-options {
+    font-size: 0.8rem;
+  }
+
+  .signup-link {
+    font-size: 0.85rem;
+  }
+}

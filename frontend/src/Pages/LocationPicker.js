@@ -1,0 +1,122 @@
+import { useState, useEffect, useRef } from "react";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  useMap,
+  useMapEvents,
+} from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import "../Styles/LocationPicker.css";
+
+const customMarker = new L.Icon({
+  iconUrl: "https://cdn-icons-png.flaticon.com/128/684/684908.png",
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+});
+
+const LocationPicker = ({ onSelect, onClose }) => {
+  const [position, setPosition] = useState([30.0444, 31.2357]);
+  const [mapInstance, setMapInstance] = useState(null);
+  const overlayRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (overlayRef.current && !overlayRef.current.contains(event.target)) {
+        onClose();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [onClose]);
+
+  const MapInstance = () => {
+    const map = useMap();
+    useEffect(() => {
+      setMapInstance(map);
+    }, [map]);
+    return null;
+  };
+
+  const getCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          const newPos = [latitude, longitude];
+          setPosition(newPos);
+          onSelect(newPos);
+          if (mapInstance) {
+            mapInstance.flyTo(newPos, 13);
+          }
+        },
+        (err) => {
+          console.error("Error fetching location:", err);
+          alert("Unable to fetch location. Please enable location services.");
+        }
+      );
+    } else {
+      alert("Geolocation is not supported by your browser.");
+    }
+  };
+
+  const LocationMarker = () => {
+    const map = useMap();
+    useMapEvents({
+      click(e) {
+        const newPos = [e.latlng.lat, e.latlng.lng];
+        setPosition(newPos);
+        onSelect(newPos);
+        map.flyTo(newPos, map.getZoom());
+      },
+    });
+    return position ? <Marker position={position} icon={customMarker} /> : null;
+  };
+
+  return (
+    <div className="map-overlay">
+      <div className="map-container" ref={overlayRef}>
+        <div className="map-header">
+          <h2>Select Location</h2>
+          <div className="header-buttons">
+            <button className="my-location-btn" onClick={getCurrentLocation}>
+              <svg
+                className="location-icon"
+                viewBox="0 0 24 24"
+                width="18"
+                height="18"
+              >
+                <path
+                  fill="currentColor"
+                  d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"
+                />
+              </svg>
+              My Location
+            </button>
+            <button className="close-button" onClick={onClose}>
+              &times;
+            </button>
+          </div>
+        </div>
+        <div className="map-content">
+          <MapContainer
+            center={position}
+            zoom={13}
+            style={{ height: "100%", width: "100%" }}
+          >
+            <MapInstance />
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            />
+            <LocationMarker />
+          </MapContainer>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default LocationPicker;
