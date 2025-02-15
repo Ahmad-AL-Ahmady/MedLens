@@ -3,14 +3,15 @@ const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const User = require("../models/userModel");
 const crypto = require("crypto");
 
-console.log("Setting up Google Strategy with following config:");
-console.log("Client ID exists:", !!process.env.GOOGLE_CLIENT_ID);
-console.log("Client Secret exists:", !!process.env.GOOGLE_CLIENT_SECRET);
-console.log(
-  "Callback URL:",
-  "http://localhost:4000/api/users/auth/google/callback"
-);
+// console.log("Setting up Google Strategy with following config:");
+// console.log("Client ID exists:", !!process.env.GOOGLE_CLIENT_ID);
+// console.log("Client Secret exists:", !!process.env.GOOGLE_CLIENT_SECRET);
+// console.log(
+//   "Callback URL:",
+//   "http://localhost:4000/api/users/auth/google/callback"
+// );
 
+// Google Strategy
 passport.use(
   new GoogleStrategy(
     {
