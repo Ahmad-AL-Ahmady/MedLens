@@ -1,17 +1,20 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 
 const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
     required: [true, "Please provide your first name"],
     minlength: 2,
+    trim: true,
   },
   lastName: {
     type: String,
     required: [true, "Please provide your last name"],
     minlength: 2,
+    trim: true,
   },
   email: {
     type: String,
@@ -22,7 +25,7 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, "Please provide a password"],
+    required: true,
     minlength: 8,
     select: false,
   },
@@ -31,30 +34,38 @@ const userSchema = new mongoose.Schema({
     required: true,
     enum: ["Doctor", "Pharmacy", "Patient", "Admin"],
   },
+  profileCompleted: {
+    type: Boolean,
+    default: false,
+  },
   location: {
     type: {
       type: String,
       enum: ["Point"],
       required: function () {
-        return this.userType === "doctor" || this.userType === "pharmacy";
+        return this.userType === "Doctor" || this.userType === "Pharmacy";
       },
     },
     coordinates: {
       type: [Number],
       required: function () {
-        return this.userType === "doctor" || this.userType === "pharmacy";
+        return this.userType === "Doctor" || this.userType === "Pharmacy";
       },
     },
   },
   gender: {
     type: String,
-    required: [true, "Please provide your gender"],
     enum: ["male", "female"],
+    required: function () {
+      return this.profileCompleted === true;
+    },
   },
   age: {
     type: Number,
-    required: [true, "Please provide your age"],
     min: 0,
+    required: function () {
+      return this.profileCompleted === true;
+    },
   },
   googleId: {
     type: String,
@@ -66,7 +77,17 @@ const userSchema = new mongoose.Schema({
     enum: ["local", "google"],
     default: "local",
   },
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
+  passwordResetOTP: String,
+  passwordResetOTPExpires: Date,
 });
+
+// Index for location-based queries
+userSchema.index({ location: "2dsphere" });
 
 // Password hashing middleware
 userSchema.pre("save", async function (next) {
@@ -75,12 +96,43 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-// Password comparison method
+// Only find active users
+userSchema.pre(/^find/, function (next) {
+  this.find({ active: { $ne: false } });
+  next();
+});
+
+// Instance methods
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword
 ) {
   return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+userSchema.methods.createPasswordResetOTP = function () {
+  // Generate 6-digit OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+  // Hash OTP before saving to database
+  this.passwordResetOTP = crypto.createHash("sha256").update(otp).digest("hex");
+
+  // Set expiry to 10 minutes
+  this.passwordResetOTPExpires = Date.now() + 10 * 60 * 1000;
+
+  return otp;
+};
+
+userSchema.methods.verifyOTP = function (candidateOTP) {
+  const hashedOTP = crypto
+    .createHash("sha256")
+    .update(candidateOTP)
+    .digest("hex");
+
+  return (
+    this.passwordResetOTP === hashedOTP &&
+    this.passwordResetOTPExpires > Date.now()
+  );
 };
 
 const User = mongoose.model("User", userSchema);
