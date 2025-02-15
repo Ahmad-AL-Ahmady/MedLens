@@ -33,10 +33,22 @@ function LoginForm() {
 
           <form onSubmit={handleSubmit}>
             <label>Email Address</label>
-            <input type="email" required />
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="Enter your email address"
+              required
+            />
 
             <label>Password</label>
-            <input type="password" required />
+            <input
+              id="password"
+              name="password"
+              type="password"
+              placeholder="Enter your password"
+              required
+            />
 
             <div className="login-options">
               <div>
