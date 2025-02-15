@@ -74,14 +74,46 @@ const LocationPicker = ({ onSelect, onClose }) => {
     });
     return position ? <Marker position={position} icon={customMarker} /> : null;
   };
-
+  const handleManualSelection = () => {
+    onSelect(null);
+    setPosition(null); // Clear the marker position
+    onClose();
+    if (mapInstance) {
+      // Get current map center instead of resetting
+      const currentCenter = mapInstance.getCenter();
+      setPosition([currentCenter.lat, currentCenter.lng]);
+      mapInstance.flyTo(currentCenter, mapInstance.getZoom());
+    }
+  };
   return (
     <div className="map-overlay">
       <div className="map-container" ref={overlayRef}>
         <div className="map-header">
           <h2>Select Location</h2>
           <div className="header-buttons">
-            <button className="my-location-btn" onClick={getCurrentLocation}>
+            <button
+              type="button"
+              className="manual-selection-btn"
+              onClick={handleManualSelection}
+            >
+              <svg
+                className="location-icon"
+                viewBox="0 0 24 24"
+                width="18"
+                height="18"
+              >
+                <path
+                  fill="currentColor"
+                  d="M12 4c4.97 0 9 4.03 9 9s-4.03 9-9 9-9-4.03-9-9 4.03-9 9-9m0-2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"
+                />
+              </svg>
+              Choose Manually
+            </button>
+            <button
+              type="button"
+              className="my-location-btn"
+              onClick={getCurrentLocation}
+            >
               <svg
                 className="location-icon"
                 viewBox="0 0 24 24"
@@ -95,7 +127,7 @@ const LocationPicker = ({ onSelect, onClose }) => {
               </svg>
               My Location
             </button>
-            <button className="close-button" onClick={onClose}>
+            <button type="button" className="close-button" onClick={onClose}>
               &times;
             </button>
           </div>

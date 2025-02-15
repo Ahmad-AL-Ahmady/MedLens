@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import LocationPicker from "./LocationPicker"; // Import the map component
 import { CiLocationOn } from "react-icons/ci";
@@ -14,8 +14,13 @@ function GoogleSignUpForm() {
   const [location, setLocation] = useState(null);
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission
+    console.log("Form location data:", location);
   };
+  useEffect(() => {
+    if (location) {
+      console.log("Selected location:", location);
+    }
+  }, [location]);
 
   return (
     <div className="signup-googel-container">

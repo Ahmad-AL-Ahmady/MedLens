@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FcGoogle } from "react-icons/fc";
 import {
   FaStethoscope,
@@ -18,6 +18,17 @@ function SignUpForm() {
   const [gender, setGender] = useState("");
   const [showMap, setShowMap] = useState(false);
   const [location, setLocation] = useState(null);
+  useEffect(() => {
+    if (location) {
+      console.log("Selected location:", location);
+    }
+  }, [location]);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Your form data including location state
+    console.log("Form location data:", location);
+    // ... submit logic
+  };
   const handleGoogleSignup = () => {
     navigate("/signup-google"); // Or your Google signup page route
   };
@@ -40,7 +51,7 @@ function SignUpForm() {
               <span>Or continue with</span>
             </div>
           </div>
-          <form className="signup-form">
+          <form className="signup-form" onSubmit={handleSubmit}>
             <div className="user-type-selection">
               {["patient", "doctor", "pharmacy"].map((type) => (
                 <label
