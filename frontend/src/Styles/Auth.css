@@ -51,8 +51,11 @@ body {
   font-size: 2rem;
   font-weight: 700;
   background: var(--Logo-color);
-  -webkit-text-fill-color: transparent;
-  font-family: "Inter", sans-serif;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  display: inline-block;
+  font-family: "Cairo", sans-serif;
 }
 
 .auth-title {
