@@ -32,14 +32,9 @@ router.get(
     console.log("Hitting Google callback route");
     next();
   },
-  passport.authenticate("google", {
-    session: false,
-    failureRedirect: "/auth/google/failure",
-  }),
+  passport.authenticate("google", { session: false }),
   authController.googleCallback
 );
-
-router.get("/auth/google/failure", authController.googleAuthFailure);
 
 // Other routes
 router.patch("/completeProfile", authController.completeProfile);

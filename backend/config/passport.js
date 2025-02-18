@@ -41,7 +41,6 @@ passport.use(
           if (!user.googleId) {
             console.log("Updating existing user with Google ID");
             user.googleId = profile.id;
-            user.provider = "google";
             await user.save({ validateBeforeSave: false });
           }
           return done(null, user);
