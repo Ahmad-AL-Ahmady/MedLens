@@ -3,6 +3,8 @@ const passport = require("passport");
 const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
+const sendEmail = require("../utils/email");
+const crypto = require("crypto");
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -13,28 +15,112 @@ const signToken = (id) => {
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
 
+  res.cookie("jwt", token, {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+    path: "/",
+  });
+
+  user.password = undefined;
   res.status(statusCode).json({
     status: "success",
     token,
     data: {
       user,
-      profileCompleted: user.profileCompleted,
     },
   });
 };
 
+// Helper function to send verification email
+const sendVerificationEmail = async (user, verificationToken) => {
+  const verificationURL = `${process.env.BASE_URL}/users/verifyEmail/${verificationToken}`;
+  // http://localhost:4000/api/users/verifyEmail/token
+
+  const message = `
+    <div style="background-color: #f9fafb; padding: 20px; font-family: Arial, sans-serif;">
+      <div style="background-color: white; padding: 20px; border-radius: 10px; max-width: 600px; margin: 0 auto; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+        <h2 style="color: #2563eb; text-align: center; font-size: 24px; margin-bottom: 20px;">Verify Your Email Address</h2>
+        <p style="color: #3a2d34; text-align: center; font-size: 16px;">Please click the button below to verify your email address:</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${verificationURL}" style="background-color: #2563eb; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">Verify Email</a>
+        </div>
+        <p style="color: #3a2d34; font-size: 14px; text-align: center; margin-bottom: 20px;">This link will expire in 10 minutes.</p>
+        <hr style="border: none; border-top: 1px solid #e6e6e6; margin: 20px 0;">
+        <p style="color: #888; font-size: 12px; text-align: center;">If you didn't create an account, please ignore this email.</p>
+      </div>
+    </div>
+  `;
+
+  await sendEmail({
+    email: user.email,
+    subject: "Please verify your email address",
+    message,
+  });
+};
+
+exports.verifyEmail = catchAsync(async (req, res, next) => {
+  const { token } = req.params;
+
+  // 1) Hash token
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+  // 2) Find user with matching token that hasn't expired
+  const user = await User.findOne({
+    emailVerificationToken: hashedToken,
+    emailVerificationExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return next(new AppError("Invalid or expired verification link", 400));
+  }
+
+  // 3) Update user
+  user.emailVerified = true;
+  user.emailVerificationToken = undefined;
+  user.emailVerificationExpires = undefined;
+  await user.save({ validateBeforeSave: false });
+
+  // 4) Log the user in automatically after verification
+  createSendToken(user, 200, res);
+});
+
 exports.signup = catchAsync(async (req, res, next) => {
+  // 1) Create user
   const newUser = await User.create({
     firstName: req.body.firstName,
     lastName: req.body.lastName,
     email: req.body.email,
     password: req.body.password,
+    passwordConfirm: req.body.password,
     userType: req.body.userType,
-    provider: "local",
     profileCompleted: false,
+    emailVerified: false,
+    age: req.body.age,
+    gender: req.body.gender,
+    location: req.body.location
+      ? req.body.userType == ("Doctor" || "Pharmacy")
+      : null,
   });
 
-  createSendToken(newUser, 201, res);
+  // 2) Generate verification token
+  const verificationToken = newUser.createEmailVerificationToken();
+  await newUser.save({ validateBeforeSave: false });
+
+  // 3) Send verification email
+  await sendVerificationEmail(newUser, verificationToken);
+
+  // 4) Send response
+  res.status(201).json({
+    status: "success",
+    message: "User created, please verify your email address",
+    data: {
+      user: newUser,
+    },
+  });
 });
 
 exports.login = catchAsync(async (req, res, next) => {

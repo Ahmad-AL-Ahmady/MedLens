@@ -22,12 +22,13 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        console.log("Received Google profile:", {
-          id: profile.id,
-          email: profile.emails?.[0]?.value,
-          displayName: profile.displayName,
-        });
+        // console.log("Received Google profile:", {
+        //   id: profile.id,
+        //   email: profile.emails?.[0]?.value,
+        //   displayName: profile.displayName,
+        // });
 
+        // 1. First, try to find user by googleId or by email
         let user = await User.findOne({
           $or: [
             { googleId: profile.id },
@@ -46,22 +47,27 @@ passport.use(
           return done(null, user);
         }
 
+        // 3. Create new user with Google profile info
         console.log("Creating new user from Google profile");
-        const randomPassword = crypto.randomBytes(20).toString("hex");
 
         const names = profile.displayName.split(" ");
         const firstName = names[0];
         const lastName = names[names.length - 1] || "";
 
+        // Generate a random password (required by our schema)
+        const randomPassword = crypto.randomBytes(20).toString("hex");
+
+        // Create new user
         user = await User.create({
           googleId: profile.id,
           firstName,
           lastName,
           email: profile.emails[0].value,
           password: randomPassword,
-          provider: "google",
+          passwordConfirm: randomPassword,
           userType: "Patient",
           profileCompleted: false,
+          avatar: profile.photos[0].value || "default.jpg",
         });
 
         console.log("New user created:", user._id);
