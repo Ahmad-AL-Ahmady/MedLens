@@ -23,7 +23,7 @@
 .login-form h1 {
   font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   color: #1a1a1a;
 }
 
@@ -95,7 +95,6 @@ label {
 input {
   width: 100%;
   padding: 12px;
-  margin-top: 5px;
   border: 1px solid #ddd;
   border-radius: 8px;
   font-size: 0.9rem;
@@ -112,6 +111,8 @@ input:focus {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
+  gap: 1rem; /* Add gap between items */
   margin: 10px 0;
   font-size: 0.9rem;
 }
@@ -120,6 +121,7 @@ input:focus {
   display: flex;
   align-items: center;
   gap: 5px;
+  white-space: nowrap; /* Prevent text wrapping */
 }
 
 .login-options p {
