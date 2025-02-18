@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const passport = require("passport");
+const cookieParser = require("cookie-parser");
 require("./config/passport");
 
 const userRouter = require("./routes/userRoutes");
@@ -12,6 +13,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(morgan("dev")); // This will log all requests
+app.use(cookieParser());
 app.use(passport.initialize());
 
 // Debug route to test base URL

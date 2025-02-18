@@ -44,6 +44,8 @@ router.get("/auth/google/failure", authController.googleAuthFailure);
 // Other routes
 router.patch("/completeProfile", authController.completeProfile);
 
+router.get("/verifyEmail/:token", authController.verifyEmail);
+
 router.post("/forgotPassword", authController.forgotPassword);
 router.post("/verifyOTP", authController.verifyOTP);
 router.patch("/resetPassword", authController.resetPassword);
