@@ -1,0 +1,251 @@
+/* MedicalReport.css */
+.medical-report {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.report-title {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+  color: #1f2937;
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+
+.title-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.5rem;
+}
+
+.print-button {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: #4b5563;
+  background-color: transparent;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.print-button:hover {
+  background-color: #f3f4f6;
+}
+
+.button-icon {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
+}
+
+.report-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-label {
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin: 0 0 0.25rem 0;
+}
+
+.info-value {
+  font-weight: 500;
+  margin: 0;
+}
+
+.section-divider {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+}
+
+.section-title {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.diagnosis-box {
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid;
+}
+
+.diagnosis-infected {
+  background-color: #fef2f2;
+  border-color: #fecaca;
+}
+
+.diagnosis-healthy {
+  background-color: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.diagnosis-text {
+  font-weight: 500;
+  margin: 0;
+}
+
+.text-infected {
+  color: #dc2626;
+}
+
+.text-healthy {
+  color: #16a34a;
+}
+
+.findings-text {
+  color: #4b5563;
+  margin: 0;
+}
+
+.recommendations-list {
+  color: #4b5563;
+  list-style-type: disc;
+  list-style-position: inside;
+  padding-left: 0;
+  margin: 0;
+}
+
+.recommendations-list li {
+  margin-bottom: 0.25rem;
+}
+
+@media (max-width: 768px) {
+  .info-grid {
+    grid-template-columns: 1fr; /* Stack items in one column */
+  }
+
+  .report-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .print-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-label {
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin: 0 0 0.25rem 0;
+}
+
+.info-value {
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Section Divider */
+.section-divider {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+}
+
+.section-title {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+/* Diagnosis Box */
+.diagnosis-box {
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid;
+}
+
+/* Diagnosis States */
+.diagnosis-infected {
+  background-color: #fef2f2;
+  border-color: #fecaca;
+}
+
+.diagnosis-healthy {
+  background-color: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.diagnosis-text {
+  font-weight: 500;
+  margin: 0;
+}
+
+.text-infected {
+  color: #dc2626;
+}
+
+.text-healthy {
+  color: #16a34a;
+}
+
+/* Findings & Recommendations */
+.findings-text {
+  color: #4b5563;
+  margin: 0;
+}
+
+.recommendations-list {
+  color: #4b5563;
+  list-style-type: disc;
+  list-style-position: inside;
+  padding-left: 0;
+  margin: 0;
+}
+
+.recommendations-list li {
+  margin-bottom: 0.25rem;
+}
+
+/* Adjustments for Mobile Screens */
+@media (max-width: 480px) {
+  .medical-report {
+    padding: 1rem;
+  }
+
+  .report-title {
+    font-size: 1.1rem;
+  }
+
+  .print-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .diagnosis-box {
+    padding: 0.5rem;
+  }
+}

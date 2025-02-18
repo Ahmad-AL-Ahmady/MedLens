@@ -1,27 +1,26 @@
-// App.js
+// src/App.js
+import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import SignUpForm from "./Pages/Signup";
-import LoginForm from "./Pages/Login";
-import ForgotPassword from "./Pages/ForgotPassword";
-import ConfirmResetCode from "./Pages/ConfirmResetCode";
-import NewPassword from "./Pages/NewPassword";
-import GoogleSignUpForm from "./Pages/Signupgoogel";
-function App() {
+import ScanPage from "./Pages/Scan";
+import Layout from "./components/Layout";
+import HomePage from "./Pages/Home";
+import DoctorPage from "./Pages/Doctor";
+import PharmacyPage from "./Pages/Pharmacy";
+import PatientPage from "./Pages/Patient";
+
+export default function App() {
   return (
     <Router>
-      <Routes>
-        {/* Authentication Routes */}
-        <Route path="/signup" element={<SignUpForm />} />
-        <Route path="/signup-google" element={<GoogleSignUpForm />} />
-        <Route path="/login" element={<LoginForm />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/confirm-code" element={<ConfirmResetCode />} />
-        <Route path="/new-password" element={<NewPassword />} />
-
-        <Route path="/" element={<LoginForm />} />
-      </Routes>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/scan" element={<ScanPage />} />
+          <Route path="/doctor" element={<DoctorPage />} />
+          <Route path="/patient" element={<PatientPage />} />
+          <Route path="/pharmacy" element={<PharmacyPage />} />
+        </Routes>
+      </Layout>
     </Router>
   );
 }
-
-export default App;
