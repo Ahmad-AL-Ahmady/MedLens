@@ -63,6 +63,13 @@ const userSchema = new mongoose.Schema({
       },
     },
   },
+  specialization: {
+    type: String,
+    required: function () {
+      return this.userType === "Doctor";
+    },
+    // enum: [],
+  },
   gender: {
     type: String,
     enum: ["male", "female"],

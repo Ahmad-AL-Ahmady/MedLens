@@ -79,6 +79,7 @@ exports.verifyEmail = catchAsync(async (req, res, next) => {
   }
 
   // 3) Update user
+  user.profileCompleted = ture;
   user.emailVerified = true;
   user.emailVerificationToken = undefined;
   user.emailVerificationExpires = undefined;
@@ -103,6 +104,9 @@ exports.signup = catchAsync(async (req, res, next) => {
     gender: req.body.gender,
     location: req.body.location
       ? req.body.userType == ("Doctor" || "Pharmacy")
+      : null,
+    specialization: req.body.specialization
+      ? req.body.userType == "Doctor"
       : null,
   });
 
