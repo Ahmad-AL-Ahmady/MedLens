@@ -79,7 +79,7 @@ const userSchema = new mongoose.Schema(
         "Radiology",
         "Psychiatry",
         "Obstetrics/Gynecology",
-        "ENT (Ear, Nose & Throat)",
+        "ENT",
       ],
     },
     gender: {

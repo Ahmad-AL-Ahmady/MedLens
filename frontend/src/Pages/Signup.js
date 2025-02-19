@@ -29,7 +29,7 @@ function SignUpForm() {
     "Radiology",
     "Psychiatry",
     "Obstetrics/Gynecology",
-    "ENT (Ear, Nose & Throat)",
+    "ENT",
   ];
   const handleGoogleSignup = () => {
     navigate("/signup-google"); // Or your Google signup page route
