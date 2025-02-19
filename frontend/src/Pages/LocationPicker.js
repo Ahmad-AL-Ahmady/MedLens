@@ -81,15 +81,10 @@ const LocationPicker = ({ onSelect, onClose }) => {
 
   const handleManualSelection = () => {
     if (mapInstance) {
-      const currentCenter = mapInstance.getCenter();
-      const newPosition = { lat: currentCenter.lat, lng: currentCenter.lng }; // ✅ Convert array to object
-
-      setPosition([currentCenter.lat, currentCenter.lng]);
-      onSelect(newPosition);
-      mapInstance.flyTo(
-        [currentCenter.lat, currentCenter.lng],
-        mapInstance.getZoom()
-      );
+      const center = mapInstance.getCenter();
+      setPosition([center.lat, center.lng]);
+      onSelect(createGeoJSONPoint(center.lng, center.lat));
+      mapInstance.flyTo([center.lat, center.lng], mapInstance.getZoom());
     }
   };
 
