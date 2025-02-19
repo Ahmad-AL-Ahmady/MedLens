@@ -85,6 +85,7 @@ const LocationPicker = ({ onSelect, onClose }) => {
       setPosition([center.lat, center.lng]);
       onSelect(createGeoJSONPoint(center.lng, center.lat));
       mapInstance.flyTo([center.lat, center.lng], mapInstance.getZoom());
+      onClose();
     }
   };
 
