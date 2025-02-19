@@ -152,6 +152,59 @@ body {
   width: 0;
   height: 0;
 }
+/* Improved Specialty Select Styles */
+.specialty-select {
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  background-color: white;
+  appearance: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 0.5rem 0 1rem;
+}
+
+.specialty-select:hover {
+  border-color: var(--primary-color);
+  background-color: hsl(220, 86%, 98%);
+}
+
+.specialty-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px hsl(220, 86%, 90%);
+}
+
+/* Custom dropdown arrow */
+.specialty-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231a202c'%3E%3Cpath d='M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem top 50%;
+  background-size: 1rem;
+}
+
+/* Dropdown options styling */
+.specialty-select option {
+  padding: 0.5rem;
+  background: white;
+  color: var(--text-primary);
+}
+
+.specialty-select option:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* Label styling */
+.specialty-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
 input {
   width: 100%;
   padding: 0.5rem 0.2rem;
@@ -424,6 +477,11 @@ input:focus {
     order: -1;
     height: 300px;
   }
+  .specialty-select {
+    font-size: 0.8125rem;
+    padding: 0.625rem 0.875rem;
+    background-position: right 0.75rem top 50%;
+  }
 
   .form-container {
     padding: 2rem 1rem;
@@ -495,8 +553,32 @@ input:focus {
   .terms-container {
     font-size: 0.875rem;
   }
+  .specialty-select {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    background-size: 0.875rem;
+    background-position: right 0.5rem top 50%;
+  }
 
+  .specialty-label {
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+  }
   .login-link {
     font-size: 0.875rem;
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  .specialty-select:hover {
+    border-color: var(--primary-color);
+    background-color: hsl(220, 86%, 98%);
+  }
+}
+
+/* Touch device adjustments */
+@media (pointer: coarse) {
+  .specialty-select {
+    min-height: 44px; /* Minimum touch target size */
   }
 }

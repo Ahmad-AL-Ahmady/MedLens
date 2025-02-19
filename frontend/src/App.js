@@ -1,26 +1,28 @@
-// src/App.js
-import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import ScanPage from "./Pages/Scan";
-import Layout from "./components/Layout";
-import HomePage from "./Pages/Home";
-import DoctorPage from "./Pages/Doctor";
-import PharmacyPage from "./Pages/Pharmacy";
-import PatientPage from "./Pages/Patient";
+import SignUpForm from "./Pages/Signup";
+import LoginForm from "./Pages/Login";
+import ForgotPassword from "./Pages/ForgotPassword";
+import ConfirmResetCode from "./Pages/ConfirmResetCode";
+import NewPassword from "./Pages/NewPassword";
 
-export default function App() {
+function App() {
   return (
     <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/home" element={<HomePage />} />
-          <Route path="/scan" element={<ScanPage />} />
-          <Route path="/doctor" element={<DoctorPage />} />
-          <Route path="/patient" element={<PatientPage />} />
-          <Route path="/pharmacy" element={<PharmacyPage />} />
-        </Routes>
-      </Layout>
+      <Routes>
+        {/* Authentication Routes */}
+        <Route path="/signup" element={<SignUpForm />} />
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/confirm-code" element={<ConfirmResetCode />} />
+        <Route path="/new-password" element={<NewPassword />} />
+
+        {/* Add a default route */}
+        <Route path="/" element={<LoginForm />} />
+
+        {/* Add other non-auth routes here */}
+      </Routes>
     </Router>
   );
 }
+
+export default App;

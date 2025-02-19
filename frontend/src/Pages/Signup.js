@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import {
   FaStethoscope,
@@ -18,20 +18,116 @@ function SignUpForm() {
   const [gender, setGender] = useState("");
   const [showMap, setShowMap] = useState(false);
   const [location, setLocation] = useState(null);
-  useEffect(() => {
-    if (location) {
-      console.log("Selected location:", location);
-    }
-  }, [location]);
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Your form data including location state
-    console.log("Form location data:", location);
-    // ... submit logic
-  };
+  const [specialization, setSpecialty] = useState("");
+  const [error, setError] = useState("");
+  const medicalSpecialties = [
+    "General Practice",
+    "Cardiology",
+    "Dermatology",
+    "Pediatrics",
+    "General Surgery",
+    "Anesthesiology",
+    "Radiology",
+    "Psychiatry",
+    "Obstetrics/Gynecology",
+    "ENT (Ear, Nose & Throat)",
+  ];
   const handleGoogleSignup = () => {
     navigate("/signup-google"); // Or your Google signup page route
   };
+  const calculateAge = (birthDate) => {
+    const today = new Date();
+    const dob = new Date(birthDate);
+    let age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+      age--;
+    }
+    return age;
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    const formData = new FormData(e.target);
+    const password = formData.get("password");
+    const confirmPassword = formData.get("confirmPassword");
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters");
+      return;
+    }
+
+    if (!formData.get("terms")) {
+      setError("Please agree to the terms and privacy policy");
+      return;
+    }
+
+    const birthDate = formData.get("birthdate");
+    const age = calculateAge(birthDate);
+
+    // Ensure location is valid if userType requires it
+    if (["doctor", "pharmacy"].includes(userType)) {
+      if (
+        !location ||
+        location.lng === undefined ||
+        location.lat === undefined
+      ) {
+        setError("Please select a valid location");
+        console.error("Invalid location:", location);
+        return;
+      }
+    }
+
+    const data = {
+      firstName: formData.get("firstName"),
+      lastName: formData.get("lastName"),
+      email: formData.get("email"),
+      password,
+      passwordConfirm: confirmPassword,
+      userType: userType.charAt(0).toUpperCase() + userType.slice(1),
+      age,
+      gender,
+      ...(userType === "doctor" && { specialization }),
+      ...(["doctor", "pharmacy"].includes(userType) && location
+        ? {
+            location: {
+              type: "Point",
+              coordinates: [location.lng, location.lat], // Make sure these exist
+            },
+          }
+        : {}),
+    };
+
+    console.log("Submitting data:", data); // Debugging log
+
+    try {
+      const response = await fetch("http://127.0.0.1:4000/api/users/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        throw new Error(responseData.message || "Signup failed");
+      }
+
+      navigate("/verify-email-instructions");
+    } catch (err) {
+      setError(err.message || "Signup failed");
+      console.error("Signup error:", err);
+    }
+  };
+
   return (
     <div className="signup-container">
       <div className="form-container">
@@ -52,6 +148,7 @@ function SignUpForm() {
             </div>
           </div>
           <form className="signup-form" onSubmit={handleSubmit}>
+            {error && <div className="error-message">{error}</div>}
             <div className="user-type-selection">
               {["patient", "doctor", "pharmacy"].map((type) => (
                 <label
@@ -104,12 +201,12 @@ function SignUpForm() {
                   type="date"
                   className="dob-input"
                   id="birthdate"
+                  name="birthdate"
                   required
                 />{" "}
               </div>
             </div>
             {/* Gender Selection */}
-            {/* Gender & Location Row */}
             <div className="gender-location-row">
               {/* Gender Selection */}
               <div className="gender-selection">
@@ -163,11 +260,30 @@ function SignUpForm() {
             />
             <input
               id="password"
-              name="password"
+              name="confirmPassword"
               type="password"
               placeholder="Confirm Password"
               required
             />
+            {userType === "doctor" && (
+              <div className="input-group">
+                <select
+                  id="specialty"
+                  name="specialty"
+                  value={specialization}
+                  onChange={(e) => setSpecialty(e.target.value)}
+                  required
+                  className="specialty-select"
+                >
+                  <option value="">Select Medical Specialty</option>
+                  {medicalSpecialties.map((spec) => (
+                    <option key={spec} value={spec}>
+                      {spec}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
             <div className="terms-container">
               <input id="terms" name="terms" type="checkbox" required />
               <label htmlFor="terms">

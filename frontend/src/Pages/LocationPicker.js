@@ -39,17 +39,16 @@ const LocationPicker = ({ onSelect, onClose }) => {
     }, [map]);
     return null;
   };
-
   const getCurrentLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           const { latitude, longitude } = pos.coords;
-          const newPos = [latitude, longitude];
-          setPosition(newPos);
-          onSelect(newPos);
+          const newPos = { lat: latitude, lng: longitude }; // ✅ Convert array to object
+          setPosition([latitude, longitude]); // ✅ Keep position as array for Leaflet
+          onSelect(newPos); // ✅ Ensure the parent gets an object
           if (mapInstance) {
-            mapInstance.flyTo(newPos, 13);
+            mapInstance.flyTo([latitude, longitude], 13);
           }
         },
         (err) => {
@@ -66,25 +65,29 @@ const LocationPicker = ({ onSelect, onClose }) => {
     const map = useMap();
     useMapEvents({
       click(e) {
-        const newPos = [e.latlng.lat, e.latlng.lng];
-        setPosition(newPos);
+        const newPos = { lat: e.latlng.lat, lng: e.latlng.lng }; // ✅ Convert array to object
+        setPosition([e.latlng.lat, e.latlng.lng]);
         onSelect(newPos);
-        map.flyTo(newPos, map.getZoom());
+        map.flyTo([e.latlng.lat, e.latlng.lng], map.getZoom());
       },
     });
     return position ? <Marker position={position} icon={customMarker} /> : null;
   };
+
   const handleManualSelection = () => {
-    onSelect(null);
-    setPosition(null); // Clear the marker position
-    onClose();
     if (mapInstance) {
-      // Get current map center instead of resetting
       const currentCenter = mapInstance.getCenter();
+      const newPosition = { lat: currentCenter.lat, lng: currentCenter.lng }; // ✅ Convert array to object
+
       setPosition([currentCenter.lat, currentCenter.lng]);
-      mapInstance.flyTo(currentCenter, mapInstance.getZoom());
+      onSelect(newPosition);
+      mapInstance.flyTo(
+        [currentCenter.lat, currentCenter.lng],
+        mapInstance.getZoom()
+      );
     }
   };
+
   return (
     <div className="map-overlay">
       <div className="map-container" ref={overlayRef}>
