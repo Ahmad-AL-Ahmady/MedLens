@@ -586,7 +586,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   res.cookie("passwordResetToken", "loggedout", {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: false,
     sameSite: "lax",
     path: "/",
   });
