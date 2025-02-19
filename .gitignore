@@ -131,3 +131,10 @@ dist
 
 # AI models
 *.h5
+
+# Upload directories
+backend/public/uploads/*
+!backend/public/uploads/.gitkeep
+!backend/public/uploads/users/
+backend/public/uploads/users/*
+!backend/public/uploads/users/.gitkeep
