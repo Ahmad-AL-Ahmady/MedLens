@@ -293,7 +293,7 @@ exports.googleCallback = async (req, res) => {
       path: "/",
     });
 
-    res.redirect(`${frontendUrl}/home`);
+    res.redirect(`${frontendUrl}/completeProfile?token=${token}`);
   } catch (error) {
     const frontendUrl = req.query.state
       ? JSON.parse(Buffer.from(req.query.state, "base64").toString())
@@ -346,29 +346,76 @@ exports.protect = catchAsync(async (req, res, next) => {
 });
 
 exports.completeProfile = catchAsync(async (req, res, next) => {
+  // 1) Get user and include necessary fields
   const user = await User.findById(req.user.id);
 
   if (!user) {
     return next(new AppError("User not found", 404));
   }
 
-  // Update user profile
-  user.gender = req.body.gender;
-  user.age = req.body.age;
-
-  // Only set location if user is Doctor or Pharmacy
-  if (user.userType === "Doctor" || user.userType === "Pharmacy") {
-    if (!req.body.location) {
-      return next(
-        new AppError("Please provide location for Doctor/Pharmacy", 400)
-      );
-    }
-    user.location = req.body.location;
+  // 2) Validate required fields
+  if (!req.body.gender || !req.body.age) {
+    return next(new AppError("Please provide gender and age", 400));
   }
 
+  // 3) Validate gender enum values
+  if (!["male", "female"].includes(req.body.gender)) {
+    return next(new AppError("Gender must be either 'male' or 'female'", 400));
+  }
+
+  // 4) Validate age
+  if (req.body.age < 0) {
+    return next(new AppError("Age cannot be negative", 400));
+  }
+
+  // 5) Check and validate location for Doctor/Pharmacy
+  if (user.userType === "Doctor" || user.userType === "Pharmacy") {
+    if (!req.body.location || !req.body.location.coordinates) {
+      return next(
+        new AppError(
+          "Please provide location coordinates for Doctor/Pharmacy users",
+          400
+        )
+      );
+    }
+
+    // Validate location format
+    const { coordinates } = req.body.location;
+    if (!Array.isArray(coordinates) || coordinates.length !== 2) {
+      return next(
+        new AppError(
+          "Location must be provided as [longitude, latitude] coordinates",
+          400
+        )
+      );
+    }
+
+    // Set location with GeoJSON format
+    user.location = {
+      type: "Point",
+      coordinates: coordinates,
+    };
+  }
+
+  // 6) Check and validate specialization for Doctor
+  if (user.userType === "Doctor") {
+    if (!req.body.specialization) {
+      return next(
+        new AppError("Please provide specialization for Doctor users", 400)
+      );
+    }
+    user.specialization = req.body.specialization;
+  }
+
+  // 7) Update basic profile fields
+  user.gender = req.body.gender;
+  user.age = req.body.age;
   user.profileCompleted = true;
+
+  // 8) Save user with validation
   await user.save();
 
+  // 9) Send response with updated user data
   createSendToken(user, 200, req, res);
 });
 
@@ -376,37 +423,45 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   // 1) Get user based on POSTed email
   const user = await User.findOne({ email: req.body.email });
 
-  // Check if user exists in DB
   if (!user) {
     return next(new AppError("There is no user with this email address", 404));
   }
 
-  // 2) Generate a random 6-digit reset code
+  // 2) Generate random OTP
   const otp = user.createPasswordResetOTP();
-  await user.save({ validateBeforeSave: false }); // validateBeforeSave is set to false to prevent mongoose from validating the document before saving it
+  console.log("Generated OTP:", otp); // Debug log
 
-  // 3) Generate the email template
+  await user.save({ validateBeforeSave: false });
+
+  // Debug log - verify the saved data
+  console.log("Saved user OTP data:", {
+    hashedOTP: user.passwordResetOTP,
+    expiryTime: user.passwordResetOTPExpires,
+    currentTime: new Date(),
+  });
+
+  // 3) Send it to user's email
   const message = `
-  <div style="background-color: #f6f9fc; padding: 20px; font-family: Arial, sans-serif;">
-    <div style="background-color: white; padding: 20px; border-radius: 10px; max-width: 600px; margin: 0 auto; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
-      <h2 style="color: #2563eb; text-align: center; font-size: 24px; margin-bottom: 20px;">Password Reset Code</h2>
-      <p style="color: #3a2d34; text-align: center; font-size: 16px;">You requested a password reset. Use the code below to reset your password:</p>
-      <div style="background-color: #2563eb; padding: 15px; margin: 20px auto; text-align: center; border-radius: 5px; font-size: 18px; font-weight: bold; color: #fff; width: fit-content;">
-        ${resetCode}
+    <div style="background-color: #f6f9fc; padding: 20px; font-family: Arial, sans-serif;">
+      <div style="background-color: white; padding: 20px; border-radius: 10px; max-width: 600px; margin: 0 auto; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+        <h2 style="color: #2563eb; text-align: center; font-size: 24px; margin-bottom: 20px;">Password Reset Code</h2>
+        <p style="color: #3a2d34; text-align: center; font-size: 16px;">You requested a password reset. Use the code below to reset your password:</p>
+        <div style="background-color: #2563eb; padding: 15px; margin: 20px auto; text-align: center; border-radius: 5px; font-size: 18px; font-weight: bold; color: #fff; width: fit-content;">
+          ${otp}
+        </div>
+        <p style="color: #3a2d34; font-size: 14px; text-align: center; margin-bottom: 20px;">This code is valid for 10 minutes.</p>
+        <hr style="border: none; border-top: 1px solid #e6e6e6; margin: 20px 0;">
+        <p style="color: #888; font-size: 12px; text-align: center;">If you didn't request this, please ignore this email.</p>
       </div>
-      <p style="color: #3a2d34; font-size: 14px; text-align: center; margin-bottom: 20px;">This code is valid for 10 minutes.</p>
-      <hr style="border: none; border-top: 1px solid #e6e6e6; margin: 20px 0;">
-      <p style="color: #888; font-size: 12px; text-align: center;">If you didn't request this, please ignore this email.</p>
     </div>
-  </div>
-`;
+  `;
 
   try {
-    // 3) Send the reset code to user's email
     await sendEmail({
       email: user.email,
       subject: "Your Password Reset Code",
       message,
+      html: message,
     });
 
     res.status(200).json({
@@ -414,8 +469,8 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
       message: "OTP sent to email!",
     });
   } catch (err) {
-    user.verificationCode = undefined;
-    user.verificationCodeExpires = undefined;
+    user.passwordResetOTP = undefined;
+    user.passwordResetOTPExpires = undefined;
     await user.save({ validateBeforeSave: false });
 
     return next(
@@ -430,34 +485,45 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 exports.verifyOTP = catchAsync(async (req, res, next) => {
   const { email, otp } = req.body;
 
-  // 1) Hash the reset code
-  const hashedCode = crypto
-    .createHash("sha256")
-    .update(resetCode)
-    .digest("hex");
+  // console.log("Verifying OTP:", { email, otp });
 
-  // 2) Find user by hashed code and check expiration
-  const user = await User.findOne({
-    email,
-    verificationCode: hashedCode,
-    verificationCodeExpires: { $gt: Date.now() },
-  });
-
-  if (!user) {
-    return next(new AppError("OTP is invalid or has expired", 400));
+  if (!email || !otp) {
+    return next(new AppError("Please provide email and OTP", 400));
   }
 
-  if (!user.verifyOTP(otp)) {
+  // Find user with unexpired OTP
+  const user = await User.findOne({ email }).select(
+    "+passwordResetOTP +passwordResetOTPExpires"
+  );
+
+  if (!user) {
+    return next(new AppError("User not found", 404));
+  }
+
+  // Verify OTP
+  const isValid = user.verifyOTP(otp);
+  if (!isValid) {
     return next(new AppError("Invalid OTP", 400));
   }
 
-  // 3) If code is valid, generate reset token
+  // Use the model method to create reset token
   const resetToken = user.createPasswordResetToken();
-  await user.save({ validateBeforeSave: false }); // validateBeforeSave
+  await user.save({ validateBeforeSave: false });
 
-  // Set resetToken in cookie - will be used automatically in resetPassword
+  // console.log("Debug verifyOTP:", {
+  //   plainToken: resetToken,
+  //   hashedTokenInDB: user.passwordResetToken,
+  // });
+
+  // Clear OTP fields
+  user.passwordResetOTP = undefined;
+  user.passwordResetOTPExpires = undefined;
+
+  await user.save({ validateBeforeSave: false });
+
+  // Send plain token in cookie
   res.cookie("passwordResetToken", resetToken, {
-    maxAge: 10 * 60 * 1000,
+    expires: new Date(Date.now() + 10 * 60 * 1000),
     httpOnly: true,
     secure: false,
     sameSite: "lax",
@@ -468,6 +534,65 @@ exports.verifyOTP = catchAsync(async (req, res, next) => {
     status: "success",
     message: "OTP verified successfully",
   });
+});
+
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  const { password, passwordConfirm } = req.body;
+  const resetToken = req.cookies.passwordResetToken;
+
+  // console.log("Reset Password Debug:", {
+  //   receivedToken: resetToken,
+  //   cookieHeader: req.headers.cookie,
+  // });
+
+  if (!resetToken) {
+    return next(new AppError("Reset session has expired or is invalid", 400));
+  }
+
+  // Hash token using same method as in model
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  // console.log("Token Comparison:", {
+  //   receivedToken: resetToken,
+  //   hashedTokenForSearch: hashedToken,
+  // });
+
+  // Find user with token
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetTokenExpires: { $gt: Date.now() },
+  });
+
+  // console.log("User Search Result:", {
+  //   userFound: !!user,
+  //   hashedTokenUsedForSearch: hashedToken,
+  // });
+
+  if (!user) {
+    return next(new AppError("Reset session has expired or is invalid", 400));
+  }
+
+  // Update password
+  user.password = password;
+  user.passwordConfirm = passwordConfirm;
+  user.passwordResetToken = undefined;
+  user.passwordResetTokenExpires = undefined;
+  await user.save();
+
+  // Clear passwordResetToken cookie
+  res.cookie("passwordResetToken", "loggedout", {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+  });
+
+  // Log user in
+  createSendToken(user, 200, req, res);
 });
 
 exports.verifyResetSession = catchAsync(async (req, res, next) => {
@@ -497,52 +622,6 @@ exports.verifyResetSession = catchAsync(async (req, res, next) => {
     status: "success",
     message: "Valid reset session",
   });
-});
-
-exports.resetPassword = catchAsync(async (req, res, next) => {
-  const { password, passwordConfirm } = req.body;
-  const resetToken = req.cookies.passwordResetToken;
-
-  if (!resetToken) {
-    return next(new AppError("Reset session has expired or is invalid", 400));
-  }
-
-  // Hash token from cookie
-  const hashedToken = crypto
-    .createHash("sha256")
-    .update(resetToken)
-    .digest("hex");
-
-  // Find user with matching hashed token
-  const user = await User.findOne({
-    passwordResetToken: hashedToken,
-    passwordResetTokenExpires: { $gt: Date.now() },
-  });
-
-  if (!user) {
-    return next(new AppError("Reset session has expired or is invalid", 400));
-  }
-
-  // Update password
-  user.password = password;
-  user.passwordConfirm = passwordConfirm;
-  user.passwordResetToken = undefined;
-  user.passwordResetTokenExpires = undefined;
-  user.verificationCode = undefined;
-  user.verificationCodeExpires = undefined;
-  await user.save();
-
-  // Clear passwordResetToken cookie
-  res.cookie("passwordResetToken", resetToken, {
-    expires: new Date(Date.now() + 10 * 1000),
-    httpOnly: true,
-    secure: false,
-    sameSite: "lax",
-    path: "/",
-  });
-
-  // Log user in
-  createSendToken(user, 200, req, res);
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {

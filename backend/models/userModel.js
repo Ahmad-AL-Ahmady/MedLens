@@ -69,7 +69,18 @@ const userSchema = new mongoose.Schema(
       required: function () {
         return this.userType === "Doctor";
       },
-      // enum: [],
+      enum: [
+        "General Practice",
+        "Cardiology",
+        "Dermatology",
+        "Pediatrics",
+        "General Surgery",
+        "Anesthesiology",
+        "Radiology",
+        "Psychiatry",
+        "Obstetrics/Gynecology",
+        "ENT (Ear, Nose & Throat)",
+      ],
     },
     gender: {
       type: String,
@@ -107,6 +118,14 @@ const userSchema = new mongoose.Schema(
     verificationCodeExpires: {
       type: Date,
       select: false,
+    },
+    passwordResetOTP: {
+      type: String,
+      select: false, // This field needs to be explicitly selected
+    },
+    passwordResetOTPExpires: {
+      type: Date,
+      select: false, // This field needs to be explicitly selected
     },
     passwordResetToken: {
       type: String,
@@ -194,36 +213,54 @@ userSchema.methods.changedPasswordAfter = function (JWTTimesTamp) {
       this.passwordChangedAt.getTime() / 1000,
       10
     );
-    console.log(changedTimestamp, JWTTimesTamp);
+    // console.log(changedTimestamp, JWTTimesTamp);
     return JWTTimesTamp < changedTimestamp;
   }
   return false;
 };
 
+// In userSchema.methods:
+
 userSchema.methods.createPasswordResetOTP = function () {
   // Generate 6-digit OTP
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  // console.log("Generated OTP before hashing:", otp); // Debug log
 
-  // Hash OTP before saving to database
+  // Hash OTP
   this.passwordResetOTP = crypto.createHash("sha256").update(otp).digest("hex");
+
+  // console.log("Hashed OTP:", this.passwordResetOTP); // Debug log
 
   // Set expiry to 10 minutes
   this.passwordResetOTPExpires = Date.now() + 10 * 60 * 1000;
 
-  return otp;
+  return otp; // Return unhashed OTP for email
 };
 
 userSchema.methods.verifyOTP = function (candidateOTP) {
-  const hashedOTP = crypto
+  if (!this.passwordResetOTP || !this.passwordResetOTPExpires) {
+    // console.log("No OTP or expiry found"); // Debug log
+    return false;
+  }
+
+  if (this.passwordResetOTPExpires < Date.now()) {
+    // console.log("OTP expired"); // Debug log
+    return false;
+  }
+
+  const hashedCandidateOTP = crypto
     .createHash("sha256")
-    .update(candidateOTP)
+    .update(candidateOTP.toString())
     .digest("hex");
 
-  return (
-    this.passwordResetOTP === hashedOTP &&
-    this.passwordResetOTPExpires > Date.now()
-  );
+  // console.log("Verification comparison:", {
+  //   stored: this.passwordResetOTP,
+  //   received: hashedCandidateOTP,
+  // }); // Debug log
+
+  return this.passwordResetOTP === hashedCandidateOTP;
 };
+
 userSchema.methods.createPasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString("hex");
 

@@ -11,9 +11,14 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors());
 app.use(morgan("dev")); // This will log all requests
-app.use(cookieParser());
+app.use(cookieParser()); // Make sure this is before your routes
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 app.use(passport.initialize());
 
 // Debug route to test base URL
