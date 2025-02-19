@@ -21,6 +21,11 @@ const LocationPicker = ({ onSelect, onClose }) => {
   const [mapInstance, setMapInstance] = useState(null);
   const overlayRef = useRef(null);
 
+  const createGeoJSONPoint = (lng, lat) => ({
+    type: "Point",
+    coordinates: [lng, lat],
+  });
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (overlayRef.current && !overlayRef.current.contains(event.target)) {
@@ -39,14 +44,14 @@ const LocationPicker = ({ onSelect, onClose }) => {
     }, [map]);
     return null;
   };
+
   const getCurrentLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           const { latitude, longitude } = pos.coords;
-          const newPos = { lat: latitude, lng: longitude }; // ✅ Convert array to object
-          setPosition([latitude, longitude]); // ✅ Keep position as array for Leaflet
-          onSelect(newPos); // ✅ Ensure the parent gets an object
+          setPosition([latitude, longitude]);
+          onSelect(createGeoJSONPoint(longitude, latitude));
           if (mapInstance) {
             mapInstance.flyTo([latitude, longitude], 13);
           }
@@ -65,10 +70,10 @@ const LocationPicker = ({ onSelect, onClose }) => {
     const map = useMap();
     useMapEvents({
       click(e) {
-        const newPos = { lat: e.latlng.lat, lng: e.latlng.lng }; // ✅ Convert array to object
-        setPosition([e.latlng.lat, e.latlng.lng]);
-        onSelect(newPos);
-        map.flyTo([e.latlng.lat, e.latlng.lng], map.getZoom());
+        const { lat, lng } = e.latlng;
+        setPosition([lat, lng]);
+        onSelect(createGeoJSONPoint(lng, lat));
+        map.flyTo([lat, lng], map.getZoom());
       },
     });
     return position ? <Marker position={position} icon={customMarker} /> : null;

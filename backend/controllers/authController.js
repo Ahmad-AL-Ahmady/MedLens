@@ -138,8 +138,8 @@ exports.verifyEmail = catchAsync(async (req, res, next) => {
 });
 
 exports.signup = catchAsync(async (req, res, next) => {
-  // 1) Create user
-  const newUser = await User.create({
+  // 1) Prepare user data with correct conditional fields
+  const userData = {
     firstName: req.body.firstName,
     lastName: req.body.lastName,
     email: req.body.email,
@@ -150,22 +150,34 @@ exports.signup = catchAsync(async (req, res, next) => {
     emailVerified: false,
     age: req.body.age,
     gender: req.body.gender,
-    location: req.body.location
-      ? req.body.userType == ("Doctor" || "Pharmacy")
-      : null,
-    specialization: req.body.specialization
-      ? req.body.userType == "Doctor"
-      : null,
-  });
+  };
 
-  // 2) Generate verification token
+  // Add location for Doctor or Pharmacy
+  if (req.body.userType === "Doctor" || req.body.userType === "Pharmacy") {
+    if (req.body.location && req.body.location.coordinates) {
+      userData.location = {
+        type: "Point",
+        coordinates: req.body.location.coordinates,
+      };
+    }
+  }
+
+  // Add specialization for Doctor
+  if (req.body.userType === "Doctor" && req.body.specialization) {
+    userData.specialization = req.body.specialization;
+  }
+
+  // 2) Create user
+  const newUser = await User.create(userData);
+
+  // 3) Generate verification token
   const verificationToken = newUser.createEmailVerificationToken();
   await newUser.save({ validateBeforeSave: false });
 
-  // 3) Send verification email
+  // 4) Send verification email
   await sendVerificationEmail(newUser, verificationToken);
 
-  // 4) Send response
+  // 5) Send response
   res.status(201).json({
     status: "success",
     message: "User created, please verify your email address",

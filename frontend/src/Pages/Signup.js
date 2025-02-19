@@ -44,6 +44,7 @@ function SignUpForm() {
     }
     return age;
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -72,11 +73,7 @@ function SignUpForm() {
 
     // Ensure location is valid if userType requires it
     if (["doctor", "pharmacy"].includes(userType)) {
-      if (
-        !location ||
-        location.lng === undefined ||
-        location.lat === undefined
-      ) {
+      if (!location || !location.type || !location.coordinates) {
         setError("Please select a valid location");
         console.error("Invalid location:", location);
         return;
@@ -94,12 +91,7 @@ function SignUpForm() {
       gender,
       ...(userType === "doctor" && { specialization }),
       ...(["doctor", "pharmacy"].includes(userType) && location
-        ? {
-            location: {
-              type: "Point",
-              coordinates: [location.lng, location.lat], // Make sure these exist
-            },
-          }
+        ? { location }
         : {}),
     };
 
