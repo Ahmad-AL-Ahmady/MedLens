@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
+const slugify = require("slugify");
 
 const userSchema = new mongoose.Schema(
   {
@@ -64,6 +65,10 @@ const userSchema = new mongoose.Schema(
         },
       },
     },
+    slug: {
+      type: String,
+      unique: true,
+    },
     specialization: {
       type: String,
       required: function () {
@@ -121,11 +126,11 @@ const userSchema = new mongoose.Schema(
     },
     passwordResetOTP: {
       type: String,
-      select: false, // This field needs to be explicitly selected
+      select: false,
     },
     passwordResetOTPExpires: {
       type: Date,
-      select: false, // This field needs to be explicitly selected
+      select: false,
     },
     passwordResetToken: {
       type: String,
@@ -165,6 +170,16 @@ userSchema.index({ location: "2dsphere" });
 // Virtual for user's full name
 userSchema.virtual("fullName").get(function () {
   return `${this.firstName} ${this.lastName}`.trim();
+});
+
+userSchema.pre("save", function (next) {
+  if (this.isModified("firstName") || this.isModified("lastName")) {
+    this.slug = slugify(`${this.firstName} ${this.lastName}`, {
+      lower: true,
+      strict: true,
+    });
+  }
+  next();
 });
 
 // Password hashing middleware

@@ -3,6 +3,7 @@ const cors = require("cors");
 const morgan = require("morgan");
 const passport = require("passport");
 const cookieParser = require("cookie-parser");
+const path = require("path");
 require("./config/passport");
 
 const userRouter = require("./routes/userRoutes");
@@ -12,7 +13,7 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(morgan("dev")); // This will log all requests
-app.use(cookieParser()); // Make sure this is before your routes
+app.use(cookieParser());
 app.use(
   cors({
     origin: "http://localhost:3000",
@@ -21,12 +22,14 @@ app.use(
 );
 app.use(passport.initialize());
 
+// Serve static files - Add this line
+app.use("/public", express.static(path.join(__dirname, "public")));
+
 // Debug route to test base URL
 app.get("/", (req, res) => {
   res.send("Server is running");
 });
 
-console.log("Registering user routes at /api/users");
 app.use("/api/users", userRouter);
 
 // Debug 404 handler

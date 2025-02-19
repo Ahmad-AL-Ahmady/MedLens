@@ -1,6 +1,8 @@
 const express = require("express");
 const passport = require("passport");
 const authController = require("../controllers/authController");
+const userController = require("../controllers/userController");
+const upload = require("../utils/multerConfig");
 
 const router = express.Router();
 
@@ -28,11 +30,23 @@ router.get(
   }),
   authController.googleCallback
 );
-router.patch("/completeProfile", authController.completeProfile);
 
 // Protected routes
 router.use(authController.protect); // Protect all routes after this middleware
 
+// Avatar routes
+router.patch(
+  "/updateAvatar",
+  upload.single("avatar"),
+  userController.uploadAvatar
+);
+router.delete("/deleteAvatar", userController.deleteAvatar);
+
+// User profile routes
+router.patch("/completeProfile", authController.completeProfile);
+// router.patch("/updateMe", userController.updateMe);
+// router.delete("/deleteMe", userController.deleteMe);
+// router.get("/me", userController.getMe);
 router.patch("/updatePassword", authController.updatePassword);
 
 module.exports = router;
