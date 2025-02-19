@@ -11,7 +11,6 @@ import LocationPicker from "./LocationPicker"; // Import the map component
 import "../Styles/Signup.css";
 import whiteLogo from "../assets/images/Whitelogo.png";
 import { Link, useNavigate } from "react-router-dom"; // Add useNavigate
-
 function SignUpForm() {
   const navigate = useNavigate();
   const [userType, setUserType] = useState("patient");
@@ -121,7 +120,9 @@ function SignUpForm() {
         throw new Error(responseData.message || "Signup failed");
       }
 
-      navigate("/verify-email-instructions");
+      navigate("/verify-email-instructions", {
+        state: { email: formData.get("email") },
+      });
     } catch (err) {
       setError(err.message || "Signup failed");
       console.error("Signup error:", err);

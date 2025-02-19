@@ -1,0 +1,155 @@
+.verify-email-container {
+  display: flex;
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.form-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #ffffff;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.05);
+}
+
+.form-content {
+  max-width: 500px;
+  width: 90%;
+  padding: 3rem 2rem;
+  text-align: center;
+  animation: fadeIn 0.6s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.email-icon {
+  color: #4caf50;
+  margin-bottom: 2rem;
+  animation: bounce 1.5s infinite;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.title {
+  font-size: 2.25rem;
+  margin-bottom: 1.5rem;
+  color: #2c3e50;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.instructions {
+  color: #6c757d;
+  margin-bottom: 2.5rem;
+  line-height: 1.7;
+  font-size: 1.1rem;
+}
+
+.email-highlight {
+  color: #3498db;
+  font-weight: 600;
+  background: #f8f9fa;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.spam-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  background: #fff3cd;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin: 2.5rem 0;
+  text-align: left;
+  border-left: 4px solid #ffd700;
+}
+
+.spam-icon {
+  font-size: 1.75rem;
+  min-width: 40px;
+  color: #ffc107;
+  flex-shrink: 0;
+}
+
+.spam-note p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #856404;
+  line-height: 1.6;
+}
+
+.back-to-login {
+  color: #3498db;
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #3498db;
+}
+
+.back-to-login:hover {
+  background: #3498db;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .verify-email-container {
+    flex-direction: column;
+  }
+
+  .form-container {
+    padding: 2rem 0;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .spam-note {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-content {
+    padding: 2rem 1rem;
+  }
+
+  .email-icon {
+    font-size: 3rem;
+  }
+
+  .back-to-login {
+    width: 100%;
+    justify-content: center;
+  }
+}

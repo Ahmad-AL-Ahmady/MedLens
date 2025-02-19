@@ -4,7 +4,7 @@ import LoginForm from "./Pages/Login";
 import ForgotPassword from "./Pages/ForgotPassword";
 import ConfirmResetCode from "./Pages/ConfirmResetCode";
 import NewPassword from "./Pages/NewPassword";
-
+import VerifyEmailInstructions from "./Pages/VerifyEmailInstructions";
 function App() {
   return (
     <Router>
@@ -15,7 +15,10 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/confirm-code" element={<ConfirmResetCode />} />
         <Route path="/new-password" element={<NewPassword />} />
-
+        <Route
+          path="/verify-email-instructions"
+          element={<VerifyEmailInstructions />}
+        />
         {/* Add a default route */}
         <Route path="/" element={<LoginForm />} />
 
