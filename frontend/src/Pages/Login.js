@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Bot, Calendar, MapPin, Stethoscope } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { Link, useNavigate } from "react-router-dom";
@@ -8,8 +8,49 @@ import "../Styles/Login.css";
 function LoginForm() {
   const navigate = useNavigate();
 
-  function handleSubmit(e) {
+  // ✅ State for form fields and errors
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  // ✅ Make function async
+  async function handleSubmit(e) {
     e.preventDefault();
+    setError("");
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("http://127.0.0.1:4000/api/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      // ✅ Store token
+      if (rememberMe) {
+        localStorage.setItem("authToken", data.token);
+      } else {
+        sessionStorage.setItem("authToken", data.token);
+      }
+
+      // ✅ Redirect user after login
+      navigate("/dashboard");
+    } catch (error) {
+      setError(error.message || "An error occurred during login");
+      console.error("Login error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   const handleGoogleLogin = () => {
@@ -31,6 +72,7 @@ function LoginForm() {
             <span>Or continue with</span>
           </div>
 
+          {/* ✅ Controlled inputs */}
           <form onSubmit={handleSubmit}>
             <label>Email Address</label>
             <input
@@ -39,6 +81,8 @@ function LoginForm() {
               type="email"
               placeholder="Enter your email address"
               required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
 
             <label>Password</label>
@@ -48,25 +92,36 @@ function LoginForm() {
               type="password"
               placeholder="Enter your password"
               required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
 
             <div className="login-options">
               <div>
-                <input type="checkbox" id="remember-me" />
+                <input
+                  type="checkbox"
+                  id="remember-me"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                />
                 <label htmlFor="remember-me">Remember me</label>
               </div>
               <Link to="/forgot-password" className="link-text">
                 Forgot password?
-              </Link>{" "}
+              </Link>
             </div>
 
-            <button type="submit" className="submit-btn">
-              Sign in
+            {/* ✅ Disable button when loading */}
+            <button type="submit" className="submit-btn" disabled={isLoading}>
+              {isLoading ? "Signing in..." : "Sign in"}
             </button>
+
+            {/* ✅ Show error message */}
+            {error && <p className="error-message">{error}</p>}
           </form>
 
           <p className="signup-link">
-            Don't have an account?
+            Don't have an account?{" "}
             <Link to="/signup" className="link-text">
               Sign up
             </Link>
@@ -81,7 +136,7 @@ function LoginForm() {
             <img src={whiteLogo} alt="Logo" />
             <span className="auth-side-logo-text">MedLens</span>
           </div>
-          <h2 className="feature-title">Welcom back</h2>
+          <h2 className="feature-title">Welcome back</h2>
           <div className="feature-list">
             {[
               {

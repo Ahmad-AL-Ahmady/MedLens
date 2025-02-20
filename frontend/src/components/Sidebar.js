@@ -17,7 +17,7 @@ export default function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const menuItems = [
-    { icon: Home, label: "Home", path: "/home" },
+    { icon: Home, label: "Dashbord", path: "/Dashbord" },
     { icon: ScanEye, label: "Scan", path: "/scan" },
     { icon: Pill, label: "Pharmacy", path: "/pharmacy" },
     { icon: Users, label: "Patient", path: "/patient" },

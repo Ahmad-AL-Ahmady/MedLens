@@ -1,8 +1,8 @@
 // HomePage.jsx
 import React from "react";
-import "../Styles/Home.css";
+import "../Styles/Dashbord.css";
 
-export default function HomePage() {
+export default function Dashbord() {
   return (
     <div className="home-container">
       <div className="welcome-card">
