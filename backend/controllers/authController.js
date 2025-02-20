@@ -305,18 +305,25 @@ exports.googleCallback = async (req, res) => {
       path: "/",
     });
 
-    res.redirect(`${frontendUrl}/completeProfile?token=${token}`);
+    // If profile is not completed, redirect to complete profile page
+    if (!user.profileCompleted) {
+      res.redirect(`${frontendUrl}/complete-profile?token=${token}`);
+    } else {
+      // If profile is completed, redirect to dashboard
+      res.redirect(`${frontendUrl}/dashboard?token=${token}`);
+    }
   } catch (error) {
     const frontendUrl = req.query.state
-      ? JSON.parse(Buffer.from(req.query.state, "base64").toString())
+      ? // Frontend URL: http://localhost:3000
+        JSON.parse(Buffer.from(req.query.state, "base64").toString())
           .frontendUrl
       : process.env.BASE_URL;
-    res.redirect(`${frontendUrl}/login`);
+    res.redirect(`${frontendUrl}/login?error=auth_failed`);
   }
 };
 
 exports.protect = catchAsync(async (req, res, next) => {
-  //1) Getting token and check if it is there or exist
+  // 1) Getting token and check if it exists
   let token;
   if (
     req.headers.authorization &&
@@ -325,18 +332,21 @@ exports.protect = catchAsync(async (req, res, next) => {
     token = req.headers.authorization.split(" ")[1];
   } else if (req.cookies.jwt) {
     token = req.cookies.jwt;
+  } else if (req.query.token) {
+    // This checks for query parameter
+    token = req.query.token;
   }
+
   if (!token) {
     return next(
-      // 401 mean this not authorized
-      new AppError("You are not logged in !! please log in to get access.", 401)
+      new AppError("You are not logged in! Please log in to get access.", 401)
     );
   }
 
-  //2) Verification token
+  // 2) Verification token
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
-  //3) Check if user still exist
+  // 3) Check if user still exists
   const currentUser = await User.findById(decoded.id);
   if (!currentUser) {
     return next(
@@ -344,16 +354,16 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
 
-  //4) Check if user changed password after the token was issued
+  // 4) Check if user changed password after the token was issued
   if (currentUser.changedPasswordAfter(decoded.iat)) {
     return next(
-      new AppError("User recently changed password! please login again", 401)
+      new AppError("User recently changed password! Please login again", 401)
     );
   }
 
   // Grant access to protected route
-  res.locals.user = currentUser;
   req.user = currentUser;
+  res.locals.user = currentUser;
   next();
 });
 
@@ -370,65 +380,21 @@ exports.completeProfile = catchAsync(async (req, res, next) => {
     return next(new AppError("Please provide gender and age", 400));
   }
 
-  // 3) Validate gender enum values
-  if (!["male", "female"].includes(req.body.gender)) {
-    return next(new AppError("Gender must be either 'male' or 'female'", 400));
-  }
+  // 3) Update user fields
+  const updateData = {
+    gender: req.body.gender,
+    age: req.body.age,
+    profileCompleted: true,
+  };
 
-  // 4) Validate age
-  if (req.body.age < 0) {
-    return next(new AppError("Age cannot be negative", 400));
-  }
+  // 4) Update the user using findByIdAndUpdate to skip validation
+  const updatedUser = await User.findByIdAndUpdate(req.user.id, updateData, {
+    new: true, // Return updated document
+    runValidators: false, // Skip validation
+  });
 
-  // 5) Check and validate location for Doctor/Pharmacy
-  if (user.userType === "Doctor" || user.userType === "Pharmacy") {
-    if (!req.body.location || !req.body.location.coordinates) {
-      return next(
-        new AppError(
-          "Please provide location coordinates for Doctor/Pharmacy users",
-          400
-        )
-      );
-    }
-
-    // Validate location format
-    const { coordinates } = req.body.location;
-    if (!Array.isArray(coordinates) || coordinates.length !== 2) {
-      return next(
-        new AppError(
-          "Location must be provided as [longitude, latitude] coordinates",
-          400
-        )
-      );
-    }
-
-    // Set location with GeoJSON format
-    user.location = {
-      type: "Point",
-      coordinates: coordinates,
-    };
-  }
-
-  // 6) Check and validate specialization for Doctor
-  if (user.userType === "Doctor") {
-    if (!req.body.specialization) {
-      return next(
-        new AppError("Please provide specialization for Doctor users", 400)
-      );
-    }
-    user.specialization = req.body.specialization;
-  }
-
-  // 7) Update basic profile fields
-  user.gender = req.body.gender;
-  user.age = req.body.age;
-  user.profileCompleted = true;
-
-  // 8) Save user with validation
-  await user.save();
-
-  // 9) Send response with updated user data
-  createSendToken(user, 200, req, res);
+  // 5) Send response
+  createSendToken(updatedUser, 200, req, res);
 });
 
 exports.forgotPassword = catchAsync(async (req, res, next) => {
