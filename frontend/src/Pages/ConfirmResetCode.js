@@ -1,22 +1,64 @@
-// ConfirmResetCode.jsx
 import { useState } from "react";
+import axios from "axios";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import "../Styles/Auth.css";
 import Darklogo from "../assets/images/Darklogo.png";
 
 function ConfirmResetCode() {
   const [code, setCode] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
-  const email = location.state?.email || "your email";
+  const email = location.state?.email || "";
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add code verification logic here
-    console.log("Verification code:", code);
 
-    // Navigate to new password page
-    navigate("/new-password");
+    if (!email) {
+      setError(
+        "Email information is missing. Please go back to the forgot password page."
+      );
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+
+    try {
+      console.log("Sending request with:", { email, code });
+      // Before sending to the backend
+      const trimmedCode = code.trim(); // Remove any whitespace, still a string
+
+      // Explicitly ensure it's a string using String() constructor (optional but explicit)
+      const stringCode = String(trimmedCode);
+      const response = await axios.post(
+        "http://127.0.0.1:4000/api/users/verifyOTP",
+        {
+          email,
+          otp: stringCode,
+        },
+        { withCredentials: true } // Add this line
+      );
+
+      console.log("OTP verification success:", response.data);
+
+      navigate("/new-password", { state: { email, resetSession: true } });
+    } catch (err) {
+      console.error("Error verifying code:", err);
+
+      if (err.response) {
+        console.error("Backend error response:", err.response.data);
+        setError(
+          err.response.data.message ||
+            "Invalid or expired code. Please try again."
+        );
+      } else {
+        setError("Something went wrong. Please try again later.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -27,7 +69,13 @@ function ConfirmResetCode() {
           <span className="auth-logo-text">MedLens</span>
         </div>
         <h1 className="auth-title">Verify Your Identity</h1>
-        <p className="auth-subtitle">We sent a 6-digit code to {email}</p>
+        <p className="auth-subtitle">
+          {email
+            ? `We sent a 6-digit code to ${email}`
+            : "Please enter your verification code"}
+        </p>
+
+        {error && <div className="auth-error">{error}</div>}
 
         <form onSubmit={handleSubmit} className="auth-form">
           <input
@@ -40,17 +88,13 @@ function ConfirmResetCode() {
             required
           />
 
-          <button type="submit" className="auth-button">
-            Verify Code
+          <button type="submit" className="auth-button" disabled={isLoading}>
+            {isLoading ? "Verifying..." : "Verify Code"}
           </button>
         </form>
 
         <div className="auth-links">
-          <Link
-            to="/forgot-password"
-            className="auth-link"
-            state={{ email }} // Preserve email state for resend
-          >
+          <Link to="/forgot-password" className="auth-link" state={{ email }}>
             Resend Code
           </Link>
           <Link to="/login" className="auth-link">

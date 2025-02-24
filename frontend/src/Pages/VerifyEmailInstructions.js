@@ -1,8 +1,7 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { CiMail } from "react-icons/ci";
 import { MdOutlineMarkEmailRead } from "react-icons/md";
 import "../Styles/VerifyEmailInstructions.css";
-import { useState } from "react";
 
 function VerifyEmailInstructions() {
   const location = useLocation();

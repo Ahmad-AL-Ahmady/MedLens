@@ -1,32 +1,52 @@
-// ForgotPassword.jsx
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom"; // Add useNavigate
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import "../Styles/Auth.css";
 import Darklogo from "../assets/images/Darklogo.png";
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");
-  const navigate = useNavigate(); // Initialize navigate hook
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add your password reset request logic here
-    console.log("Password reset requested for:", email);
+    setIsLoading(true);
+    setError("");
 
-    // Navigate to confirm-code page with email state
-    navigate("/confirm-code", { state: { email } });
+    try {
+      // Use the correct API URL with port 4000
+      const response = await axios.post(
+        "http://127.0.0.1:4000/api/users/forgotPassword",
+        { email }
+      );
+
+      // If successful, navigate to confirm-code page with email
+      console.log("Password reset requested successfully:", response.data);
+      navigate("/confirm-code", { state: { email } });
+    } catch (err) {
+      console.error("Error requesting password reset:", err);
+      setError(
+        err.response?.data?.message ||
+          "Failed to request password reset. Please try again."
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="auth-container">
       <div className="auth-card">
-        {/* Add logo section */}
         <div className="auth-logo-container">
           <img src={Darklogo} alt="Company Logo" className="auth-logo" />
           <span className="auth-logo-text">MedLens</span>
         </div>
         <h1 className="auth-title">Forgot Password?</h1>
         <p className="auth-subtitle">Enter your email to reset your password</p>
+
+        {error && <div className="auth-error">{error}</div>}
 
         <form onSubmit={handleSubmit} className="auth-form">
           <input
@@ -38,8 +58,8 @@ function ForgotPassword() {
             required
           />
 
-          <button type="submit" className="auth-button">
-            Send Reset Code
+          <button type="submit" className="auth-button" disabled={isLoading}>
+            {isLoading ? "Sending..." : "Send Reset Code"}
           </button>
         </form>
 

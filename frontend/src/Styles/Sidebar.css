@@ -17,10 +17,6 @@ body {
   width: 16rem;
 }
 
-.sidebar.collapsed {
-  width: 5rem;
-}
-
 .sidebar-header {
   display: flex;
   align-items: center;

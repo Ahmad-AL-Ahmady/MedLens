@@ -2,7 +2,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap");
 
 :root {
-  --primary-color: #2563eb; /* More professional blue */
+  --primary-color: #2563eb;
   --primary-hover: #1d4ed8;
   --background-light: #f8fafc;
   --text-dark: #122b68;
@@ -54,8 +54,8 @@ body {
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
+  font-family: "Inter", sans-serif;
   display: inline-block;
-  font-family: "Cairo", sans-serif;
 }
 
 .auth-title {
@@ -82,7 +82,66 @@ body {
   align-items: center;
   justify-content: center;
 }
+/* Error States */
+.auth-input-error {
+  border-color: #dc2626;
+  background: #fef2f2;
+}
 
+.auth-error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #dc2626;
+  background: #fef2f2;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #fecaca;
+}
+
+.auth-error-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* Loading Animation */
+.auth-button-loader {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 0.5rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Disabled States */
+.auth-button:disabled,
+.auth-link[aria-disabled="true"] {
+  opacity: 0.7;
+  pointer-events: none;
+} /* Resend Code Button */
+.auth-link[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Numeric Input Styling */
+input[inputMode="numeric"] {
+  font-family: monospace;
+  letter-spacing: 0.5rem;
+  font-size: 1.5rem;
+  text-align: center;
+}
 .auth-input {
   width: 100%;
   padding: 1rem;

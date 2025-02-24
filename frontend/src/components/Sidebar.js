@@ -11,13 +11,13 @@ import {
 import { NavLink } from "react-router-dom";
 
 import "../Styles/Sidebar.css";
-import Blue from "../assets/images/Bluelogo.png";
+import Final from "../Images/Final.png";
 
 export default function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const menuItems = [
-    { icon: Home, label: "Dashbord", path: "/Dashbord" },
+    { icon: Home, label: "Dashboard", path: "/dashboard" },
     { icon: ScanEye, label: "Scan", path: "/scan" },
     { icon: Pill, label: "Pharmacy", path: "/pharmacy" },
     { icon: Users, label: "Patient", path: "/patient" },
@@ -29,8 +29,8 @@ export default function Sidebar() {
       <div className="sidebar-header">
         {isExpanded && (
           <div className="logo-container">
-            <img src={Blue} alt="MedLens Logo" className="info-logo" />
-            <span className="logo-text">MedLens</span>
+            <img src={Final} alt="MedLens Logo" className="info-logo" />
+            <span className="logo-text">MedLenes</span>
           </div>
         )}
         <button

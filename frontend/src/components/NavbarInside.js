@@ -6,8 +6,8 @@ export default function Navbar() {
   const location = useLocation();
   const getPageTitle = (path) => {
     switch (path) {
-      case "/home":
-        return "Home";
+      case "/dashboard":
+        return "Dashboard";
       case "/scan":
         return "Scan Dashboard";
       case "/pharmacy":

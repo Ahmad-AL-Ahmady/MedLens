@@ -139,23 +139,3 @@
 }
 
 /* Remove the old .location-btn styles */
-/* In LocationPicker.css */
-.manual-selection-btn {
-  background-color: #4dabf7;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.2s ease;
-}
-
-.manual-selection-btn:hover {
-  background-color: #339af0;
-  transform: translateY(-1px);
-}

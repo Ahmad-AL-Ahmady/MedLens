@@ -4,18 +4,21 @@ import LoginForm from "./Pages/Login";
 import ForgotPassword from "./Pages/ForgotPassword";
 import ConfirmResetCode from "./Pages/ConfirmResetCode";
 import NewPassword from "./Pages/NewPassword";
-import HomePage from "./Pages/Homepage";
 import VerifyEmailInstructions from "./Pages/VerifyEmailInstructions";
+import HomePage from "./Pages/Homepage";
 import ScanPage from "./Pages/Scan";
 import Layout from "./components/Layout";
-import Dashbord from "./Pages/Dashbord";
 import DoctorPage from "./Pages/Doctor";
 import PharmacyPage from "./Pages/Pharmacy";
 import PatientPage from "./Pages/Patient";
+import Dashbord from "./Pages/Dashbord";
+import GoogleSignUpForm from "./Pages/Signupgoogel";
+
 function App() {
   return (
     <Router>
       <Routes>
+        {/* Authentication Routes */}
         <Route path="/" element={<HomePage />} />
         <Route path="/signup" element={<SignUpForm />} />
         <Route path="/login" element={<LoginForm />} />
@@ -26,18 +29,16 @@ function App() {
           path="/verify-email-instructions"
           element={<VerifyEmailInstructions />}
         />
-        <Route path="/" element={<LoginForm />} />
+        <Route path="signup-google" element={<GoogleSignUpForm />} />
+        {/* Protected Routes Wrapped in Layout */}
+        <Route path="/" element={<Layout />}>
+          <Route path="dashboard" element={<Dashbord />} />
+          <Route path="scan" element={<ScanPage />} />
+          <Route path="doctor" element={<DoctorPage />} />
+          <Route path="patient" element={<PatientPage />} />
+          <Route path="pharmacy" element={<PharmacyPage />} />
+        </Route>
       </Routes>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Dashbord />} />
-          <Route path="/home" element={<Dashbord />} />
-          <Route path="/scan" element={<ScanPage />} />
-          <Route path="/doctor" element={<DoctorPage />} />
-          <Route path="/patient" element={<PatientPage />} />
-          <Route path="/pharmacy" element={<PharmacyPage />} />
-        </Routes>
-      </Layout>
     </Router>
   );
 }

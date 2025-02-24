@@ -1,15 +1,9 @@
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
-import {
-  FaStethoscope,
-  FaCalendarAlt,
-  FaMedkit,
-  FaRobot,
-} from "react-icons/fa";
+import InfoSection from "../components/InfoSection";
 import { CiLocationOn } from "react-icons/ci";
 import LocationPicker from "./LocationPicker"; // Import the map component
 import "../Styles/Signup.css";
-import whiteLogo from "../assets/images/Whitelogo.png";
 import { Link, useNavigate } from "react-router-dom"; // Add useNavigate
 function SignUpForm() {
   const navigate = useNavigate();
@@ -123,26 +117,29 @@ function SignUpForm() {
 
   return (
     <div className="signup-container">
-      <div className="form-container">
-        <div className="form-content">
+      <div className="signup-form-container">
+        <div className="signup-form-content">
           <div>
-            <h1 className="title">Create Account</h1>
-            <p className="subtitle">
+            <h1 className="signup-form-title">Create Account</h1>
+            <p className="signup-form-subtitle">
               Join MedLens for smart healthcare solutions
             </p>
           </div>
-          <div className="auth-options">
-            <button className="google-button" onClick={handleGoogleSignup}>
-              <FcGoogle className="icon" />
+          <div>
+            <button
+              className="signup-google-button"
+              onClick={handleGoogleSignup}
+            >
+              <FcGoogle className="signup-icon" />
               Sign up with Google
             </button>
-            <div className="separator">
+            <div className="signup-separator">
               <span>Or continue with</span>
             </div>
           </div>
           <form className="signup-form" onSubmit={handleSubmit}>
-            {error && <div className="error-message">{error}</div>}
-            <div className="user-type-selection">
+            {error && <div className="signup-error-message">{error}</div>}
+            <div className="signup-user-type-selection">
               {["patient", "doctor", "pharmacy"].map((type) => (
                 <label
                   key={type}
@@ -164,13 +161,14 @@ function SignUpForm() {
                 </label>
               ))}
             </div>
-            <div className="input-group">
+            <div className="signup-input-group signup-name-group">
               <input
                 id="firstName"
                 name="firstName"
                 type="text"
                 placeholder="First Name"
                 required
+                className="signup-input"
               />
               <input
                 id="lastName"
@@ -178,6 +176,7 @@ function SignUpForm() {
                 type="text"
                 placeholder="Last Name"
                 required
+                className="signup-input"
               />
             </div>
             <input
@@ -186,13 +185,14 @@ function SignUpForm() {
               type="email"
               placeholder="Email Address"
               required
+              className="signup-input"
             />
             {/* Replace Age input with this */}
             <div className="dob-input-group">
-              <div className="dob-input-wrapper">
+              <div className="signup-dob-input-wrapper">
                 <input
                   type="date"
-                  className="dob-input"
+                  className="signup-dob-input"
                   id="birthdate"
                   name="birthdate"
                   required
@@ -200,13 +200,13 @@ function SignUpForm() {
               </div>
             </div>
             {/* Gender Selection */}
-            <div className="gender-location-row">
+            <div className="signup-gender-location-row">
               {/* Gender Selection */}
-              <div className="gender-selection">
+              <div className="signup-gender-selection">
                 {["male", "female"].map((genderOption) => (
                   <label
                     key={genderOption}
-                    className={`gender-label ${
+                    className={`signup-gender-label ${
                       gender === genderOption ? "active" : ""
                     }`}
                   >
@@ -216,7 +216,7 @@ function SignUpForm() {
                       value={genderOption}
                       checked={gender === genderOption}
                       onChange={(e) => setGender(e.target.value)}
-                      className="hidden-radio"
+                      className="hidden-radio  signup-input "
                     />
                     {genderOption.charAt(0).toUpperCase() +
                       genderOption.slice(1)}
@@ -226,13 +226,13 @@ function SignUpForm() {
 
               {/* Location Picker */}
               {["doctor", "pharmacy"].includes(userType) && (
-                <div className="location-container">
+                <div className="signup-location-container">
                   <button
                     type="button"
-                    className="location-button"
+                    className="signup-location-button"
                     onClick={() => setShowMap(!showMap)}
                   >
-                    <CiLocationOn className="location-icon" />
+                    <CiLocationOn className="signup-location-icon" />
                     {location ? "Location Selected" : "Select Location"}
                   </button>
                 </div>
@@ -250,6 +250,7 @@ function SignUpForm() {
               type="password"
               placeholder="Password"
               required
+              className="signup-input"
             />
             <input
               id="password"
@@ -257,6 +258,7 @@ function SignUpForm() {
               type="password"
               placeholder="Confirm Password"
               required
+              className="signup-input"
             />
             {userType === "doctor" && (
               <div className="input-group">
@@ -266,7 +268,7 @@ function SignUpForm() {
                   value={specialization}
                   onChange={(e) => setSpecialty(e.target.value)}
                   required
-                  className="specialty-select"
+                  className="signup-specialty-select  specialty-select"
                 >
                   <option value="">Select Medical Specialty</option>
                   {medicalSpecialties.map((spec) => (
@@ -277,9 +279,9 @@ function SignUpForm() {
                 </select>
               </div>
             )}
-            <div className="terms-container">
+            <div className="signup-terms-container">
               <input id="terms" name="terms" type="checkbox" required />
-              <label htmlFor="terms">
+              <label htmlFor="terms" className="signup-terms-label">
                 I agree to the Terms and Privacy Policy
               </label>
             </div>
@@ -287,57 +289,15 @@ function SignUpForm() {
               Sign Up
             </button>
           </form>
-          <p className="login-link">
+          <p className="login-link-signup-form">
             Already have an account?{" "}
-            <Link to="/login" className="link-text">
+            <Link to="/login" className="signup-form-link-text">
               Log in
             </Link>
           </p>
         </div>
       </div>
-
-      {/* Side Info Section */}
-      <div className="info-container">
-        <div className="info-content">
-          <div className="logo-container">
-            <img src={whiteLogo} alt="MedLens Logo" className="info-logo" />
-            <h1 className="logo-text">MedLens</h1>
-          </div>
-          <h2 className="info-title">Experience Smart Healthcare</h2>
-          <div className="info-list">
-            {[
-              {
-                title: "AI-Powered Diagnosis",
-                desc: "Get preliminary diagnoses using AI technology",
-                icon: <FaRobot className="info-icon" />,
-              },
-              {
-                title: "Easy Scheduling",
-                desc: "Book appointments with professionals",
-                icon: <FaCalendarAlt className="info-icon" />,
-              },
-              {
-                title: "Online Pharmacy",
-                desc: "Order medications with home delivery",
-                icon: <FaMedkit className="info-icon" />,
-              },
-              {
-                title: "Virtual Consultations",
-                desc: "Connect with doctors from home",
-                icon: <FaStethoscope className="info-icon" />,
-              },
-            ].map((item) => (
-              <div key={item.title} className="info-item">
-                <h3 className="info-item-title">
-                  {item.icon}
-                  {item.title}
-                </h3>
-                <p className="info-item-desc">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      <InfoSection />
     </div>
   );
 }

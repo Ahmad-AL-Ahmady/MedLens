@@ -14,6 +14,7 @@ export default function ChatBot() {
 
   const handleSend = () => {
     if (!input.trim()) return;
+
     setMessages((prev) => [...prev, { text: input, isBot: false }]);
     setInput("");
 
@@ -30,19 +31,25 @@ export default function ChatBot() {
 
   return (
     <>
+      {/* Chat toggle button */}
       {!isOpen && (
         <button className="chat-toggle" onClick={() => setIsOpen(true)}>
           <MessageCircle className="toggle-icon" />
         </button>
       )}
+
+      {/* Chat window */}
       {isOpen && (
-        <div className="chat-window">
+        <div className="chat-window open">
+          {/* Chat Header */}
           <div className="chat-header">
             <h3 className="chat-title">Medical Assistant</h3>
             <button className="close-button" onClick={() => setIsOpen(false)}>
-              <X className="close-icon" />
+              <X />
             </button>
           </div>
+
+          {/* Messages Container */}
           <div className="messages-container">
             {messages.map((message, index) => (
               <div
@@ -61,18 +68,20 @@ export default function ChatBot() {
               </div>
             ))}
           </div>
+
+          {/* Input Field */}
           <div className="input-container">
             <div className="input-wrapper">
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleSend()}
+                onKeyDown={(e) => e.key === "Enter" && handleSend()} // Fixed event handling
                 placeholder="Type your message..."
                 className="chat-input"
               />
               <button onClick={handleSend} className="send-button">
-                <Send className="send-icon" />
+                <Send />
               </button>
             </div>
           </div>
