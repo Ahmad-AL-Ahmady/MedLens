@@ -463,8 +463,6 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 exports.verifyOTP = catchAsync(async (req, res, next) => {
   const { email, otp } = req.body;
 
-  // console.log("Verifying OTP:", { email, otp });
-
   if (!email || !otp) {
     return next(new AppError("Please provide email and OTP", 400));
   }
@@ -484,39 +482,38 @@ exports.verifyOTP = catchAsync(async (req, res, next) => {
     return next(new AppError("Invalid OTP", 400));
   }
 
-  // Use the model method to create reset token
+  // Generate reset token
   const resetToken = user.createPasswordResetToken();
-  await user.save({ validateBeforeSave: false });
 
-  // console.log("Debug verifyOTP:", {
-  //   plainToken: resetToken,
-  //   hashedTokenInDB: user.passwordResetToken,
-  // });
-
-  // Clear OTP fields
+  // Clear OTP fields in the same save operation
   user.passwordResetOTP = undefined;
   user.passwordResetOTPExpires = undefined;
 
+  // Only save once with all changes
   await user.save({ validateBeforeSave: false });
 
-  // Send plain token in cookie
+  // Send token in cookie
   res.cookie("passwordResetToken", resetToken, {
     expires: new Date(Date.now() + 10 * 60 * 1000),
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+    secure: false, // Set to true in production with HTTPS
+    sameSite: "lax", // Use 'lax' instead of 'none'
     path: "/",
   });
 
   res.status(200).json({
     status: "success",
     message: "OTP verified successfully",
+    resetToken: resetToken, // Send token in response
   });
 });
 
 exports.resetPassword = catchAsync(async (req, res, next) => {
-  const { password, passwordConfirm } = req.body;
-  const resetToken = req.cookies.passwordResetToken;
+  const { password, passwordConfirm, resetToken: bodyToken } = req.body;
+  const cookieToken = req.cookies.passwordResetToken;
+
+  // Use either cookie token or body token
+  const resetToken = cookieToken || bodyToken;
 
   // console.log("Reset Password Debug:", {
   //   receivedToken: resetToken,

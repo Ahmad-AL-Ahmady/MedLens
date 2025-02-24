@@ -33,7 +33,7 @@ function ConfirmResetCode() {
       // Explicitly ensure it's a string using String() constructor (optional but explicit)
       const stringCode = String(trimmedCode);
       const response = await axios.post(
-        "http://127.0.0.1:4000/api/users/verifyOTP",
+        "http://localhost:4000/api/users/verifyOTP",
         {
           email,
           otp: stringCode,

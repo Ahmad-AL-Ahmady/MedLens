@@ -18,7 +18,7 @@ function ForgotPassword() {
     try {
       // Use the correct API URL with port 4000
       const response = await axios.post(
-        "http://127.0.0.1:4000/api/users/forgotPassword",
+        "http://localhost:4000/api/users/forgotPassword",
         { email }
       );
 
