@@ -173,7 +173,7 @@ userSchema.virtual("fullName").get(function () {
 
 userSchema.pre("save", function (next) {
   if (this.isModified("firstName") || this.isModified("lastName")) {
-    this.slug = slugify(`${this.firstName} ${this.lastName}`, {
+    this.slug = slugify(`${this.firstName} ${this.lastName} ${this._id}`, {
       lower: true,
       strict: true,
     });
