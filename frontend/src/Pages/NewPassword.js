@@ -40,8 +40,16 @@ function NewPassword() {
 
       await axios.patch(
         "http://localhost:4000/api/users/resetPassword",
-        requestData,
-        { withCredentials: true }
+        {
+          password,
+          passwordConfirm: confirmPassword,
+        },
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
 
       // Clear the stored token
