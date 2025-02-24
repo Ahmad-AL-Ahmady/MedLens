@@ -407,16 +407,16 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
   // 2) Generate random OTP
   const otp = user.createPasswordResetOTP();
-  console.log("Generated OTP:", otp); // Debug log
+  // console.log("Generated OTP:", otp); // Debug log
 
   await user.save({ validateBeforeSave: false });
 
   // Debug log - verify the saved data
-  console.log("Saved user OTP data:", {
-    hashedOTP: user.passwordResetOTP,
-    expiryTime: user.passwordResetOTPExpires,
-    currentTime: new Date(),
-  });
+  // console.log("Saved user OTP data:", {
+  //   hashedOTP: user.passwordResetOTP,
+  //   expiryTime: user.passwordResetOTPExpires,
+  //   currentTime: new Date(),
+  // });
 
   // 3) Send it to user's email
   const message = `
