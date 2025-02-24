@@ -16,8 +16,11 @@ app.use(morgan("dev")); // This will log all requests
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "http://localhost:3000", // Your React app URL
     credentials: true,
+    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
+    exposedHeaders: ["set-cookie"],
   })
 );
 app.use(passport.initialize());
