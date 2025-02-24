@@ -30,7 +30,12 @@ function NewPassword() {
           password,
           passwordConfirm: confirmPassword,
         },
-        { withCredentials: true }
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
       navigate("/login");
     } catch (err) {
