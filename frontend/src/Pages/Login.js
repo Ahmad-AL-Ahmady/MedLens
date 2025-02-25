@@ -3,7 +3,6 @@ import { FcGoogle } from "react-icons/fc";
 import { Link, useNavigate } from "react-router-dom";
 import InfoSection from "../components/InfoSection";
 import "../Styles/Login.css";
-
 function LoginForm() {
   const navigate = useNavigate();
 

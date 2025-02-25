@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {
   Users,
-  Home,
+  LayoutDashboard,
   ChevronRight,
   ChevronLeft,
   Stethoscope,
@@ -17,7 +17,7 @@ export default function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const menuItems = [
-    { icon: Home, label: "Dashboard", path: "/dashboard" },
+    { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
     { icon: ScanEye, label: "Scan", path: "/scan" },
     { icon: Pill, label: "Pharmacy", path: "/pharmacy" },
     { icon: Users, label: "Patient", path: "/patient" },

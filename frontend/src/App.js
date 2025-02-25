@@ -11,8 +11,10 @@ import Layout from "./components/Layout";
 import DoctorPage from "./Pages/Doctor";
 import PharmacyPage from "./Pages/Pharmacy";
 import PatientPage from "./Pages/Patient";
-import Dashbord from "./Pages/Dashbord";
+import PatientDashbord from "./Pages/PatientDashbord";
 import GoogleSignUpForm from "./Pages/Signupgoogel";
+import DoctorDashbord from "./Pages/DoctorDashbord";
+import PharmacyDashboard from "./Pages/PharmacyDashboard";
 
 function App() {
   return (
@@ -32,7 +34,7 @@ function App() {
         <Route path="signup-google" element={<GoogleSignUpForm />} />
         {/* Protected Routes Wrapped in Layout */}
         <Route path="/" element={<Layout />}>
-          <Route path="dashboard" element={<Dashbord />} />
+          <Route path="dashboard" element={<PatientDashbord />} />
           <Route path="scan" element={<ScanPage />} />
           <Route path="doctor" element={<DoctorPage />} />
           <Route path="patient" element={<PatientPage />} />
