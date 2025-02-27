@@ -236,7 +236,7 @@ exports.login = catchAsync(async (req, res, next) => {
 
   // 5) Send token and log in user
   createSendToken(user, 200, req, res);
-  console.log(`User logged in: ${user.email}`);
+  // console.log(`User logged in: ${user.email}`);
 });
 
 exports.googleLogin = async (req, res) => {
@@ -285,7 +285,7 @@ exports.googleCallback = async (req, res) => {
       await user.save({ validateBeforeSave: false });
       await sendVerificationEmail(user, verificationToken);
     }
-    console.log("User data:", user);
+    // console.log("User data:", user);
 
     // Get the state from Google's response
     const { state } = req.query;
@@ -570,34 +570,34 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   createSendToken(user, 200, req, res);
 });
 
-exports.verifyResetSession = catchAsync(async (req, res, next) => {
-  const resetToken = req.cookies.passwordResetToken;
+// exports.verifyResetSession = catchAsync(async (req, res, next) => {
+//   const resetToken = req.cookies.passwordResetToken;
 
-  if (!resetToken) {
-    return next(new AppError("Reset session has expired or is invalid", 400));
-  }
+//   if (!resetToken) {
+//     return next(new AppError("Reset session has expired or is invalid", 400));
+//   }
 
-  // Hash token from cookie
-  const hashedToken = crypto
-    .createHash("sha256")
-    .update(resetToken)
-    .digest("hex");
+//   // Hash token from cookie
+//   const hashedToken = crypto
+//     .createHash("sha256")
+//     .update(resetToken)
+//     .digest("hex");
 
-  // Find user with matching hashed token
-  const user = await User.findOne({
-    passwordResetToken: hashedToken,
-    passwordResetTokenExpires: { $gt: Date.now() },
-  });
+//   // Find user with matching hashed token
+//   const user = await User.findOne({
+//     passwordResetToken: hashedToken,
+//     passwordResetTokenExpires: { $gt: Date.now() },
+//   });
 
-  if (!user) {
-    return next(new AppError("Reset session has expired or is invalid", 400));
-  }
+//   if (!user) {
+//     return next(new AppError("Reset session has expired or is invalid", 400));
+//   }
 
-  res.status(200).json({
-    status: "success",
-    message: "Valid reset session",
-  });
-});
+//   res.status(200).json({
+//     status: "success",
+//     message: "Valid reset session",
+//   });
+// });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
   // 1) get user info
@@ -627,4 +627,15 @@ exports.logout = (req, res) => {
   });
 
   res.status(200).json({ status: "success" });
+};
+
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.userType)) {
+      return next(
+        new AppError("You do not have permission to perform this action", 403)
+      );
+    }
+    next();
+  };
 };

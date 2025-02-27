@@ -6,18 +6,13 @@ const upload = require("../utils/multerConfig");
 
 const router = express.Router();
 
-// Auth routes
+// Public routes - no authentication required
 router.post("/signup", authController.signup);
 router.post("/login", authController.login);
-router.get("/logout", authController.logout);
-
-// Password reset flow
 router.post("/forgotPassword", authController.forgotPassword);
 router.post("/verifyOTP", authController.verifyOTP);
-router.get("/verifyResetSession", authController.verifyResetSession);
+// router.get("/verifyResetSession", authController.verifyResetSession);
 router.patch("/resetPassword", authController.resetPassword);
-
-// Email verification
 router.get("/verifyEmail/:token", authController.verifyEmail);
 
 // Google authentication
@@ -31,22 +26,29 @@ router.get(
   authController.googleCallback
 );
 
-// Protected routes
-router.use(authController.protect); // Protect all routes after this middleware
+// Protected routes - authentication required
+router.use(authController.protect);
 
-// Avatar routes
+// Routes accessible to all authenticated users
+router.post("/logout", authController.logout);
+router.patch("/completeProfile", authController.completeProfile);
+router.patch("/updatePassword", authController.updatePassword);
 router.patch(
   "/updateAvatar",
-  upload.single("avatar"),
+  upload.avatar.single("avatar"),
   userController.uploadAvatar
 );
 router.delete("/deleteAvatar", userController.deleteAvatar);
+router.get("/me", userController.getMe);
+router.patch("/updateMe", userController.updateMe);
 
-// User profile routes
-router.patch("/completeProfile", authController.completeProfile);
-// router.patch("/updateMe", userController.updateMe);
-// router.delete("/deleteMe", userController.deleteMe);
-// router.get("/me", userController.getMe);
-router.patch("/updatePassword", authController.updatePassword);
+// Admin only routes
+router.use(authController.restrictTo("Admin"));
+router.get("/", userController.getAllUsers);
+router
+  .route("/:id")
+  .get(userController.getUser)
+  .patch(userController.updateUser)
+  .delete(userController.deleteUser);
 
 module.exports = router;

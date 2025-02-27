@@ -6,7 +6,15 @@ const cookieParser = require("cookie-parser");
 const path = require("path");
 require("./config/passport");
 
+require("./models"); // This will load the index.js file that registers all models
 const userRouter = require("./routes/userRoutes");
+const profileRouter = require("./routes/profileRoutes");
+// const profileRouter = require("./routes/profileRoutes");
+// const medicalScanRouter = require("./routes/medicalScanRoutes");
+// const appointmentRouter = require("./routes/appointmentRoutes");
+// const medicationRouter = require("./routes/medicationRoutes");
+// const pharmacyInventoryRouter = require("./routes/pharmacyInventoryRoutes");
+// const reviewRouter = require("./routes/reviewRoutes");
 
 const app = express();
 
@@ -33,7 +41,15 @@ app.get("/", (req, res) => {
   res.send("Server is running");
 });
 
+// Router Mounting
 app.use("/api/users", userRouter);
+app.use("/api/profiles", profileRouter);
+// app.use("/api/profiles", profileRouter);
+// app.use("/api/scans", medicalScanRouter);
+// app.use("/api/appointments", appointmentRouter);
+// app.use("/api/medications", medicationRouter);
+// app.use("/api/inventory", pharmacyInventoryRouter);
+// app.use("/api/reviews", reviewRouter);
 
 // Debug 404 handler
 app.use((req, res, next) => {

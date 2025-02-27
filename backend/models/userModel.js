@@ -213,6 +213,110 @@ userSchema.pre("save", function (next) {
   next();
 });
 
+// Create a flag to track if this is a new document
+userSchema.pre("save", function (next) {
+  this._isNewDocument = this.isNew; // Store the "isNew" state before saving
+  next();
+});
+
+// This will automatically create the appropriate profile when a new user is created
+// This will automatically create the appropriate profile when a new user is created
+userSchema.post("save", async function (doc) {
+  if (doc._isNewDocument) {
+    console.log(
+      `Post-save hook triggered for user: ${doc._id}, type: ${doc.userType}`
+    );
+    try {
+      // Check if a profile already exists to prevent duplicates
+      let profileExists = false;
+
+      if (doc.userType === "Patient") {
+        console.log("Creating PatientProfile...");
+        try {
+          const PatientProfile = mongoose.model("PatientProfile");
+          profileExists = await PatientProfile.exists({ user: doc._id });
+          console.log(`Profile exists check result: ${profileExists}`);
+
+          if (!profileExists) {
+            const patientProfile = await PatientProfile.create({
+              user: doc._id,
+            });
+            console.log(
+              `PatientProfile created successfully: ${patientProfile._id}`
+            );
+          } else {
+            console.log(`PatientProfile already exists for user ${doc._id}`);
+          }
+        } catch (modelError) {
+          console.error("Error with PatientProfile model:", modelError);
+        }
+      } else if (doc.userType === "Doctor") {
+        console.log("Creating DoctorProfile...");
+        try {
+          const DoctorProfile = mongoose.model("DoctorProfile");
+          profileExists = await DoctorProfile.exists({ user: doc._id });
+
+          if (!profileExists) {
+            const doctorProfile = await DoctorProfile.create({ user: doc._id });
+            console.log(
+              `DoctorProfile created successfully: ${doctorProfile._id}`
+            );
+          } else {
+            console.log(`DoctorProfile already exists for user ${doc._id}`);
+          }
+        } catch (modelError) {
+          console.error("Error with DoctorProfile model:", modelError);
+        }
+      } else if (doc.userType === "Pharmacy") {
+        console.log("Creating PharmacyProfile...");
+        try {
+          const PharmacyProfile = mongoose.model("PharmacyProfile");
+          profileExists = await PharmacyProfile.exists({ user: doc._id });
+
+          if (!profileExists) {
+            const pharmacyProfile = await PharmacyProfile.create({
+              user: doc._id,
+            });
+            console.log(
+              `PharmacyProfile created successfully: ${pharmacyProfile._id}`
+            );
+          } else {
+            console.log(`PharmacyProfile already exists for user ${doc._id}`);
+          }
+        } catch (modelError) {
+          console.error("Error with PharmacyProfile model:", modelError);
+        }
+      }
+    } catch (error) {
+      console.error("Error in profile creation post-save hook:", error);
+    }
+  } else {
+    console.log(`User ${doc._id} updated (not creating profile)`);
+  }
+});
+
+// Add these virtual properties to the userSchema to help with populating related data
+userSchema.virtual("patientProfile", {
+  ref: "PatientProfile",
+  foreignField: "user",
+  localField: "_id",
+  justOne: true, // This ensures it returns an object, not an array
+});
+
+userSchema.virtual("doctorProfile", {
+  ref: "DoctorProfile",
+  foreignField: "user",
+  localField: "_id",
+  justOne: true,
+});
+
+userSchema.virtual("pharmacyProfile", {
+  ref: "PharmacyProfile",
+  foreignField: "user",
+  localField: "_id",
+  justOne: true,
+});
+
 // Instance methods
 userSchema.methods.correctPassword = async function (
   candidatePassword,
@@ -232,8 +336,6 @@ userSchema.methods.changedPasswordAfter = function (JWTTimesTamp) {
   }
   return false;
 };
-
-// In userSchema.methods:
 
 userSchema.methods.createPasswordResetOTP = function () {
   // Generate 6-digit OTP
