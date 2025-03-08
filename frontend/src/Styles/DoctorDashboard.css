@@ -102,26 +102,6 @@
   font-feature-settings: "tnum";
 }
 
-.doctor-dashboard-card__subtext {
-  font-size: 0.875rem;
-  color: var(--dd-text-secondary);
-  margin: 0;
-  letter-spacing: 0.01em;
-  position: relative;
-  padding-left: 1.5rem;
-}
-
-.doctor-dashboard-card__subtext::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 1rem;
-  height: 2px;
-  background: var(--dd-border);
-}
-
 /* Schedule Section */
 .doctor-dashboard-schedule {
   background: var(--dd-bg);

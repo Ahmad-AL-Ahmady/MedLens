@@ -34,7 +34,7 @@ function App() {
         <Route path="signup-google" element={<GoogleSignUpForm />} />
         {/* Protected Routes Wrapped in Layout */}
         <Route path="/" element={<Layout />}>
-          <Route path="dashboard" element={<PatientDashbord />} />
+          <Route path="dashboard" element={<PharmacyDashboard />} />
           <Route path="scan" element={<ScanPage />} />
           <Route path="doctor" element={<DoctorPage />} />
           <Route path="patient" element={<PatientPage />} />

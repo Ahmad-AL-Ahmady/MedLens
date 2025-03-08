@@ -24,12 +24,11 @@ export default function DoctorDashboard() {
         {/* Scans Reviewed Card */}
         <div className="doctor-dashboard-card">
           <div className="doctor-dashboard-card__header">
-            <h3 className="doctor-dashboard-card__title">Scans Reviewed</h3>
+            <h3 className="doctor-dashboard-card__title">Scans </h3>
             <Activity className="doctor-dashboard-card__icon doctor-dashboard-card__icon--blue" />
           </div>
           <div className="doctor-dashboard-card__content">
             <p className="doctor-dashboard-card__value">28</p>
-            <p className="doctor-dashboard-card__subtext">This week</p>
           </div>
         </div>
       </div>
@@ -48,16 +47,6 @@ export default function DoctorDashboard() {
                       "Jane Smith",
                       "Mike Johnson",
                       "Sarah Williams",
-                    ][i]
-                  }
-                </p>
-                <p className="doctor-dashboard-appointment__type">
-                  {
-                    [
-                      "X-Ray Review",
-                      "General Checkup",
-                      "Follow-up",
-                      "Initial Consultation",
                     ][i]
                   }
                 </p>
