@@ -8,8 +8,6 @@ const doctorProfileSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    experience: Number, // Years of experience
-    hospital: String,
     biography: {
       type: String,
       trim: true,
