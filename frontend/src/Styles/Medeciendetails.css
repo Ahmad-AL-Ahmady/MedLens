@@ -1,0 +1,205 @@
+/* Medicine Details Styles */
+.medecien-details {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 2.5rem;
+  font-family: "Poppins", sans-serif;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.medecien-details__back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f8fafc;
+  border: none;
+  color: #1e40af;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 2.5rem;
+}
+
+.medecien-details__back-button:hover {
+  background: #e2e8f0;
+  transform: translateX(-4px);
+}
+
+.medecien-details__header {
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.medecien-details__title {
+  color: #1e3a8a;
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.025em;
+}
+
+.medecien-details__category {
+  background: linear-gradient(to right, #3b82f6, #1d4ed8);
+  color: white;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: inline-block;
+  box-shadow: 0 2px 4px rgba(30, 64, 175, 0.1);
+}
+
+.medecien-details__description {
+  color: #475569;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  margin-bottom: 2.5rem;
+  max-width: 75ch;
+}
+
+.medecien-details__subtitle {
+  color: #1e3a8a;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.medecien-details__subtitle::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 24px;
+  background: #3b82f6;
+  border-radius: 4px;
+}
+
+.medecien-details__pharmacy-list {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.medecien-details__pharmacy-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 1.75rem;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.medecien-details__pharmacy-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(30, 64, 175, 0.08);
+  border-color: #bfdbfe;
+}
+
+.medecien-details__pharmacy-info {
+  flex: 1;
+  padding-right: 1.5rem;
+}
+
+.medecien-details__pharmacy-name {
+  color: #1e3a8a;
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.medecien-details__pharmacy-distance {
+  color: #475569;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.medecien-details__pharmacy-distance::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #94a3b8;
+}
+
+.medecien-details__pharmacy-address {
+  color: #64748b;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.medecien-details__pharmacy-pricing {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 140px;
+}
+
+.medecien-details__pharmacy-price {
+  color: #059669;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.medecien-details__view-map-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #1d4ed8;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.medecien-details__view-map-button:hover {
+  background: #1e40af;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .medecien-details {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+
+  .medecien-details__pharmacy-item {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .medecien-details__pharmacy-pricing {
+    align-items: flex-start;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .medecien-details__title {
+    font-size: 1.75rem;
+  }
+
+  .medecien-details__view-map-button {
+    width: 100%;
+    justify-content: center;
+  }
+}

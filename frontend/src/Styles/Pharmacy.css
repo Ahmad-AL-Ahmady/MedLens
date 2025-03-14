@@ -1,28 +1,208 @@
-/* PageStyles.css */
-.page-container {
-  max-width: 56rem;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 1rem;
+/* Pharmacy.css */
+.pharmacy-page {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 2rem;
+  font-family: "Poppins", system-ui, sans-serif;
+  background: #f8fafc;
+  min-height: 100vh;
 }
 
-.page-card {
-  background-color: #ffffff;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  padding: 1.5rem;
-}
-
-.page-title {
-  font-size: 1.5rem;
-  line-height: 2rem;
+.pharmacy-page__title {
+  color: #1e3a8a;
+  margin-bottom: 2rem;
+  font-size: 2.25rem;
   font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 1rem;
+  text-align: center;
+  letter-spacing: -0.015em;
 }
 
-.page-text {
-  color: #4b5563;
+.pharmacy-page__search-container {
+  margin: 0 auto 3rem;
+  max-width: 600px;
+  position: relative;
+}
+
+.pharmacy-page__search-input {
+  width: 100%;
+  padding: 1.25rem 2rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
   font-size: 1rem;
-  line-height: 1.5rem;
+  transition: all 0.3s ease;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.pharmacy-page__search-input:focus {
+  outline: none;
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 4px rgba(147, 197, 253, 0.2);
+}
+
+.pharmacy-page__category-filters {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.pharmacy-page__medicine-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.pharmacy-page__medicine-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 2px 4px -1px rgba(0, 0, 0, 0.02);
+  border: 1px solid #f1f5f9;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.pharmacy-page__medicine-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+}
+
+.pharmacy-page__medicine-header {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.pharmacy-page__medicine-name {
+  margin: 0;
+  color: #1e40af;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.pharmacy-page__medicine-category {
+  background: #dbeafe;
+  color: #1d4ed8;
+  padding: 0.4rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px solid #bfdbfe;
+  align-self: flex-start;
+}
+
+.pharmacy-page__medicine-description {
+  color: #64748b;
+  margin: 0.5rem 0 1rem;
+  line-height: 1.6;
+  flex-grow: 1;
+}
+
+.pharmacy-page__medicine-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.pharmacy-page__medicine-price {
+  color: #059669;
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: -0.01em;
+}
+
+.pharmacy-page__medicine-stock {
+  color: #475569;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pharmacy-page__medicine-stock::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+}
+
+.pharmacy-page__medicine-stock[data-stock="low"]::before {
+  background: #ef4444;
+}
+
+.pharmacy-page__medicine-stock[data-stock="medium"]::before {
+  background: #f59e0b;
+}
+
+.pharmacy-page__category-tag {
+  display: inline-flex;
+  background: #e2e8f0;
+  color: #475569;
+  padding: 0.75rem 2rem;
+  border-radius: 12px;
+  font-weight: 500;
+  border: 1px solid #cbd5e1;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.pharmacy-page__category-tag:hover {
+  background: #cbd5e1;
+  transform: scale(1.02);
+}
+
+.pharmacy-page__no-results {
+  text-align: center;
+  color: #64748b;
+  padding: 2rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+@media (max-width: 1024px) {
+  .pharmacy-page {
+    padding: 1.5rem;
+  }
+
+  .pharmacy-page__title {
+    font-size: 2rem;
+  }
+
+  .pharmacy-page__medicine-grid {
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .pharmacy-page__search-input {
+    padding: 1rem 1.5rem;
+  }
+
+  .pharmacy-page__medicine-name {
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .pharmacy-page__title {
+    font-size: 1.75rem;
+  }
+
+  .pharmacy-page__medicine-card {
+    padding: 1.5rem;
+  }
 }

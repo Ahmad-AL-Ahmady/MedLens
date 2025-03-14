@@ -73,10 +73,10 @@ export default function PharmacyDashboard() {
 
       {/* Medications Section */}
       <div className="pharmacy-dashboard-section">
-        <div className="medications-header">
-          <h2 className="section-title">Manage Medicines</h2>
+        <div className="pharmacy-dashboard-header">
+          <h2 className="pharmacy-dashboard-title">Manage Medicines</h2>
           <button
-            className="add-medicine-btn"
+            className="pharmacy-dashboard-add-button"
             onClick={() => setShowAddForm(true)}
           >
             <Plus size={16} />
@@ -84,29 +84,37 @@ export default function PharmacyDashboard() {
           </button>
         </div>
 
-        <table className="medicines-table">
+        <table className="pharmacy-dashboard-table">
           <thead>
-            <tr className="table-header-row">
-              <th className="table-header">NAME</th>
-              <th className="table-header">CATEGORY</th>
-              <th className="table-header">STOCK</th>
-              <th className="table-header">PRICE</th>
-              <th className="table-header">ACTIONS</th>
+            <tr className="pharmacy-dashboard-table-header">
+              <th className="pharmacy-dashboard-table-heading">NAME</th>
+              <th className="pharmacy-dashboard-table-heading">CATEGORY</th>
+              <th className="pharmacy-dashboard-table-heading">STOCK</th>
+              <th className="pharmacy-dashboard-table-heading">PRICE</th>
+              <th className="pharmacy-dashboard-table-heading">ACTIONS</th>
             </tr>
           </thead>
           <tbody>
             {medicines.map((medicine) => (
-              <tr key={medicine.id} className="table-row">
-                <td className="table-data">{medicine.name}</td>
-                <td className="table-data">{medicine.category}</td>
-                <td className="table-data">{medicine.stock}</td>
-                <td className="table-data">${medicine.price.toFixed(2)}</td>
-                <td className="table-data">
+              <tr key={medicine.id} className="pharmacy-dashboard-table-row">
+                <td className="pharmacy-dashboard-table-data">
+                  {medicine.name}
+                </td>
+                <td className="pharmacy-dashboard-table-data">
+                  {medicine.category}
+                </td>
+                <td className="pharmacy-dashboard-table-data">
+                  {medicine.stock}
+                </td>
+                <td className="pharmacy-dashboard-table-data">
+                  ${medicine.price.toFixed(2)}
+                </td>
+                <td className="pharmacy-dashboard-table-data">
                   <button
-                    className="edit-button"
+                    className="pharmacy-dashboard-edit-button"
                     onClick={() => setEditingMedicine(medicine)}
                   >
-                    <Edit2 className="edit-icon" size={18} />
+                    <Edit2 className="pharmacy-dashboard-edit-icon" size={18} />
                   </button>
                 </td>
               </tr>
@@ -114,14 +122,15 @@ export default function PharmacyDashboard() {
           </tbody>
         </table>
       </div>
+
       {/* Edit Medicine Form Overlay */}
       {editingMedicine && (
-        <div className="medcien-add-form-overlay">
-          <div className="medcien-add-form-container">
-            <div className="medcien-add-form-header">
+        <div className="pharmacy-dashboard-form-overlay">
+          <div className="pharmacy-dashboard-form-container">
+            <div className="pharmacy-dashboard-form-header">
               <h2>Edit {editingMedicine.name}</h2>
               <button
-                className="medcien-add-form-close"
+                className="pharmacy-dashboard-form-close"
                 onClick={() => setEditingMedicine(null)}
               >
                 <X size={24} />
@@ -129,11 +138,11 @@ export default function PharmacyDashboard() {
             </div>
 
             <form
-              className="medcien-add-form-content"
+              className="pharmacy-dashboard-form-content"
               onSubmit={handleEditSubmit}
             >
-              <div className="medcien-form-column">
-                <div className="medcien-form-group">
+              <div className="pharmacy-dashboard-form-column">
+                <div className="pharmacy-dashboard-form-group">
                   <label>Price ($)</label>
                   <input
                     type="number"
@@ -144,7 +153,7 @@ export default function PharmacyDashboard() {
                   />
                 </div>
 
-                <div className="medcien-form-group">
+                <div className="pharmacy-dashboard-form-group">
                   <label>Stock Quantity</label>
                   <input
                     type="number"
@@ -156,8 +165,8 @@ export default function PharmacyDashboard() {
                 </div>
               </div>
 
-              <div className="medcien-form-fullwidth">
-                <div className="medcien-form-group availability-toggle">
+              <div className="pharmacy-dashboard-form-fullwidth">
+                <div className="pharmacy-dashboard-form-group">
                   <label>
                     <input
                       type="checkbox"
@@ -174,15 +183,18 @@ export default function PharmacyDashboard() {
                 </div>
               </div>
 
-              <div className="medcien-form-actions">
+              <div className="pharmacy-dashboard-form-actions">
                 <button
                   type="button"
-                  className="medcien-form-cancel"
+                  className="pharmacy-dashboard-form-cancel"
                   onClick={() => setEditingMedicine(null)}
                 >
                   Cancel
                 </button>
-                <button type="submit" className="medcien-form-submit">
+                <button
+                  type="submit"
+                  className="pharmacy-dashboard-form-submit"
+                >
                   Save Changes
                 </button>
               </div>
@@ -190,52 +202,56 @@ export default function PharmacyDashboard() {
           </div>
         </div>
       )}
+
       {/* Add Medicine Form Overlay */}
       {showAddForm && (
-        <div className="medcien-add-form-overlay">
-          <div className="medcien-add-form-container">
-            <div className="medcien-add-form-header">
+        <div className="pharmacy-dashboard-form-overlay">
+          <div className="pharmacy-dashboard-form-container">
+            <div className="pharmacy-dashboard-form-header">
               <h2>Add New Medicine</h2>
               <button
-                className="medcien-add-form-close"
+                className="pharmacy-dashboard-form-close"
                 onClick={() => setShowAddForm(false)}
               >
                 <Plus size={24} />
               </button>
             </div>
 
-            <form className="medcien-add-form-content">
-              <div className="medcien-form-column">
-                <div className="medcien-form-group">
+            <form className="pharmacy-dashboard-form-content">
+              <div className="pharmacy-dashboard-form-column">
+                <div className="pharmacy-dashboard-form-group">
                   <label>Name</label>
                   <input type="text" required />
                 </div>
-                <div className="medcien-form-group">
+                <div className="pharmacy-dashboard-form-group">
                   <label>Category</label>
                   <input type="text" required />
                 </div>
               </div>
 
-              <div className="medcien-form-column">
-                <div className="medcien-form-group">
+              <div className="pharmacy-dashboard-form-column">
+                <div className="pharmacy-dashboard-form-group">
                   <label>Price</label>
                   <input type="number" step="0.01" required />
                 </div>
-                <div className="medcien-form-group">
+                <div className="pharmacy-dashboard-form-group">
                   <label>Stock</label>
                   <input type="number" required />
                 </div>
               </div>
 
-              <div className="medcien-form-actions">
+              <div className="pharmacy-dashboard-form-actions">
                 <button
                   type="button"
-                  className="medcien-form-cancel"
+                  className="pharmacy-dashboard-form-cancel"
                   onClick={() => setShowAddForm(false)}
                 >
                   Cancel
                 </button>
-                <button type="submit" className="medcien-form-submit">
+                <button
+                  type="submit"
+                  className="pharmacy-dashboard-form-submit"
+                >
                   Add Medicine
                 </button>
               </div>

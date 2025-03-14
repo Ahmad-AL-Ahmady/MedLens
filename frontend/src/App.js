@@ -15,6 +15,7 @@ import PatientDashbord from "./Pages/PatientDashbord";
 import GoogleSignUpForm from "./Pages/Signupgoogel";
 import DoctorDashbord from "./Pages/DoctorDashbord";
 import PharmacyDashboard from "./Pages/PharmacyDashboard";
+import MedicineDetails from "./components/MedecienDetails";
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
           <Route path="doctor" element={<DoctorPage />} />
           <Route path="patient" element={<PatientPage />} />
           <Route path="pharmacy" element={<PharmacyPage />} />
+          <Route path="medicines/:id" element={<MedicineDetails />} />{" "}
         </Route>
       </Routes>
     </Router>
