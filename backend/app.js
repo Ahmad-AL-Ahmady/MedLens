@@ -9,7 +9,7 @@ require("./config/passport");
 require("./models"); // This will load the index.js file that registers all models
 const userRouter = require("./routes/userRoutes");
 const profileRouter = require("./routes/profileRoutes");
-// const profileRouter = require("./routes/profileRoutes");
+const doctorRouter = require("./routes/doctorRoutes");
 // const medicalScanRouter = require("./routes/medicalScanRoutes");
 // const appointmentRouter = require("./routes/appointmentRoutes");
 // const medicationRouter = require("./routes/medicationRoutes");
@@ -44,7 +44,7 @@ app.get("/", (req, res) => {
 // Router Mounting
 app.use("/api/users", userRouter);
 app.use("/api/profiles", profileRouter);
-// app.use("/api/profiles", profileRouter);
+app.use("/api/doctors", doctorRouter); // Add doctor routes
 // app.use("/api/scans", medicalScanRouter);
 // app.use("/api/appointments", appointmentRouter);
 // app.use("/api/medications", medicationRouter);

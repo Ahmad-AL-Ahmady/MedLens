@@ -1,5 +1,37 @@
 const mongoose = require("mongoose");
 
+const availabilitySchema = new mongoose.Schema(
+  {
+    start: {
+      type: String,
+      validate: {
+        validator: function (v) {
+          // Time format validation (HH:MM)
+          return /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(v);
+        },
+        message: (props) =>
+          `${props.value} is not a valid time format! Use HH:MM`,
+      },
+    },
+    end: {
+      type: String,
+      validate: {
+        validator: function (v) {
+          // Time format validation (HH:MM)
+          return /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(v);
+        },
+        message: (props) =>
+          `${props.value} is not a valid time format! Use HH:MM`,
+      },
+    },
+    isAvailable: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { _id: false }
+);
+
 const doctorProfileSchema = new mongoose.Schema(
   {
     user: {
@@ -17,13 +49,34 @@ const doctorProfileSchema = new mongoose.Schema(
       min: 0,
     },
     availability: {
-      monday: { start: String, end: String, isAvailable: Boolean },
-      tuesday: { start: String, end: String, isAvailable: Boolean },
-      wednesday: { start: String, end: String, isAvailable: Boolean },
-      thursday: { start: String, end: String, isAvailable: Boolean },
-      friday: { start: String, end: String, isAvailable: Boolean },
-      saturday: { start: String, end: String, isAvailable: Boolean },
-      sunday: { start: String, end: String, isAvailable: Boolean },
+      monday: { type: availabilitySchema, default: () => ({}) },
+      tuesday: { type: availabilitySchema, default: () => ({}) },
+      wednesday: { type: availabilitySchema, default: () => ({}) },
+      thursday: { type: availabilitySchema, default: () => ({}) },
+      friday: { type: availabilitySchema, default: () => ({}) },
+      saturday: { type: availabilitySchema, default: () => ({}) },
+      sunday: { type: availabilitySchema, default: () => ({}) },
+    },
+    // New fields for enhanced location information
+    locationName: {
+      type: String,
+      trim: true,
+    },
+    formattedAddress: {
+      type: String,
+      trim: true,
+    },
+    city: {
+      type: String,
+      trim: true,
+    },
+    state: {
+      type: String,
+      trim: true,
+    },
+    country: {
+      type: String,
+      trim: true,
     },
     averageRating: {
       type: Number,

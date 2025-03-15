@@ -1,153 +1,53 @@
-// File: routes/profileRoutes.js
 const express = require("express");
 const authController = require("../controllers/authController");
-const catchAsync = require("../utils/catchAsync");
-const User = require("../models/userModel");
-const PatientProfile = require("../models/patientProfileModel");
+const profileController = require("../controllers/profileController");
 
 const router = express.Router();
 
-// Protect all profile routes
+// Protect all profile routes - require authentication
 router.use(authController.protect);
 
-// Test route to check if profiles are being created
-router.get(
-  "/test-profile",
-  catchAsync(async (req, res, next) => {
-    // Get current user
-    const user = await User.findById(req.user.id);
+// Main profile routes available to all authenticated users
+router.get("/", profileController.getProfile);
+router.patch("/", profileController.updateProfile);
 
-    // Find the profile based on user type
-    let profile;
-    let modelName;
+// Ensure profile exists (middleware)
+router.use(profileController.ensureProfileExists);
 
-    if (user.userType === "Patient") {
-      profile = await PatientProfile.findOne({ user: user._id });
-      modelName = "PatientProfile";
-    } else if (user.userType === "Doctor") {
-      // This will only work if DoctorProfile model is defined
-      try {
-        const DoctorProfile = require("../models/doctorProfileModel");
-        profile = await DoctorProfile.findOne({ user: user._id });
-        modelName = "DoctorProfile";
-      } catch (error) {
-        console.error("Error loading DoctorProfile model:", error);
-      }
-    } else if (user.userType === "Pharmacy") {
-      // This will only work if PharmacyProfile model is defined
-      try {
-        const PharmacyProfile = require("../models/pharmacyProfileModel");
-        profile = await PharmacyProfile.findOne({ user: user._id });
-        modelName = "PharmacyProfile";
-      } catch (error) {
-        console.error("Error loading PharmacyProfile model:", error);
-      }
-    }
-
-    // If profile doesn't exist, try creating it
-    if (!profile && user.userType === "Patient") {
-      profile = await PatientProfile.create({ user: user._id });
-    }
-
-    res.status(200).json({
-      status: "success",
-      data: {
-        userType: user.userType,
-        profileModel: modelName,
-        profileExists: !!profile,
-        user: {
-          id: user._id,
-          name: `${user.firstName} ${user.lastName}`,
-          email: user.email,
-        },
-        profile: profile,
-      },
-    });
+// Type-specific routes with appropriate restrictions
+// Doctor profile routes
+router
+  .route("/doctor")
+  .get(authController.restrictTo("Doctor", "Admin"), (req, res, next) => {
+    return profileController.getProfile(req, res, next);
   })
-);
+  .patch(authController.restrictTo("Doctor"), (req, res, next) => {
+    return profileController.updateProfile(req, res, next);
+  });
 
-// Get my profile - returns different profile based on user type
-router.get(
-  "/my-profile",
-  catchAsync(async (req, res, next) => {
-    const user = await User.findById(req.user.id);
-
-    let profile;
-    if (user.userType === "Patient") {
-      profile = await PatientProfile.findOne({ user: user._id });
-    } else if (user.userType === "Doctor") {
-      try {
-        const DoctorProfile = require("../models/doctorProfileModel");
-        profile = await DoctorProfile.findOne({ user: user._id });
-      } catch (error) {
-        console.error("Doctor profile model not available yet");
-      }
-    } else if (user.userType === "Pharmacy") {
-      try {
-        const PharmacyProfile = require("../models/pharmacyProfileModel");
-        profile = await PharmacyProfile.findOne({ user: user._id });
-      } catch (error) {
-        console.error("Pharmacy profile model not available yet");
-      }
-    }
-
-    res.status(200).json({
-      status: "success",
-      data: {
-        profile,
-      },
-    });
+// Pharmacy profile routes
+router
+  .route("/pharmacy")
+  .get(authController.restrictTo("Pharmacy", "Admin"), (req, res, next) => {
+    return profileController.getProfile(req, res, next);
   })
-);
+  .patch(authController.restrictTo("Pharmacy"), (req, res, next) => {
+    return profileController.updateProfile(req, res, next);
+  });
 
-// Update my profile
-router.patch(
-  "/update-profile",
-  catchAsync(async (req, res, next) => {
-    const user = await User.findById(req.user.id);
-
-    // Filter allowed fields based on user type
-    let allowedFields = [];
-    let profile;
-
-    if (user.userType === "Patient") {
-      allowedFields = [
-        "allergies",
-        "chronicConditions",
-        "bloodType",
-        "emergencyContact",
-      ];
-      // Filter request body
-      const filteredBody = {};
-      Object.keys(req.body).forEach((key) => {
-        if (allowedFields.includes(key)) {
-          filteredBody[key] = req.body[key];
-        }
-      });
-
-      profile = await PatientProfile.findOneAndUpdate(
-        { user: user._id },
-        filteredBody,
-        { new: true, runValidators: true }
-      );
+// Patient profile routes
+router
+  .route("/patient")
+  .get(
+    authController.restrictTo("Patient", "Admin", "Doctor"),
+    (req, res, next) => {
+      return profileController.getProfile(req, res, next);
     }
+  )
+  .patch(authController.restrictTo("Patient"), (req, res, next) => {
+    return profileController.updateProfile(req, res, next);
+  });
 
-    // Add other profile types here when available
-
-    if (!profile) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Profile not found",
-      });
-    }
-
-    res.status(200).json({
-      status: "success",
-      data: {
-        profile,
-      },
-    });
-  })
-);
+router.get("/test-all-profiles", profileController.testAllProfileTypes);
 
 module.exports = router;
