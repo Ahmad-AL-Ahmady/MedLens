@@ -213,7 +213,7 @@ export default function PharmacyDashboard() {
                 className="pharmacy-dashboard-form-close"
                 onClick={() => setShowAddForm(false)}
               >
-                <Plus size={24} />
+                <X size={24} />
               </button>
             </div>
 
@@ -223,9 +223,16 @@ export default function PharmacyDashboard() {
                   <label>Name</label>
                   <input type="text" required />
                 </div>
-                <div className="pharmacy-dashboard-form-group">
-                  <label>Category</label>
-                  <input type="text" required />
+                <div className="pharmacy-dashboard-form-group floating-label">
+                  <select id="category" className="pharmacy-dashboard-select">
+                    <option value="">Select Category</option>
+                    <option value="Antibiotics">Antibiotics</option>
+                    <option value="Pain Relief">Pain Relief</option>
+                    <option value="Cardiology">Cardiology</option>
+                    <option value="Dermatology">Dermatology</option>
+                    <option value="Pediatrics">Pediatrics</option>
+                  </select>
+                  <label htmlFor="category">Category</label>
                 </div>
               </div>
 

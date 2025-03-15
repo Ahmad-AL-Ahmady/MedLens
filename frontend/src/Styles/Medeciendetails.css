@@ -55,14 +55,6 @@
   box-shadow: 0 2px 4px rgba(30, 64, 175, 0.1);
 }
 
-.medecien-details__description {
-  color: #475569;
-  font-size: 1.05rem;
-  line-height: 1.8;
-  margin-bottom: 2.5rem;
-  max-width: 75ch;
-}
-
 .medecien-details__subtitle {
   color: #1e3a8a;
   font-size: 1.5rem;

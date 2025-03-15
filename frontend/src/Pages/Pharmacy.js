@@ -8,28 +8,28 @@ export default function PharmacyPage() {
     {
       name: "Amoxicillin",
       category: "Antibiotics",
-      description: "Antibiotic medication used to treat bacterial infections",
+
       price: "From $15.99",
       stock: "150 in stock",
     },
     {
       name: "Ibuprofen",
       category: "Pain Relief",
-      description: "Pain reliever and fever reducer",
+
       price: "From $8.99",
       stock: "200 in stock",
     },
     {
       name: "Omeprazole",
       category: "Antacids",
-      description: "Treats stomach acid problems",
+
       price: "From $12.99",
       stock: "90 in stock",
     },
     {
       name: "Cetirizine",
       category: "Antihistamines",
-      description: "Relieves allergy symptoms",
+
       price: "From $10.50",
       stock: "120 in stock",
     },

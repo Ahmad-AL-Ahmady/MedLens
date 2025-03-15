@@ -11,7 +11,6 @@ export default function MedicineDetails() {
     id: 1,
     name: "Amoxicillin",
     category: "Antibiotics",
-    description: "Antibiotic medication used to treat bacterial infections",
     pharmacies: [
       {
         name: "Central Pharmacy",
@@ -64,8 +63,6 @@ export default function MedicineDetails() {
         <h1 className="medecien-details__title">{medicine.name}</h1>
         <span className="medecien-details__category">{medicine.category}</span>
       </div>
-
-      <p className="medecien-details__description">{medicine.description}</p>
 
       <h2 className="medecien-details__subtitle">
         Available at Nearby Pharmacies
