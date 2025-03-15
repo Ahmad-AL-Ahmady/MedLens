@@ -359,3 +359,198 @@ exports.getDoctorById = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+// Get all available doctor specializations
+exports.getSpecializations = catchAsync(async (req, res, next) => {
+  // Fetch all unique specializations from doctors
+  const specializations = await User.distinct("specialization", {
+    userType: "Doctor",
+    specialization: { $exists: true, $ne: null },
+  });
+
+  // Count doctors in each specialization
+  const specializationCounts = await Promise.all(
+    specializations.map(async (spec) => {
+      const count = await User.countDocuments({
+        userType: "Doctor",
+        specialization: spec,
+      });
+
+      return {
+        name: spec,
+        doctorCount: count,
+      };
+    })
+  );
+
+  // Sort by doctor count (descending)
+  specializationCounts.sort((a, b) => b.doctorCount - a.doctorCount);
+
+  res.status(200).json({
+    status: "success",
+    results: specializationCounts.length,
+    data: {
+      specializations: specializationCounts,
+    },
+  });
+});
+
+// Add to doctorController.js
+
+// Get all doctors with filtering and pagination
+exports.getAllDoctors = catchAsync(async (req, res, next) => {
+  // Build query based on filters
+  const queryObj = { userType: "Doctor" };
+
+  // Filter by specialization if provided
+  if (req.query.specialization) {
+    queryObj.specialization = req.query.specialization;
+  }
+
+  // Filter by name if provided
+  if (req.query.name) {
+    const nameRegex = new RegExp(req.query.name, "i");
+    queryObj.$or = [{ firstName: nameRegex }, { lastName: nameRegex }];
+  }
+
+  // Pagination
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 10;
+  const skip = (page - 1) * limit;
+
+  // Execute query with pagination
+  const doctors = await User.find(queryObj)
+    .select("firstName lastName specialization location avatar")
+    .skip(skip)
+    .limit(limit);
+
+  // Get total count for pagination
+  const totalDoctors = await User.countDocuments(queryObj);
+
+  // Get doctor profiles for each doctor
+  const doctorIds = doctors.map((doctor) => doctor._id);
+  const doctorProfiles = await DoctorProfile.find({
+    user: { $in: doctorIds },
+  });
+
+  // Create a map for quick access to profiles
+  const profileMap = {};
+  doctorProfiles.forEach((profile) => {
+    profileMap[profile.user.toString()] = profile;
+  });
+
+  // Combine doctor info with profile info
+  const doctorsWithProfiles = doctors.map((doctor) => {
+    const profile = profileMap[doctor._id.toString()] || {};
+    return {
+      id: doctor._id,
+      firstName: doctor.firstName,
+      lastName: doctor.lastName,
+      specialization: doctor.specialization,
+      location: doctor.location,
+      avatar: doctor.avatar,
+      fees: profile.fees,
+      averageRating: profile.averageRating || 0,
+      totalReviews: profile.totalReviews || 0,
+      locationDetails: {
+        locationName: profile.locationName,
+        city: profile.city,
+        state: profile.state,
+        country: profile.country,
+      },
+    };
+  });
+
+  res.status(200).json({
+    status: "success",
+    results: doctorsWithProfiles.length,
+    pagination: {
+      page,
+      limit,
+      totalDoctors,
+      totalPages: Math.ceil(totalDoctors / limit),
+    },
+    data: {
+      doctors: doctorsWithProfiles,
+    },
+  });
+});
+
+// Get all doctors with filtering and pagination
+exports.getAllDoctors = catchAsync(async (req, res, next) => {
+  // Build query based on filters
+  const queryObj = { userType: "Doctor" };
+
+  // Filter by specialization if provided
+  if (req.query.specialization) {
+    queryObj.specialization = req.query.specialization;
+  }
+
+  // Filter by name if provided
+  if (req.query.name) {
+    const nameRegex = new RegExp(req.query.name, "i");
+    queryObj.$or = [{ firstName: nameRegex }, { lastName: nameRegex }];
+  }
+
+  // Pagination
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 10;
+  const skip = (page - 1) * limit;
+
+  // Execute query with pagination
+  const doctors = await User.find(queryObj)
+    .select("firstName lastName specialization location avatar fees")
+    .skip(skip)
+    .limit(limit);
+
+  // Get total count for pagination
+  const totalDoctors = await User.countDocuments(queryObj);
+
+  // Get doctor profiles for each doctor
+  const doctorIds = doctors.map((doctor) => doctor._id);
+  const doctorProfiles = await DoctorProfile.find({
+    user: { $in: doctorIds },
+  });
+
+  // Create a map for quick access to profiles
+  const profileMap = {};
+  doctorProfiles.forEach((profile) => {
+    profileMap[profile.user.toString()] = profile;
+  });
+
+  // Combine doctor info with profile info
+  const doctorsWithProfiles = doctors.map((doctor) => {
+    const profile = profileMap[doctor._id.toString()] || {};
+    return {
+      id: doctor._id,
+      firstName: doctor.firstName,
+      lastName: doctor.lastName,
+      specialization: doctor.specialization,
+      location: doctor.location,
+      avatar: doctor.avatar,
+      fees: profile.fees,
+      averageRating: profile.averageRating || 0,
+      totalReviews: profile.totalReviews || 0,
+      locationDetails: {
+        locationName: profile.locationName,
+        city: profile.city,
+        state: profile.state,
+        country: profile.country,
+      },
+    };
+  });
+
+  res.status(200).json({
+    status: "success",
+    results: doctorsWithProfiles.length,
+    pagination: {
+      page,
+      limit,
+      totalDoctors,
+      totalPages: Math.ceil(totalDoctors / limit),
+    },
+    data: {
+      doctors: doctorsWithProfiles,
+    },
+  });
+});
