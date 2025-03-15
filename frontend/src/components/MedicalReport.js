@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { FileText, Printer } from "lucide-react";
 import "../Styles/MedicalReport.css";
 
-export default function MedicalReport({ scanResult, date }) {
+export default function MedicalReport({ imageUrl, scanResult, confidence, date }) {
   return (
     <div className="medical-report">
       <div className="report-header">
@@ -16,6 +16,7 @@ export default function MedicalReport({ scanResult, date }) {
           Print Report
         </button>
       </div>
+
       <div className="report-content">
         <div className="info-grid">
           <div className="info-item">
@@ -29,59 +30,27 @@ export default function MedicalReport({ scanResult, date }) {
             </p>
           </div>
         </div>
+
         <div className="section-divider">
           <h4 className="section-title">Diagnosis</h4>
-          <div
-            className={`diagnosis-box ${
-              scanResult === "infected"
-                ? "diagnosis-infected"
-                : "diagnosis-healthy"
-            }`}
-          >
-            <p
-              className={`diagnosis-text ${
-                scanResult === "infected" ? "text-infected" : "text-healthy"
-              }`}
-            >
-              {scanResult === "infected"
-                ? "Infection Detected"
-                : "No Infection Detected"}
+          <div className="diagnosis-box">
+            <p className="diagnosis-text">
+              Prediction: <strong>{scanResult}</strong>
+            </p>
+            <p className="confidence-text">
+              Confidence: <strong>{confidence}%</strong>
             </p>
           </div>
-        </div>
-        <div className="section-divider">
-          <h4 className="section-title">Findings</h4>
-          <p className="findings-text">
-            {scanResult === "infected"
-              ? "Analysis indicates presence of abnormal patterns consistent with infection. Further clinical correlation is recommended."
-              : "No significant abnormalities detected. Normal anatomical structures are preserved."}
-          </p>
-        </div>
-        <div className="section-divider">
-          <h4 className="section-title">Recommendations</h4>
-          <ul className="recommendations-list">
-            {scanResult === "infected" ? (
-              <>
-                <li>Schedule follow-up examination in 2 weeks</li>
-                <li>Consider additional diagnostic tests</li>
-                <li>Consultation with specialist recommended</li>
-              </>
-            ) : (
-              <>
-                <li>Routine follow-up as scheduled</li>
-                <li>Maintain regular check-ups</li>
-                <li>No immediate additional testing required</li>
-              </>
-            )}
-          </ul>
         </div>
       </div>
     </div>
   );
 }
 
-// Add PropTypes for type checking in JavaScript
+// PropTypes for type checking
 MedicalReport.propTypes = {
-  scanResult: PropTypes.oneOf(["infected", "healthy"]).isRequired,
+  imageUrl: PropTypes.string.isRequired,
+  scanResult: PropTypes.string.isRequired,
+  confidence: PropTypes.number.isRequired,
   date: PropTypes.string.isRequired,
 };

@@ -8,6 +8,7 @@ export default function ScanPage() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [scanResult, setScanResult] = useState(null);
+  const [confidence, setConfidence] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
 
   const handleFileChange = (event) => {
@@ -15,6 +16,7 @@ export default function ScanPage() {
     if (file) {
       setSelectedFile(file);
       setScanResult(null);
+      setConfidence(null);
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewUrl(reader.result);
@@ -23,13 +25,28 @@ export default function ScanPage() {
     }
   };
 
-  const handleScan = () => {
+  const handleScan = async () => { //function scan to connect models_server 
+    if (!selectedFile) return;
+
     setIsScanning(true);
-    setTimeout(() => {
-      const isInfected = Math.random() > 0.5;
-      setScanResult(isInfected ? "infected" : "not infected");
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/predict/", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+      setScanResult(data.prediction || "Error processing image");
+      setConfidence(data.confidence || "N/A");
+    } catch (error) {
+      setScanResult("Failed to connect to the server.");
+      setConfidence(null);
+    } finally {
       setIsScanning(false);
-    }, 2000);
+    }
   };
 
   return (
@@ -71,6 +88,7 @@ export default function ScanPage() {
                   setSelectedFile(null);
                   setPreviewUrl(null);
                   setScanResult(null);
+                  setConfidence(null);
                 }}
               >
                 Remove
@@ -92,7 +110,9 @@ export default function ScanPage() {
 
       {scanResult && (
         <MedicalReport
-          scanResult={scanResult}
+          imageUrl={previewUrl}  // Pass image URL
+          scanResult={scanResult}  // Pass prediction result
+          confidence={confidence}  // Pass confidence score
           date={new Date().toLocaleDateString()}
         />
       )}
