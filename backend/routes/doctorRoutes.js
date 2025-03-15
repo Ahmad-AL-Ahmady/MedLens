@@ -33,6 +33,13 @@ router.get("/nearby", doctorController.getNearbyDoctors);
 router.use(authController.protect);
 
 /**
+ * Update a doctor's availability schedule
+ * Can be used by the doctor to update their own schedule
+ * or by an admin to update any doctor's schedule
+ */
+router.patch("/:id/availability", doctorController.updateAvailability);
+
+/**
  * GET /api/doctors/profile
  * Frontend: Used in doctor's dashboard to view own profile
  * Only accessible to doctors - shows their profile with appointments and reviews

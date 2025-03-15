@@ -554,3 +554,131 @@ exports.getAllDoctors = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+/**
+ * Update doctor availability schedule
+ * @route PATCH /api/doctors/:id/availability
+ * @access Private (Admin or the Doctor themselves)
+ */
+exports.updateAvailability = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const { availability } = req.body;
+
+  // Validate the request body
+  if (!availability) {
+    return next(new AppError("Availability data is required", 400));
+  }
+
+  // Check if valid days are provided
+  const validDays = [
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+    "sunday",
+  ];
+  const providedDays = Object.keys(availability);
+
+  // Ensure all provided days are valid
+  const invalidDays = providedDays.filter((day) => !validDays.includes(day));
+  if (invalidDays.length > 0) {
+    return next(new AppError(`Invalid day(s): ${invalidDays.join(", ")}`, 400));
+  }
+
+  // Validate time format for each day
+  for (const day of providedDays) {
+    const dayData = availability[day];
+
+    // Skip validation if day is marked as unavailable
+    if (dayData.isAvailable === false) {
+      continue;
+    }
+
+    // If day is available, start and end times are required
+    if (dayData.isAvailable === true) {
+      if (!dayData.start || !dayData.end) {
+        return next(
+          new AppError(`Start and end times are required for ${day}`, 400)
+        );
+      }
+
+      // Validate time format (HH:MM)
+      const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+      if (!timeRegex.test(dayData.start) || !timeRegex.test(dayData.end)) {
+        return next(
+          new AppError(`Invalid time format for ${day}. Use HH:MM format.`, 400)
+        );
+      }
+
+      // Validate start time is before end time
+      const startMinutes = timeToMinutes(dayData.start);
+      const endMinutes = timeToMinutes(dayData.end);
+
+      if (startMinutes >= endMinutes) {
+        return next(
+          new AppError(`Start time must be before end time for ${day}`, 400)
+        );
+      }
+    }
+  }
+
+  // Check authorization - only the doctor themselves or an admin can update
+  const doctor = await User.findById(id);
+
+  if (!doctor) {
+    return next(new AppError("Doctor not found", 404));
+  }
+
+  if (doctor.userType !== "Doctor") {
+    return next(new AppError("User is not a doctor", 400));
+  }
+
+  // Check if the user is allowed to update this doctor's availability
+  const isAuthorized =
+    req.user.id === id || // Doctor updating their own availability
+    req.user.userType === "Admin"; // Admin updating any doctor
+
+  if (!isAuthorized) {
+    return next(
+      new AppError(
+        "You are not authorized to update this doctor's availability",
+        403
+      )
+    );
+  }
+
+  // Find the doctor profile
+  const doctorProfile = await DoctorProfile.findOne({ user: id });
+
+  if (!doctorProfile) {
+    return next(new AppError("Doctor profile not found", 404));
+  }
+
+  // Update only the provided days, keep existing availability for other days
+  const updatedAvailability = { ...doctorProfile.availability };
+  for (const day of providedDays) {
+    updatedAvailability[day] = availability[day];
+  }
+
+  // Update the doctor profile
+  const updatedProfile = await DoctorProfile.findByIdAndUpdate(
+    doctorProfile._id,
+    { availability: updatedAvailability },
+    { new: true, runValidators: true }
+  );
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      availability: updatedProfile.availability,
+    },
+  });
+});
+
+// Helper function to convert HH:MM to minutes for comparison
+const timeToMinutes = (time) => {
+  const [hours, minutes] = time.split(":").map(Number);
+  return hours * 60 + minutes;
+};

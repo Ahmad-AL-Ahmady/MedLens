@@ -10,8 +10,8 @@ require("./models"); // This will load the index.js file that registers all mode
 const userRouter = require("./routes/userRoutes");
 const profileRouter = require("./routes/profileRoutes");
 const doctorRouter = require("./routes/doctorRoutes");
+const appointmentRouter = require("./routes/appointmentRoutes"); // Add this line
 // const medicalScanRouter = require("./routes/medicalScanRoutes");
-// const appointmentRouter = require("./routes/appointmentRoutes");
 // const medicationRouter = require("./routes/medicationRoutes");
 // const pharmacyInventoryRouter = require("./routes/pharmacyInventoryRoutes");
 // const reviewRouter = require("./routes/reviewRoutes");
@@ -44,9 +44,9 @@ app.get("/", (req, res) => {
 // Router Mounting
 app.use("/api/users", userRouter);
 app.use("/api/profiles", profileRouter);
-app.use("/api/doctors", doctorRouter); // Add doctor routes
+app.use("/api/doctors", doctorRouter);
+app.use("/api/appointments", appointmentRouter); // Add this line
 // app.use("/api/scans", medicalScanRouter);
-// app.use("/api/appointments", appointmentRouter);
 // app.use("/api/medications", medicationRouter);
 // app.use("/api/inventory", pharmacyInventoryRouter);
 // app.use("/api/reviews", reviewRouter);
