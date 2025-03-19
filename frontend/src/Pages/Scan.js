@@ -25,7 +25,7 @@ export default function ScanPage() {
     }
   };
 
-  const handleScan = async () => { //function scan to connect models_server 
+  const handleScan = async () => {
     if (!selectedFile) return;
 
     setIsScanning(true);
@@ -39,8 +39,8 @@ export default function ScanPage() {
       });
 
       const data = await response.json();
-      setScanResult(data.prediction || "Error processing image");
-      setConfidence(data.confidence || "N/A");
+      setScanResult(data.classification_result || "Unknown"); // تحديث نتيجة التصنيف
+      setConfidence(data.confidence_score || "N/A");
     } catch (error) {
       setScanResult("Failed to connect to the server.");
       setConfidence(null);
@@ -110,13 +110,15 @@ export default function ScanPage() {
 
       {scanResult && (
         <MedicalReport
-          imageUrl={previewUrl}  // Pass image URL
-          scanResult={scanResult}  // Pass prediction result
-          confidence={confidence}  // Pass confidence score
+          imageUrl={previewUrl}
+          scanResult={scanResult}
+          confidence={confidence}
           date={new Date().toLocaleDateString()}
         />
       )}
-      <ChatBot />
+      
+      {/* تمرير نتيجة التصنيف إلى ChatBot */}
+      <ChatBot classificationResult={scanResult} />
     </div>
   );
 }
