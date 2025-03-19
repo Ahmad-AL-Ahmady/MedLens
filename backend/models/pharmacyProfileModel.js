@@ -1,5 +1,38 @@
 const mongoose = require("mongoose");
 
+// Define a schema for opening/closing hours
+const operatingHoursSchema = new mongoose.Schema(
+  {
+    open: {
+      type: String,
+      validate: {
+        validator: function (v) {
+          // Time format validation (HH:MM)
+          return /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(v);
+        },
+        message: (props) =>
+          `${props.value} is not a valid time format! Use HH:MM`,
+      },
+    },
+    close: {
+      type: String,
+      validate: {
+        validator: function (v) {
+          // Time format validation (HH:MM)
+          return /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(v);
+        },
+        message: (props) =>
+          `${props.value} is not a valid time format! Use HH:MM`,
+      },
+    },
+    isOpen: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { _id: false }
+);
+
 const pharmacyProfileSchema = new mongoose.Schema(
   {
     user: {
@@ -8,19 +41,38 @@ const pharmacyProfileSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    openingHours: {
-      monday: { open: String, close: String },
-      tuesday: { open: String, close: String },
-      wednesday: { open: String, close: String },
-      thursday: { open: String, close: String },
-      friday: { open: String, close: String },
-      saturday: { open: String, close: String },
-      sunday: { open: String, close: String },
+    // Enhanced operating hours with availability
+    operatingHours: {
+      monday: { type: operatingHoursSchema, default: () => ({}) },
+      tuesday: { type: operatingHoursSchema, default: () => ({}) },
+      wednesday: { type: operatingHoursSchema, default: () => ({}) },
+      thursday: { type: operatingHoursSchema, default: () => ({}) },
+      friday: { type: operatingHoursSchema, default: () => ({}) },
+      saturday: { type: operatingHoursSchema, default: () => ({}) },
+      sunday: { type: operatingHoursSchema, default: () => ({}) },
     },
-    description: {
+    // Location information
+    locationName: {
       type: String,
       trim: true,
     },
+    formattedAddress: {
+      type: String,
+      trim: true,
+    },
+    city: {
+      type: String,
+      trim: true,
+    },
+    state: {
+      type: String,
+      trim: true,
+    },
+    country: {
+      type: String,
+      trim: true,
+    },
+    // Rating information
     averageRating: {
       type: Number,
       default: 0,
@@ -30,6 +82,11 @@ const pharmacyProfileSchema = new mongoose.Schema(
     totalReviews: {
       type: Number,
       default: 0,
+    },
+    // Additional information
+    phoneNumber: {
+      type: String,
+      trim: true,
     },
   },
   {

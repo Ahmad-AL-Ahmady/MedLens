@@ -11,14 +11,6 @@ const medicationSchema = new mongoose.Schema(
     // manufacturer: String,
     description: String,
     strength: String, // e.g., "500mg"
-    requiresPrescription: {
-      type: Boolean,
-      default: false,
-    },
-    price: {
-      type: Number,
-      required: true,
-    },
   },
   {
     timestamps: true,
