@@ -182,6 +182,34 @@ exports.createAppointment = catchAsync(async (req, res, next) => {
     return next(new AppError("Doctor not found", 404));
   }
 
+  // Validate that the appointment date is not in the past
+  const appointmentDate = new Date(date);
+  appointmentDate.setHours(0, 0, 0, 0);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  if (appointmentDate < today) {
+    return next(new AppError("Cannot book appointments for past dates", 400));
+  }
+
+  // If date is today, validate that the appointment time is not in the past
+  if (appointmentDate.getTime() === today.getTime()) {
+    const currentTime = new Date();
+    const currentHours = currentTime.getHours();
+    const currentMinutes = currentTime.getMinutes();
+
+    const [startHours, startMinutes] = startTime.split(":").map(Number);
+
+    // Convert both to minutes for comparison
+    const currentTotalMinutes = currentHours * 60 + currentMinutes;
+    const startTotalMinutes = startHours * 60 + startMinutes;
+
+    if (startTotalMinutes <= currentTotalMinutes) {
+      return next(new AppError("Cannot book appointments for past times", 400));
+    }
+  }
+
   // Validate the appointment time is available
   const isAvailable = await isTimeSlotAvailable(
     doctorId,

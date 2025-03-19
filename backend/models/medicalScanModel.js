@@ -2,14 +2,9 @@ const mongoose = require("mongoose");
 
 const medicalScanSchema = new mongoose.Schema(
   {
-    patient: {
+    uploadedBy: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
-      required: true,
-    },
-    scanType: {
-      type: String,
-      enum: ["X-Ray", "CT", "MRI", "Ultrasound"],
       required: true,
     },
     scanDate: {
@@ -17,32 +12,26 @@ const medicalScanSchema = new mongoose.Schema(
       default: Date.now,
     },
     images: [String], // Array of image URLs/paths
-    uploadedBy: {
-      type: mongoose.Schema.ObjectId,
-      ref: "User",
+    bodyPart: {
+      type: String,
+      required: true,
     },
     description: String,
-    bodyPart: String,
     aiAnalysis: {
       diagnosisConfidence: Number,
       findings: String,
       infectionDetected: Boolean,
-      recommendations: String,
       processingDate: Date,
-    },
-    doctorNotes: {
-      doctor: {
-        type: mongoose.Schema.ObjectId,
-        ref: "User",
-      },
-      notes: String,
-      date: Date,
     },
   },
   {
     timestamps: true,
   }
 );
+
+// Create index for faster queries
+medicalScanSchema.index({ uploadedBy: 1 });
+medicalScanSchema.index({ scanDate: 1 });
 
 const MedicalScan = mongoose.model("MedicalScan", medicalScanSchema);
 
