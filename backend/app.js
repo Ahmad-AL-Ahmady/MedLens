@@ -13,7 +13,7 @@ const doctorRouter = require("./routes/doctorRoutes");
 const appointmentRouter = require("./routes/appointmentRoutes");
 const medicationRouter = require("./routes/medicationRoutes");
 const pharmacyRouter = require("./routes/pharmacyRoutes");
-// const medicalScanRouter = require("./routes/medicalScanRoutes");
+const patientRouter = require("./routes/patientRoutes");
 // const reviewRouter = require("./routes/reviewRoutes");
 
 const app = express();
@@ -48,7 +48,7 @@ app.use("/api/doctors", doctorRouter);
 app.use("/api/appointments", appointmentRouter);
 app.use("/api/medications", medicationRouter);
 app.use("/api/pharmacies", pharmacyRouter);
-// app.use("/api/scans", medicalScanRouter);
+app.use("/api/patients", patientRouter);
 // app.use("/api/reviews", reviewRouter);
 
 // Debug 404 handler
