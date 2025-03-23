@@ -17,6 +17,8 @@ import DoctorDashbord from "./Pages/DoctorDashbord";
 import PharmacyDashboard from "./Pages/PharmacyDashboard";
 import MedicineDetails from "./components/MedecienDetails";
 import PatientProfile from "./Pages/PatientProfile";
+import DoctorProfile from "./Pages/DoctorProfile";
+import PharmacyProfile from "./Pages/PharmacyProfile";
 
 function App() {
   return (
@@ -44,8 +46,9 @@ function App() {
           <Route path="medicines/:id" element={<MedicineDetails />} />{" "}
         </Route>
         <Route path="/profile/patient" element={<PatientProfile />} />
-        {/* <Route path="/profile/doctor" element={<DoctorProfile />} />
-        <Route path="/profile/pharmacist" element={<PharmacistProfile />} /> */}
+        <Route path="/profile/doctor" element={<DoctorProfile />} />
+        <Route path="/profile/pharmacy" element={<PharmacyProfile />} />
+        <Route path="/doctors/:id" element={<DoctorProfile />} />
       </Routes>
     </Router>
   );

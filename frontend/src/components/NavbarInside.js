@@ -17,7 +17,7 @@ export default function Navbar() {
       return;
     }
 
-    fetch("http://localhost:4000/api/profiles/my-profile", {
+    fetch("http://localhost:4000/api/profiles", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -25,9 +25,9 @@ export default function Navbar() {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log("Profile data:", data);
+        // console.log("Profile data:", data);
         if (data.status === "success") {
-          setUser(data.data.profile?.user);
+          setUser(data.data);
         }
       })
       .catch((error) => {
@@ -37,7 +37,7 @@ export default function Navbar() {
   }, []);
   //console.log("Token stored:", localStorage.getItem("token"));
   //console.log("Token :", sessionStorage.getItem("token"));
-  // console.log("User:", user);
+  //console.log("User:", user);
 
   const getPageTitle = (path) => {
     switch (path) {
@@ -62,23 +62,34 @@ export default function Navbar() {
       <div className="navbar-container">
         <h1 className="navbar-title">{getPageTitle(location.pathname)}</h1>
         <div className="navbar-actions">
-          <button className="navbar-button">
+          <button className="navbar-button" title="Notifications">
             <Bell className="navbar-icon" />
           </button>
-          <button className="navbar-button">
+          <button className="navbar-button" title="Setting">
             <Settings className="navbar-icon" />
           </button>
           <div className="navbar-avatar">
             <div className="navbar-avatar">
               <img
-                src={
-                  user?.avatar
-                    ? `http://localhost:4000/${user.avatar}`
-                    : "http://localhost:4000/public/uploads/users/default.jpg"
-                }
+                src={`http://localhost:4000/public/uploads/users/${user?.user?.avatar}`}
                 alt="Profile"
                 className="profile-avatar"
-                onClick={() => navigate("/profile/patient")}
+                onClick={() => {
+                  switch (user.user.userType) {
+                    case "Patient":
+                      navigate("/profile/patient");
+                      break;
+                    case "Doctor":
+                      navigate("/profile/doctor");
+                      break;
+                    case "Pharmacy":
+                      navigate("/profile/pharmacy");
+                      break;
+                    default:
+                      navigate("/login");
+                  }
+                }}
+                title="View Profile"
               />
             </div>
           </div>

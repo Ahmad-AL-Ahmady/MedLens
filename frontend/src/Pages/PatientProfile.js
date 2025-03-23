@@ -1,52 +1,160 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import {
+  Mail,
+  Calendar,
+  User,
+  Activity,
+  Stethoscope,
+  ClipboardList,
+  ScanBarcode,
+} from "lucide-react";
+import "../Styles/PatientProfile.css";
 
 export default function PatientProfile() {
-  const location = useLocation();
-  const patient = location.state?.patient;
+  const [patientData, setPatientData] = useState(null);
   const [scans, setScans] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!patientId) return; // تأكد من وجود patientId قبل جلب البيانات
+    const token =
+      localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
 
-    const fetchData = async () => {
+    if (!token) {
+      console.error("No token found");
+      setError("No token found");
+      setLoading(false);
+      return;
+    }
+
+    const fetchProfile = async () => {
       try {
         const response = await fetch(
-          `http://localhost:4000/api/patients/${patientId}`
+          "http://localhost:4000/api/patients/profile",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
+
         const data = await response.json();
-        setPatientData(data);
+
+        if (data.status === "success" && data.data?.profile) {
+          setPatientData(data.data);
+          setAppointments(data.data.profile.appointments || []);
+        } else {
+          setError("Failed to fetch patient data");
+        }
       } catch (error) {
         console.error("Error fetching patient data:", error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchData();
-  }, [patientId]); // تأكدي أن المتغيرات الضرورية فقط في الـ dependency array
+    const fetchScans = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:4000/api/medical-scans",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
+
+        const data = await response.json();
+        if (data.status === "success") {
+          setScans(data.data.scans || []);
+        } else {
+          setScans([]);
+        }
+      } catch (error) {
+        console.error("Error fetching medical scans:", error);
+        setScans([]);
+      }
+    };
+
+    fetchProfile();
+    fetchScans();
+  }, []);
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
+  if (!patientData) return <p>No patient data available</p>;
+  //console.log(" rendring Patient Data:", patientData);
 
   return (
     <div className="patient-profile">
-      <img src={patient.image} alt={patient.name} className="profile-img" />
-      <h1>{patient.name}</h1>
-      <p>Email: {patient.email}</p>
-      <p>Born: {patient.dob}</p>
-      <p>Status: {patient.status}</p>
+      {/* Personal Data */}
+      <div className="patient-profile-header">
+        <img
+          src={`http://localhost:4000/public/uploads/users/${patientData.avatar}`}
+          alt="Profile"
+          className="patient-profile-img"
+        />
+        <div className="patient-profile-info">
+          <h1>{`${patientData.firstName} ${patientData.lastName}`}</h1>
+          <p className="email">
+            <Mail size={16} color="#1f61a8" />
+            {patientData.email}
+          </p>
+          <div className="patient-extra-info">
+            <p>
+              <Calendar size={15} color="#505050" />
+              {patientData.age} years
+            </p>
+            <p>
+              <User size={15} color="#505050" /> {patientData.gender}
+            </p>
+            <p>
+              <Activity size={15} color="#505050" /> Status:{" "}
+              {patientData.userType}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="patient-profile-summary-cards">
+        <div className="patient-profile-card">
+          <Stethoscope size={16} color="#1f61a8" />
+          <h3>{patientData.visits || 0}</h3>
+          <p>Visits</p>
+        </div>
+        <div className="patient-profile-card">
+          <Calendar size={16} color="green" />
+          <h3>
+            {patientData.patientSince
+              ? `${patientData.patientSince} Years`
+              : "N/A"}
+          </h3>
+          <p>Patient Since</p>
+        </div>
+        <div className="patient-profile-card">
+          <ClipboardList size={16} color="green" />
+          <h3>{patientData.reports || 0}</h3>
+          <p>Reports</p>
+        </div>
+      </div>
 
       {/* Past Scans */}
-      <div className="section">
-        <h2>Past Scans</h2>
-        <table className="data-table">
+      <div className="patient-profile-scan-section">
+        <h2>
+          <ScanBarcode size={15} color="#1f61a8" />
+          Past Scans
+        </h2>
+        <table className="patient-profile-data-table">
           <thead>
             <tr>
               <th>Date</th>
               <th>Type</th>
               <th>Body Part</th>
-              <th>Doctor</th>
               <th>Status</th>
             </tr>
           </thead>
@@ -54,16 +162,15 @@ export default function PatientProfile() {
             {scans.length > 0 ? (
               scans.map((scan) => (
                 <tr key={scan.id}>
-                  <td>{scan.date}</td>
-                  <td>{scan.type}</td>
-                  <td>{scan.bodyPart}</td>
-                  <td>{scan.doctor}</td>
-                  <td className="status">{scan.status}</td>
+                  <td>{scan?.date}</td>
+                  <td>{scan?.type}</td>
+                  <td>{scan?.bodyPart}</td>
+                  <td className="patient-profile-status">{scan?.status}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="5">No scans available</td>
+                <td colSpan="5">No scans found for this patient.</td>
               </tr>
             )}
           </tbody>
@@ -71,9 +178,12 @@ export default function PatientProfile() {
       </div>
 
       {/* Past Appointments */}
-      <div className="section">
-        <h2>Past Appointments</h2>
-        <table className="data-table">
+      <div className="patient-profile-scan-section">
+        <h2>
+          <Calendar size={15} color="#1f61a8" />
+          Past Appointments
+        </h2>
+        <table className="patient-profile-data-table">
           <thead>
             <tr>
               <th>Date</th>
@@ -85,16 +195,16 @@ export default function PatientProfile() {
           <tbody>
             {appointments.length > 0 ? (
               appointments.map((appointment) => (
-                <tr key={appointment.id}>
-                  <td>{appointment.date}</td>
-                  <td>{appointment.doctor}</td>
-                  <td>{appointment.department}</td>
-                  <td>{appointment.notes}</td>
+                <tr key={appointment?.id}>
+                  <td>{appointment?.date}</td>
+                  <td>{appointment?.doctor}</td>
+                  <td>{appointment?.department}</td>
+                  <td>{appointment?.notes}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="4">No appointments available</td>
+                <td colSpan="4">No appointments scheduled.</td>
               </tr>
             )}
           </tbody>
