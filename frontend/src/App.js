@@ -11,17 +11,19 @@ import Layout from "./components/Layout";
 import DoctorPage from "./Pages/Doctor";
 import PharmacyPage from "./Pages/Pharmacy";
 import PatientPage from "./Pages/Patient";
-import PatientDashbord from "./Pages/PatientDashbord";
+import PatientDashboard from "./Pages/PatientDashbord"; // Fixed typo
 import GoogleSignUpForm from "./Pages/Signupgoogel";
-import DoctorDashbord from "./Pages/DoctorDashbord";
+import DoctorDashboard from "./Pages/DoctorDashbord"; // Fixed typo
 import PharmacyDashboard from "./Pages/PharmacyDashboard";
 import MedicineDetails from "./components/MedecienDetails";
+import ProtectedRoute from "./components/ProtectedRoute";
+import AuthenticatedRoute from "./components/AuthenticatedRoute";
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Authentication Routes */}
+        {/* Public Routes */}
         <Route path="/" element={<HomePage />} />
         <Route path="/signup" element={<SignUpForm />} />
         <Route path="/login" element={<LoginForm />} />
@@ -32,15 +34,74 @@ function App() {
           path="/verify-email-instructions"
           element={<VerifyEmailInstructions />}
         />
-        <Route path="signup-google" element={<GoogleSignUpForm />} />
+        <Route path="/signup-google" element={<GoogleSignUpForm />} />
+
         {/* Protected Routes Wrapped in Layout */}
         <Route path="/" element={<Layout />}>
-          <Route path="dashboard" element={<PharmacyDashboard />} />
-          <Route path="scan" element={<ScanPage />} />
-          <Route path="doctor" element={<DoctorPage />} />
-          <Route path="patient" element={<PatientPage />} />
-          <Route path="pharmacy" element={<PharmacyPage />} />
-          <Route path="medicines/:id" element={<MedicineDetails />} />{" "}
+          <Route
+            path="patient-dashboard"
+            element={
+              <ProtectedRoute requiredRole="Patient">
+                <PatientDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="doctor-dashboard"
+            element={
+              <ProtectedRoute requiredRole="Doctor">
+                <DoctorDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="pharmacy-dashboard"
+            element={
+              <ProtectedRoute requiredRole="Pharmacy">
+                <PharmacyDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="scan"
+            element={
+              <AuthenticatedRoute>
+                <ScanPage />
+              </AuthenticatedRoute>
+            }
+          />
+          <Route
+            path="doctor"
+            element={
+              <AuthenticatedRoute>
+                <DoctorPage />
+              </AuthenticatedRoute>
+            }
+          />
+          <Route
+            path="patient"
+            element={
+              <AuthenticatedRoute>
+                <PatientPage />
+              </AuthenticatedRoute>
+            }
+          />
+          <Route
+            path="pharmacy"
+            element={
+              <AuthenticatedRoute>
+                <PharmacyPage />
+              </AuthenticatedRoute>
+            }
+          />
+          <Route
+            path="medicines/:id"
+            element={
+              <AuthenticatedRoute>
+                <MedicineDetails />
+              </AuthenticatedRoute>
+            }
+          />
         </Route>
       </Routes>
     </Router>
