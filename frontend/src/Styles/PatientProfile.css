@@ -1,0 +1,38 @@
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: white;
+  width: 95%;
+  height: 100%;
+  max-width: 100%;
+  margin: 50px auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+  border: 3px solid #007bff;
+  border: none;
+}
+
+.profile-info {
+  text-align: center;
+}
+
+.profile-info h2 {
+  margin: 10px 0;
+  font-size: 24px;
+}
+
+.profile-info p {
+  font-size: 16px;
+  color: #555;
+  margin: 5px 0;
+}

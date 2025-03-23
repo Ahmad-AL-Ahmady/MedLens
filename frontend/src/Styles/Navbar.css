@@ -53,13 +53,16 @@ body {
 .nav-item:hover .nav-icon {
   transform: scale(1.05);
 }
-.navbar-avatar {
+.navbar-avatar,
+.navbar-avatar img {
   width: 2rem;
   height: 2rem;
-  background-color: #3b82f6;
   border-radius: 9999px;
+  border: none;
   flex-shrink: 0;
+  cursor: pointer;
 }
+
 @media (max-width: 768px) {
   .navbar-container {
     flex-direction: column;
