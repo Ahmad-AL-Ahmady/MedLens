@@ -261,6 +261,8 @@ exports.getPharmacyById = catchAsync(async (req, res, next) => {
       firstName: pharmacy.firstName,
       lastName: pharmacy.lastName,
       location: pharmacy.location,
+      avatar: pharmacy.avatar,
+      email: pharmacy.email,
       locationDetails: pharmacyProfile
         ? {
             locationName: pharmacyProfile.locationName,
