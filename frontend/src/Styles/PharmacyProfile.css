@@ -1,0 +1,319 @@
+/* PageStyles.css */
+.pharmacy-profile-container {
+  max-width: 900px;
+  margin: 20px auto;
+  background: #f8fafc;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(3, 105, 161, 0.08);
+  padding: 20px;
+  font-family: "Arial", sans-serif;
+}
+
+/* ✅ Pharmacist info */
+.pharmacy-profile-header {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 10px;
+  border: 0.8px solid #ebebeb;
+  position: relative;
+}
+
+.pharmacy-header-top {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.pharmacy-profile-image {
+  width: 100px;
+  height: 100px;
+  margin-right: 30px;
+}
+
+.pharmacy-profile-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+}
+
+.pharmacy-profile-name {
+  font-size: 16px;
+  color: black;
+}
+
+.pharmacy-profile-usertype {
+  color: #1e56cf;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.pharmacy-profile-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+}
+
+.pharmacy-profile-details svg {
+  margin-right: 7px;
+}
+
+.pharmacy-profile-email {
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  margin-bottom: 8px;
+  color: #484848;
+}
+
+.operating-hours-title {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #5795f9 0%, #1e56cf 100%);
+  color: white;
+  padding: 12px 13px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  position: absolute;
+  right: 20px;
+  top: 15px;
+  transition: background 0.3s ease;
+}
+
+.operating-hours-title:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(1px);
+  z-index: 1000;
+}
+
+.modal-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px 50px;
+  border-radius: 8px;
+
+  z-index: 1001;
+  text-align: center;
+}
+
+.modal-content h2 {
+  font-size: 15px;
+  margin-bottom: 13px;
+  margin-right: 180px;
+}
+
+.close-btn {
+  position: absolute;
+  top: 0.5px;
+  right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+}
+
+.operating-hours-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.operating-hours-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px;
+  background: white;
+  border-radius: 3px;
+  border: 0.001px solid #b9cffb;
+}
+
+.day {
+  font-weight: normal;
+  font-size: 12px;
+  color: #000000;
+}
+
+.status.open {
+  color: green;
+  font-weight: bold;
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.status.closed {
+  color: #1e56cf;
+  font-weight: bold;
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+/* ✅ Stats Cards */
+.pharmacy-profile-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.pharmacy-profile-card {
+  flex: 1;
+  padding: 15px;
+  background: #f8fafc;
+  border-radius: 10px;
+  text-align: center;
+  margin: 0 5px;
+}
+
+.pharmacy-profile-card span {
+  display: block;
+  font-size: 16px;
+  font-weight: bold;
+  color: black;
+}
+
+.pharmacy-profile-card p {
+  color: #484848;
+  font-size: 10px;
+}
+
+/* ✅ Location Map */
+.pharmacy-profile-map {
+  margin-top: 20px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.pharmacy-profile-map iframe {
+  width: 100%;
+  height: 300px;
+  border: none;
+  border-radius: 10px;
+}
+
+/* ✅ Review */
+.pharmacy-profile-reviews {
+  margin-top: 20px;
+  padding: 15px;
+  background: #ffffff;
+  border-radius: 10px;
+  border: 0.8px solid #ebebeb;
+}
+
+.pharmacy-profile-reviews h2 {
+  font-size: 15px;
+  color: black;
+}
+
+.pharmacy-profile-reviews p {
+  font-size: 12px;
+  color: #1f61a8;
+}
+
+.pharmacy-profile-review {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.pharmacy-profile-review:last-child {
+  border-bottom: none;
+}
+
+.pharmacy-profile-review strong {
+  font-size: 11px;
+  color: #1f61a8;
+}
+
+.pharmacy-profile-review p {
+  font-size: 11px;
+  color: #444;
+  margin: 5px 0;
+}
+
+.pharmacy-profile-rating {
+  font-size: 14px;
+  color: #fad955;
+}
+
+@media (max-width: 599px) {
+  .pharmacy-header-top {
+    display: grid;
+    text-align: center;
+  }
+
+  .operating-hours-title {
+    position: static;
+    margin-top: 10px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .operating-hours-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+
+  .operating-hours-item {
+    padding: 6px;
+    font-size: 12px;
+    flex-wrap: wrap;
+    max-width: 190px;
+    margin-left: 30px;
+  }
+
+  .modal-content {
+    width: 90%;
+    padding: 0;
+  }
+
+  .modal-content h2 {
+    font-size: 11px;
+    margin-right: 100px;
+    margin-bottom: 5px;
+  }
+
+  .day {
+    font-size: 11px;
+    font-weight: bold;
+  }
+
+  .status {
+    font-size: 11px;
+    font-weight: bold;
+  }
+
+  .close-btn {
+    font-size: 15px;
+    top: -3px;
+  }
+
+  .pharmacy-profile-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .pharmacy-profile-card {
+    flex: 1 1 100%;
+  }
+}
