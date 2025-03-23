@@ -342,6 +342,8 @@ exports.getDoctorById = catchAsync(async (req, res, next) => {
     status: "success",
     data: {
       id: doctor._id,
+      avatar: doctor.avatar,
+      email: doctor.email,
       firstName: doctor.firstName,
       lastName: doctor.lastName,
       specialization: doctor.specialization,
