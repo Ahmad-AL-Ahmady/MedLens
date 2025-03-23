@@ -411,7 +411,17 @@
 .pharmacy-dashboard-form-close:hover {
   color: #1f2937;
 }
+.pharmacy-dashboard-form-group input[type="checkbox"] {
+  accent-color: var(--primary-color);
+  margin-right: 0.5rem;
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+}
 
+.pharmacy-dashboard-form-group input[type="checkbox"]:hover {
+  opacity: 0.8;
+}
 /* Form Content */
 .pharmacy-dashboard-form-content {
   display: grid;
@@ -478,6 +488,140 @@
   grid-column: 1 / -1;
 }
 
+/* Radio Button Group Container */
+.pharmacy-dashboard-form-group--radio {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 32px;
+  padding: 8px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+/* Radio Option Label */
+.pharmacy-dashboard-form-group--radio label {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 18px 24px;
+  border: 2px solid var(--primary-light);
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover State */
+.pharmacy-dashboard-form-group--radio label:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border-color: var(--primary-color);
+}
+
+/* Radio Input */
+.pharmacy-dashboard-form-group--radio input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  height: 0;
+  width: 0;
+}
+
+/* Custom Radio Circle */
+.pharmacy-dashboard-form-group--radio label span:first-child {
+  position: relative;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+  border: 2px solid var(--primary-light);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+/* Checked State */
+.pharmacy-dashboard-form-group--radio
+  input[type="radio"]:checked
+  ~ span:first-child {
+  border-color: var(--primary-color);
+  background-color: var(--primary-light);
+}
+
+.pharmacy-dashboard-form-group--radio
+  input[type="radio"]:checked
+  ~ span:first-child::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  background: var(--primary-color);
+  border-radius: 50%;
+}
+
+/* Label Text */
+.pharmacy-dashboard-form-group--radio label span:last-child {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--primary-dark);
+  letter-spacing: -0.15px;
+  transition: color 0.3s ease;
+}
+
+/* Active State */
+.pharmacy-dashboard-form-group--radio label:active {
+  transform: scale(0.98);
+}
+
+/* Focus State */
+.pharmacy-dashboard-form-group--radio
+  input[type="radio"]:focus-visible
+  ~ span:last-child {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Selected State Animation */
+.pharmacy-dashboard-form-group--radio
+  input[type="radio"]:checked
+  ~ span:last-child {
+  color: var(--primary-dark);
+  font-weight: 600;
+}
+
+/* Professional Hover Effect */
+.pharmacy-dashboard-form-group--radio label:hover span:first-child {
+  transform: scale(1.05);
+}
+
+/* Subtle Background Pulse */
+@keyframes subtlePulse {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.pharmacy-dashboard-form-group--radio input[type="radio"]:checked + label {
+  border-color: var(--primary-color);
+  background: linear-gradient(
+    45deg,
+    var(--primary-light) 0%,
+    rgba(255, 255, 255, 0.95) 50%,
+    var(--primary-light) 100%
+  );
+  background-size: 200% 200%;
+  animation: subtlePulse 3s ease infinite;
+}
 /* Add floating label variant */
 .pharmacy-dashboard-form-group.floating-label {
   position: relative;

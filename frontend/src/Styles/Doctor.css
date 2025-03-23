@@ -1,28 +1,480 @@
 /* PageStyles.css */
-.page-container {
-  max-width: 56rem;
+.doctorpage-container {
+  max-width: 80rem;
   margin-left: auto;
   margin-right: auto;
-  padding: 1rem;
+  padding: 0 1rem;
+}
+/* ✅ Specialty buttons */
+.specialty-container {
+  display: flex;
+  overflow: hidden;
+  white-space: nowrap;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  gap: 15px;
+  margin-bottom: 35px;
 }
 
-.page-card {
-  background-color: #ffffff;
+.specialty-btn {
+  flex-shrink: 0;
+  padding: 7px 10px;
+  border: 0.2px solid #eeeeee;
+  border-radius: 5px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  max-width: 320px;
+  text-overflow: ellipsis;
+}
+
+.specialty-btn.active {
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--primary-dark)
+  );
+  color: white;
+}
+
+.specialty-btn:hover {
+  box-shadow: 0 2px 4px rgba(116, 115, 115, 0.2);
+  transform: translateY(-1.5px);
+}
+
+.specialty-btn svg {
+  margin-right: 8px;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+.arrows {
+  display: flex;
+  justify-content: right;
+  gap: 10px;
+  margin-bottom: 16px;
+  margin-right: 35px;
+}
+
+.arrows button {
+  font-size: 15px;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--primary-dark)
+  );
+  color: white;
+  border: 20px;
+  width: 20px;
+  border-radius: 3px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(140, 140, 140, 0.6);
+  transition: background-color 0.3s ease;
+}
+
+.arrows button:disabled {
+  background: #cbcbd1;
+  cursor: not-allowed;
+}
+
+/* ✅ Search bar */
+.search-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 94%;
+  margin-top: 20px;
+  margin-bottom: 40px;
+  margin-left: 33px;
+  gap: 10px;
+}
+
+.search-box {
+  border: 0.2px solid #eeeeee;
   border-radius: 0.5rem;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  padding: 1.5rem;
+  padding: 5px;
+  background: white;
+  height: 38px;
+  width: 200px;
+  font-size: 16px;
+  flex: 1;
 }
 
-.page-title {
-  font-size: 1.5rem;
-  line-height: 2rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 1rem;
+.search-box:focus-within {
+  outline: none;
+  border-color: #c0d7f2;
+  box-shadow: 0 0 0 4px rgba(147, 197, 253, 0.1);
 }
 
-.page-text {
-  color: #4b5563;
-  font-size: 1rem;
-  line-height: 1.5rem;
+.search-button {
+  display: flex;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--primary-dark)
+  );
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 0.5rem;
+  height: 38px;
+  cursor: pointer;
 }
+
+.search-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.distance-select {
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--primary-dark)
+  );
+  border: 1px solid;
+  border-radius: 0.6rem;
+  padding: 11px 14px;
+  font-size: 13px;
+  display: block;
+  color: #ffffff;
+  cursor: pointer;
+  appearance: none;
+  margin-left: 0;
+}
+
+.distance-select:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+.distance-select option {
+  background-color: rgb(255, 255, 255);
+  color: #747474;
+}
+
+.distance-select:focus {
+  outline: none;
+}
+
+/* ✅ Doctor card */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.Recommended-title {
+  font-size: 16.5px;
+  font-weight: bold;
+  color: #1f61a8;
+  margin-left: 35px;
+}
+
+.view-all-btn {
+  background: none;
+  border: none;
+  color: #1f61a8;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+  gap: 5px;
+  display: flex;
+  align-items: center;
+  margin-right: 39px;
+}
+
+.view-all-btn svg {
+  fill: #1f61a8;
+  font-size: 14px;
+}
+
+.view-all-btn:hover {
+  text-decoration: underline;
+}
+
+.doctors-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.doctor-card {
+  width: 320px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 2px 4px rgba(140, 140, 140, 0.1);
+  border: 0.2px solid #eeeeee;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.doctor-card:hover {
+  outline: none;
+  border-color: #c0d7f2;
+  box-shadow: 0 0 0 4px rgba(147, 197, 253, 0.1);
+}
+
+.doctor-info {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 15px;
+}
+
+.doctor-img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+}
+
+.doctor-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: 10px;
+  margin-left: 20px;
+}
+.doctor-name {
+  font-size: 15px;
+  font-weight: bold;
+  color: #444;
+}
+
+.specialty {
+  font-size: 13px;
+  color: #1f61a8;
+  font-weight: normal;
+  margin: 2px 0;
+}
+
+.rating {
+  font-size: 14px;
+  color: #444;
+  margin-top: 5px;
+}
+.rating svg {
+  stroke: none;
+  fill: #f0c51d;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  margin-bottom: 5px;
+}
+
+.profile-btn {
+  background: rgb(210, 235, 255);
+  color: #1f61a8;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 30px;
+  width: 30%;
+  height: 35px;
+  margin-right: 199px;
+  box-shadow: 0 2px 4px rgba(140, 140, 140, 0.2);
+}
+
+.profile-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.error-message {
+  color: red;
+  font-weight: bold;
+}
+
+.no-doctors {
+  font-style: normal;
+  color: #777;
+}
+
+@media (max-width: 1200px) {
+  .doctor-card {
+    width: 280px;
+  }
+
+  .profile-btn {
+    width: 40%;
+    margin-right: 150px;
+  }
+}
+
+@media (max-width: 992px) {
+  .doctor-card {
+    width: 250px;
+  }
+
+  .profile-btn {
+    width: 50%;
+    margin-right: 120px;
+  }
+
+  .search-wrapper {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .search-input {
+    width: 90%;
+  }
+
+  .search-options {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    width: 90%;
+  }
+
+  .distance-select,
+  .signup-location-container,
+  .search-button {
+    flex: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .specialty-container {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .search-wrapper {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 10px;
+    gap: 10px;
+    margin-left: 0;
+    display: flex;
+  }
+
+  .search-box,
+  .distance-select,
+  .signup-location-container {
+    width: 90%;
+    max-width: 450px;
+  }
+
+  .search-box {
+    font-size: 16px;
+    padding: 10px;
+  }
+  .search-button {
+    flex: 1;
+    padding: 10px;
+    font-size: 16px;
+    text-align: center;
+  }
+
+  .distance-select {
+    width: 90%;
+    max-width: 450px;
+    display: flex;
+    gap: 10px;
+    flex: 2;
+    padding: 10px;
+  }
+
+  .Recommended-title {
+    margin-left: 0;
+  }
+
+  .view-all-btn {
+    margin-right: 0;
+  }
+
+  .profile-btn {
+    width: 60%;
+    margin-right: 80px;
+  }
+
+  .doctors-container {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .doctorpage-container {
+    padding: 0 0.5rem;
+  }
+
+  .doctor-card {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .Recommended-title {
+    margin-left: 0;
+  }
+
+  .view-all-btn {
+    margin-right: 0;
+  }
+
+  .profile-btn {
+    width: 70%;
+    margin-right: 50px;
+  }
+
+  .arrows {
+    justify-content: center;
+    margin-right: 0;
+  }
+
+  .search-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .search-input {
+    width: 90%;
+  }
+
+  .distance-select {
+    width: 90%;
+  }
+
+  .search-button {
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 400px) {
+  .doctor-card {
+    width: 100%;
+    max-width: 280px;
+  }
+
+  .Recommended-title {
+    margin-left: 0;
+  }
+
+  .view-all-btn {
+    margin-right: 0;
+  }
+
+  .profile-btn {
+    width: 80%;
+    margin-right: 20px;
+  }
+
+  .view-all-btn {
+    font-size: 12px;
+  }
+
+  .search-box {
+    font-size: 14px;
+  }
+}
+

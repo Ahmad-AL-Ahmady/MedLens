@@ -1,66 +1,85 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap");
+
 :root {
-  --primary-color: #2563eb;
-  --secondary-color: #3b82f6;
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
-  --surface-light: #ffffff;
-  --surface-dark: #f8fafc;
-  --border-light: #e2e8f0;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
-  --transition-default: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Primary Color Scheme */
+  --primary-color: #0369a1; /* Deep, professional blue */
+  --primary-light: #e0f2fe; /* Subtle light accent */
+  --primary-dark: #075985; /* Darker shade for contrast */
+  --primary-hover: #0c4a6e; /* Hover state */
+  /* Refined Text and Surface Colors */
+  --text-primary: #1a2533; /* Darker, more formal gray */
+  --text-secondary: #5b6b82; /* Softer secondary text */
+  --surface-light: #ffffff; /* Clean white */
+  --surface-dark: #f9fafb; /* Subtle off-white */
+  --border-light: #d7dfe9; /* Professional, muted border */
+  /* Enhanced Shadows */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 6px 12px -2px rgba(0, 0, 0, 0.1);
+  --transition-default: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Slightly slower for elegance */
 }
+
 body {
   font-family: "Inter", sans-serif;
+  background-color: var(--surface-dark); /* Subtle off-white background */
+  color: var(--text-primary);
+  line-height: 1.6; /* Improved readability */
 }
 
 .scan-container {
-  max-width: 64rem;
-  padding: 2rem;
-  margin-left: auto;
-  margin-right: auto;
+  max-width: 72rem; /* Wider container for a more spacious layout */
+  padding: 3rem;
+  margin: 0 auto;
 }
 
 .upload-card {
-  background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
+  background-color: var(--surface-light);
+  border-radius: 0.75rem; /* Slightly larger radius for sophistication */
+  box-shadow: var(--shadow-md);
+  padding: 2rem; /* More padding for breathing room */
+  margin-bottom: 2rem;
+  border: 1px solid var(--border-light);
 }
 
 .upload-header {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .scan-title {
-  font-size: 1.25rem;
-  line-height: 1.75rem;
-  font-weight: 600;
-  color: #2563eb;
-  margin-bottom: 0.5rem;
+  font-size: 1.5rem; /* Larger title for prominence */
+  line-height: 2rem;
+  font-weight: 700; /* Bolder for authority */
+  color: var(--primary-dark); /* Darker primary for professionalism */
+  margin-bottom: 0.75rem;
 }
 
 .scan-subtitle {
-  color: #4b5563;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  font-weight: 400;
 }
 
 .upload-area {
-  border: 2px dashed #e5e7eb;
-  border-radius: 0.5rem;
-  padding: 2rem;
-  margin-bottom: 1.5rem;
+  border: 2px dashed var(--border-light); /* More neutral border */
+  border-radius: 0.75rem;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
   text-align: center;
   position: relative;
   overflow: hidden;
+  background-color: var(--surface-light);
+  transition: var(--transition-default);
+}
+
+.upload-area:hover {
+  border-color: var(--primary-color); /* Subtle primary color on hover */
+  box-shadow: var(--shadow-sm); /* Light shadow on hover */
 }
 
 .upload-content {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
 .upload-icon {
@@ -69,33 +88,38 @@ body {
 }
 
 .icon {
-  width: 3rem;
-  height: 3rem;
-  color: #9ca3af;
+  width: 3.5rem;
+  height: 3.5rem;
+  color: var(--primary-color); /* Primary color for consistency */
 }
 
 .upload-text {
-  color: #4b5563;
+  color: var(--text-secondary);
+  font-size: 1rem;
 }
 
 .upload-or {
-  color: #9ca3af;
+  color: var(--text-secondary);
   font-size: 0.875rem;
+  font-weight: 500;
 }
 
 .file-label {
   display: inline-block;
-  background-color: #3b82f6;
+  background-color: var(--primary-color);
   color: white;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1.5rem; /* Larger padding for a premium feel */
   border-radius: 0.5rem;
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
-  margin-top: 0.5rem;
+  transition: var(--transition-default);
+  font-weight: 500;
+  text-transform: uppercase; /* Uppercase for formality */
+  letter-spacing: 0.05em; /* Slight letter spacing for refinement */
 }
 
 .file-label:hover {
-  background-color: #2563eb;
+  background-color: var(--primary-hover);
+  box-shadow: var(--shadow-sm); /* Subtle shadow on hover */
 }
 
 .file-input {
@@ -104,6 +128,7 @@ body {
 
 .preview-container {
   position: relative;
+  margin-top: 1.5rem;
 }
 
 .preview-image {
@@ -111,45 +136,58 @@ body {
   max-height: 100%;
   width: auto;
   height: auto;
-  object-fit: contain; /* Ensures image stays within container */
-  border-radius: 0.5rem;
+  object-fit: contain;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
 }
 
 .remove-button {
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  background-color: #ef4444;
+  top: 0.75rem;
+  right: 0.75rem;
+  background-color: #dc2626; /* Slightly darker red for maturity */
   color: white;
-  padding: 0.25rem 0.5rem;
+  padding: 0.375rem 0.75rem;
   border-radius: 0.375rem;
   font-size: 0.875rem;
+  font-weight: 500;
   border: none;
   cursor: pointer;
+  transition: var(--transition-default);
+}
+
+.remove-button:hover {
+  background-color: #b91c1c; /* Even darker red for hover */
+  box-shadow: var(--shadow-sm);
 }
 
 .scan-button {
   width: 100%;
-  padding: 0.75rem;
+  padding: 1rem; /* Taller button for prominence */
   border-radius: 0.5rem;
-  font-weight: 500;
+  font-weight: 600; /* Bolder text */
   color: white;
   border: none;
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
+  transition: var(--transition-default);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .scan-button.active {
-  background-color: #3b82f6;
+  background-color: var(--primary-dark); /* Darker primary for a serious tone */
 }
 
 .scan-button.active:hover {
-  background-color: #2563eb;
+  background-color: var(--primary-hover);
+  box-shadow: var(--shadow-sm);
 }
 
 .scan-button.disabled {
-  background-color: #d1d5db;
+  background-color: #e5e7eb; /* More neutral disabled state */
   cursor: not-allowed;
+  opacity: 0.7; /* Slight fade for disabled state */
 }
 
 /* Additional utility classes */
@@ -166,19 +204,19 @@ body {
 }
 
 .text-gray-600 {
-  color: #4b5563;
+  color: var(--text-secondary);
 }
 
 .bg-blue-500 {
-  background-color: #3b82f6;
+  background-color: var(--primary-color);
 }
 
 .hover\:bg-blue-600:hover {
-  background-color: #2563eb;
+  background-color: var(--primary-hover);
 }
 
 .bg-gray-300 {
-  background-color: #d1d5db;
+  background-color: #e5e7eb;
 }
 
 .cursor-not-allowed {
@@ -188,30 +226,30 @@ body {
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .scan-container {
-    padding: 1rem;
+    padding: 2rem;
   }
 
   .upload-card {
-    padding: 1rem;
-    margin-bottom: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
   }
 
   .upload-area {
-    padding: 1.5rem;
+    padding: 2rem;
   }
 
   .scan-title {
-    font-size: 1.125rem;
-    line-height: 1.5rem;
+    font-size: 1.25rem;
+    line-height: 1.75rem;
   }
 
   .scan-subtitle,
   .upload-text {
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
   }
 
   .file-label {
-    padding: 0.5rem;
+    padding: 0.625rem 1.25rem;
     font-size: 0.875rem;
   }
 
@@ -220,46 +258,47 @@ body {
   }
 
   .remove-button {
-    padding: 0.25rem;
-    font-size: 0.75rem;
+    padding: 0.375rem 0.625rem;
+    font-size: 0.8125rem;
   }
 
   .scan-button {
-    padding: 0.5rem;
-    font-size: 0.875rem;
+    padding: 0.875rem;
+    font-size: 0.9375rem;
   }
 }
 
 @media (max-width: 480px) {
   .scan-container {
-    padding: 0.5rem;
-  }
-
-  .upload-card {
-    padding: 0.75rem;
-  }
-
-  .upload-area {
     padding: 1rem;
   }
 
+  .upload-card {
+    padding: 1rem;
+  }
+
+  .upload-area {
+    padding: 1.5rem;
+  }
+
   .scan-title {
-    font-size: 1rem;
-    margin-bottom: 0.25rem;
+    font-size: 1.125rem;
+    margin-bottom: 0.5rem;
   }
 
   .upload-content {
-    gap: 0.75rem;
+    gap: 1rem;
   }
 
   .upload-icon .icon {
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 3rem;
+    height: 3rem;
   }
 
   .file-label {
     width: 100%;
     box-sizing: border-box;
+    padding: 0.625rem;
   }
 
   .preview-image {
@@ -267,7 +306,8 @@ body {
   }
 
   .scan-button {
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
+    padding: 0.75rem;
   }
 }
 
