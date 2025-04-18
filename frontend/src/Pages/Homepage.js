@@ -561,7 +561,7 @@ export default function HomePage() {
         <div className="home-footer-bottom">
           <div className="home-footer-bottom-content">
             <div className="home-footer-copyright">
-              © 2024 MedCal. All rights reserved.
+              © 2025 MedCal. All rights reserved.
             </div>
           </div>
         </div>
