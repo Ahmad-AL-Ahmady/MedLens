@@ -42,7 +42,7 @@ body {
 }
 
 .upload-header {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 .scan-title {
@@ -50,13 +50,40 @@ body {
   line-height: 2rem;
   font-weight: 700; /* Bolder for authority */
   color: var(--primary-dark); /* Darker primary for professionalism */
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
 .scan-subtitle {
   color: var(--text-secondary);
   font-size: 1rem;
   font-weight: 400;
+}
+
+/* label style */
+.dropdown-label {
+  display: block;
+  font-size: 14px;
+  color: var(--primary-dark);
+  margin-bottom: 4px;
+  margin-left: 2px;
+  font-weight: bold;
+}
+
+.body-part-select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  font-size: 13px;
+  background-color: #fff;
+  color: var(--text-secondary);
+  outline: none;
+  transition: border-color 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.body-part-select:focus {
+  border-color: var(--primary-color);
 }
 
 .upload-area {
