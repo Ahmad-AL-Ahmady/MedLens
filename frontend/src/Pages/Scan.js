@@ -9,6 +9,7 @@ export default function ScanPage() {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [scanResult, setScanResult] = useState(null);
   const [confidence, setConfidence] = useState(null);
+  const [bodyArea, setBodyArea] = useState("");
   const [isScanning, setIsScanning] = useState(false);
 
   const handleFileChange = (event) => {
@@ -39,7 +40,7 @@ export default function ScanPage() {
       });
 
       const data = await response.json();
-      setScanResult(data.classification_result || "Unknown"); // تحديث نتيجة التصنيف
+      setScanResult(data.classification_result || "Unknown"); // Default to "Unknown" if no result is returned
       setConfidence(data.confidence_score || "N/A");
     } catch (error) {
       setScanResult("Failed to connect to the server.");
@@ -56,6 +57,17 @@ export default function ScanPage() {
           <h2 className="scan-title">X-Ray Scan</h2>
           <p className="scan-subtitle">Upload an X-ray image for analysis</p>
         </div>
+
+        <label className="dropdown-label">Body Part</label>
+        <select
+          className="body-part-select"
+          value={bodyArea}
+          onChange={(e) => setBodyArea(e.target.value)}
+        >
+          <option value="chest">Chest</option>
+          <option value="dentist">Dentist</option>
+          <option value="bones">Bones</option>
+        </select>
 
         <div className="upload-area">
           {!previewUrl ? (
@@ -116,7 +128,7 @@ export default function ScanPage() {
           date={new Date().toLocaleDateString()}
         />
       )}
-      
+
       {/* تمرير نتيجة التصنيف إلى ChatBot */}
       <ChatBot classificationResult={scanResult} />
     </div>

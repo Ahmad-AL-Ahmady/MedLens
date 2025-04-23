@@ -198,6 +198,8 @@
   max-width: 1440px;
   padding: 2rem;
   margin: 0 auto;
+  margin-left: 50px;
+  margin-top: 40px;
   opacity: 0;
   transform: translateY(40px);
   animation: heroEntrance 1s cubic-bezier(0.4, 0, 0.2, 1) 0.2s forwards;
@@ -215,6 +217,7 @@
   font-weight: 800;
   color: transparent;
   margin-bottom: 2rem;
+  margin-right: 8rem;
   line-height: 1.1;
   letter-spacing: -0.03em;
   background: linear-gradient(to right, #93c5fd 0%, #2563eb 100%);
@@ -238,7 +241,6 @@
 .home-hero-content p {
   font-size: 1.5rem;
   color: #e5e7eb;
-  margin-bottom: 3rem;
   max-width: 48rem;
   line-height: 1.6;
   position: relative;
@@ -296,6 +298,8 @@
   gap: 1rem;
   font-size: 1.25rem;
   font-weight: 600;
+  margin-top: 4rem;
+  margin-right: 50px;
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;

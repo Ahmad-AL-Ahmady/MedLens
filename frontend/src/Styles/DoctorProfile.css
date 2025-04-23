@@ -1,0 +1,500 @@
+/* ✅ Page Style.css*/
+.doctor-profile-container {
+  max-width: 900px;
+  margin: 20px auto;
+  background: #f8fafc;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(3, 105, 161, 0.08);
+  padding: 20px;
+  font-family: "Arial", sans-serif;
+}
+
+/* ✅ Doctor Info*/
+.doctor-profile-header {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 10px;
+  border: 0.8px solid #ebebeb;
+  position: relative;
+}
+
+.doctor-header-top {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.doctor-profile-image {
+  width: 100px;
+  height: 100px;
+  margin-right: 30px;
+  margin-bottom: 32px;
+}
+
+.doctor-profile-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+}
+
+.doctor-profile-name {
+  font-size: 16px;
+  color: black;
+}
+
+.doctor-profile-usertype {
+  color: #1e56cf;
+  font-size: 12px;
+  margin-bottom: 12px;
+  font-weight: bold;
+}
+
+.doctor-profile-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+}
+
+.doctor-profile-details svg {
+  margin-right: 7px;
+}
+
+.doctor-profile-email {
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  margin-bottom: 8px;
+  color: #484848;
+}
+
+.working-hours-text {
+  font-size: 12px;
+  font-weight: bold;
+  color: #666;
+  display: flex;
+  align-items: center; 
+  transition: color 0.3s ease;
+  margin-bottom: 10px;
+}
+
+.working-hours-text:hover {
+  color: #1e56cf;
+}
+
+/* Working Hours */
+.modal-content {
+  background: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  max-width: 500px;
+  text-align: center;
+  height: 250px;
+  width: 450px;
+}
+.modal-content  h2 {
+  font-size: 13px !important;
+  color: #1f61a8 !important;
+  font-weight: bold !important;
+  margin-bottom: 5px !important;
+  margin-left: -75px !important;
+  cursor: pointer;
+}
+
+
+.operating-hours-grid {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  justify-content: center;
+}
+
+.operating-hours-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fafafa;
+  padding: 8px 15px;
+  border-radius: 5px;
+  border: 1px solid #d1d5db;
+}
+.operating-hours-item:hover{
+  border-color: #74acec;
+  box-shadow: 0 0 0 4px rgba(147, 197, 253, 0.1);
+}
+
+.operating-hours-item .day {
+  color: #666;
+  font-size: 12px;
+  font-weight: bold;
+
+}
+
+
+.status {
+  font-size: 10px;
+  font-weight: bold;
+  border-radius: 3px;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+
+
+.status.open {
+  background-color: #e3fcef; 
+  color: #1f9254; 
+  border: 1px solid #69c493;
+}
+
+
+
+.status.closed {
+  background-color: #e6f0ff; 
+  color: #2f55d3; 
+  border: 1px solid #7faaf0;
+  padding: 0px 14px;
+}
+
+
+
+.close-btn {
+  top: 1px;
+  right: 15px;
+  color: #555;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  color: #1f61a8;
+}
+
+/* Add Appointment Button*/
+.add-appointment-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #639efd 0%, #425f9f 100%);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  padding: 12px 13px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  text-decoration: none;
+  width: fit-content;
+  position: absolute;
+  right: 20px;
+  top: 20px;
+}
+
+.add-appointment-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.add-appointment-btn svg {
+  margin-right: 8px;
+  font-size: 15px;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(20, 20, 21, 0.5); 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+}
+
+.modal-container {
+  background-color: white;
+  padding: 10px;
+  border-radius: 7px;
+  width: 400px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.close-bt {
+  color: #555;
+  cursor: pointer;
+  margin-left: 360px;
+  font-size: 23px;
+  margin-top: -10px;
+}
+.close-bt:hover {
+  color: #1f61a8;
+}
+
+.appointment-form-title {
+  font-size: 15px;
+  font-weight: bold;
+  top: -10px;
+  color: #1f61a8;
+  position: relative;
+  margin-left: 122px;
+}
+
+.appointment-form-label {
+  display: flex;
+  font-size: 12px;
+  font-weight: normal;
+  color: #666;
+  margin-bottom: 1px;
+  margin-left: 2px;
+
+}
+
+/* inputs */
+.appointment-form-input,
+.appointment-form-textarea {
+  width: 100%;
+  padding: 7px;
+  border: 1px solid #ced0d2;
+  border-radius: 5px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.appointment-form-input:focus,
+.appointment-form-textarea:focus {
+  border-color: #387ce8;
+}
+
+.appointment-form-button {
+  background: linear-gradient(135deg, #5b92ec 0%, #365088 100%);
+  color: white;
+  padding: 8px 130px;
+  border-radius: 5px;
+  border: 0.01px solid #f8fafc;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 7px;
+
+}
+
+.appointment-form-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+}
+
+
+
+/* Cards Section*/
+.doctor-profile-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.doctor-profile-card {
+  flex: 1;
+  padding: 15px;
+  background: #f8fafc;
+  border-radius: 10px;
+  text-align: center;
+  margin: 0 5px;
+  border: 0.01px solid #f8fafc;
+}
+
+.doctor-profile-card:hover {
+  outline: none;
+  border-color: #c0d7f2;
+  box-shadow: 0 0 0 2.5px rgba(147, 197, 253, 0.1);
+}
+
+.doctor-profile-card span {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  color: black;
+}
+
+.doctor-profile-card p {
+  color: #484848;
+  font-size: 10px;
+}
+
+/* Map Section*/
+.doctor-profile-map {
+  margin-top: 20px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.doctor-profile-map iframe {
+  width: 100%;
+  height: 300px;
+  border: none;
+  border-radius: 10px;
+}
+
+/* Rating Section*/
+.doctor-profile-reviews {
+  margin-top: 20px;
+  padding: 15px;
+  background: #ffffff;
+  border-radius: 10px;
+  border: 0.8px solid #ebebeb;
+}
+
+.doctor-profile-reviews h2 {
+  font-size: 15px;
+  color: black;
+}
+
+.doctor-profile-reviews p {
+  font-size: 12px;
+  color: #666;
+}
+
+.doctor-profile-review {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.doctor-profile-review:last-child {
+  border-bottom: none;
+}
+
+.doctor-profile-review strong {
+  font-size: 11px;
+  color: #1f61a8;
+}
+
+.doctor-profile-review p {
+  font-size: 11px;
+  color: #444;
+  margin: 5px 0;
+}
+
+.doctor-profile-rating {
+  font-size: 14px;
+  color: #fad955;
+}
+
+@media (max-width: 599px) {
+  .doctor-header-top {
+    display: grid;
+    text-align: center;
+  }
+
+  .consulting-hours-title {
+    position: static;
+    margin-top: 10px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .consulting-hours-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+
+  .consulting-hours-item {
+    padding: 6px;
+    font-size: 12px;
+    flex-wrap: wrap;
+    max-width: 190px;
+    margin-left: 30px;
+  }
+
+  .modal-content {
+    width: 90%;
+    padding: 0;
+  }
+
+  .modal-content h2 {
+    font-size: 11px;
+    margin-right: 100px;
+    margin-bottom: 5px;
+  }
+
+  .day {
+    font-size: 11px;
+    font-weight: bold;
+  }
+
+  .status {
+    font-size: 11px;
+    font-weight: bold;
+  }
+
+  .close-btn {
+    font-size: 15px;
+    top: -3px;
+  }
+
+  .doctor-profile-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .doctor-profile-card {
+    flex: 1 1 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    width: 90%;
+    height: auto;
+    padding: 15px;
+  }
+
+  .operating-hours-grid {
+    grid-template-columns: 1fr; 
+  }
+
+  .add-appointment-btn {
+    font-size: 10px;
+    padding: 10px 12px;
+    right: 10px;
+    top: 10px;
+  }
+
+  .modal-container {
+    width: 90%;
+    padding: 15px;
+    border-radius: 7px;
+  }
+
+  .close-bt {
+    margin-left: auto;
+    margin-top: -5px;
+    font-size: 20px;
+  }
+
+  .appointment-form-title {
+    font-size: 14px;
+    margin-left: 0;
+    text-align: center;
+  }
+
+  .appointment-form-label {
+    font-size: 11px;
+  }
+
+  .appointment-form-input,
+  .appointment-form-textarea {
+    padding: 6px;
+    font-size: 12px;
+  }
+
+  .appointment-form-button {
+    padding: 8px 0;
+    width: 100%;
+    font-size: 12px;
+  }
+
+}
