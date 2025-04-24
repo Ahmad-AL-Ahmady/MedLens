@@ -296,31 +296,31 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      <section class="home-How-section">
-        <div class="home-How-container">
-          <h2 class="home-How-title">How It Works</h2>
-          <p class="home-How-steps">Simple steps to get started</p>
-          <div class="home-how-step-container">
-            <div class="home-how-step-card">
-              <div class="home-how-step-number">1</div>
-              <h3 class="home-how-step-heading">Input Symptoms</h3>
-              <p class="home-how-step-text">
+      <section className="home-How-section">
+        <div className="home-How-container">
+          <h2 className="home-How-title">How It Works</h2>
+          <p className="home-How-steps">Simple steps to get started</p>
+          <div className="home-how-step-container">
+            <div className="home-how-step-card">
+              <div className="home-how-step-number">1</div>
+              <h3 className="home-how-step-heading">Input Symptoms</h3>
+              <p className="home-how-step-text">
                 Enter your symptoms and medical history into our AI-powered
                 system.
               </p>
             </div>
-            <div class="home-how-step-card">
-              <div class="home-how-step-number">2</div>
-              <h3 class="home-how-step-heading">Get AI Analysis</h3>
-              <p class="home-how-step-text">
+            <div className="home-how-step-card">
+              <div className="home-how-step-number">2</div>
+              <h3 className="home-how-step-heading">Get AI Analysis</h3>
+              <p className="home-how-step-text">
                 Our advanced AI analyzes your information and provides potential
                 diagnoses..
               </p>
             </div>
-            <div class="home-how-step-card">
-              <div class="home-how-step-number">3</div>
-              <h3 class="home-how-step-heading">Connect with Doctors</h3>
-              <p class="home-how-step-text">
+            <div className="home-how-step-card">
+              <div className="home-how-step-number">3</div>
+              <h3 className="home-how-step-heading">Connect with Doctors</h3>
+              <p className="home-how-step-text">
                 Book appointments with specialists based on the AI
                 recommendations..
               </p>

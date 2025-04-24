@@ -3,17 +3,15 @@ import { FcGoogle } from "react-icons/fc";
 import { Link, useNavigate } from "react-router-dom";
 import InfoSection from "../components/InfoSection";
 import "../Styles/Login.css";
+
 function LoginForm() {
   const navigate = useNavigate();
-
-  // ✅ State for form fields and errors
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // ✅ Make function async
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
@@ -29,20 +27,37 @@ function LoginForm() {
       });
 
       const data = await response.json();
+      console.log("API Response:", data); // Log to inspect the response
 
       if (!response.ok) {
         throw new Error(data.message || "Login failed");
       }
 
-      // ✅ Store token
-      if (rememberMe) {
-        localStorage.setItem("authToken", data.token);
-      } else {
-        sessionStorage.setItem("authToken", data.token);
+      // Verify user and userType exist in the response
+      if (!data.data?.user || !data.data.user.userType) {
+        throw new Error("User role not found in response");
       }
 
-      // ✅ Redirect user after login
-      navigate("/dashboard");
+      // Store token and role
+      const storage = rememberMe ? localStorage : sessionStorage;
+      storage.setItem("authToken", data.token);
+      storage.setItem("userRole", data.data.user.userType);
+
+      // Navigate based on user role
+      const userRole = data.data.user.userType;
+      console.log("User role:", userRole);
+
+      // Important: Check capitalization of role names as they come from your API
+      if (userRole === "Patient") {
+        navigate("/patient-dashboard");
+      } else if (userRole === "Doctor") {
+        navigate("/doctor-dashboard");
+      } else if (userRole === "Pharmacy") {
+        navigate("/pharmacy-dashboard");
+      } else {
+        console.error("Unknown role:", userRole);
+        throw new Error("Unknown user role: " + userRole);
+      }
     } catch (error) {
       setError(error.message || "An error occurred during login");
       console.error("Login error:", error);
@@ -63,16 +78,12 @@ function LoginForm() {
           <p className="login-subtitle">
             Access your MedLens healthcare account
           </p>
-
           <button onClick={handleGoogleLogin} className="google-login">
             <FcGoogle className="google-login-icon" /> Continue with Google
           </button>
-
           <div className="login-separator">
             <span className="login-separator-span">Or continue with</span>
           </div>
-
-          {/* ✅ Controlled inputs */}
           <form onSubmit={handleSubmit} className="login-form-inputs">
             <label className="login-form-inputs-label">Email Address</label>
             <input
@@ -85,7 +96,6 @@ function LoginForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-
             <label className="login-form-inputs-label">Password</label>
             <input
               className="login-form-input"
@@ -97,7 +107,6 @@ function LoginForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-
             <div className="login-options">
               <div className="login-options-div">
                 <input
@@ -112,8 +121,6 @@ function LoginForm() {
                 Forgot password?
               </Link>
             </div>
-
-            {/* ✅ Disable button when loading */}
             <button
               type="submit"
               className="login-form-submit-btn"
@@ -121,11 +128,8 @@ function LoginForm() {
             >
               {isLoading ? "Signing in..." : "Sign in"}
             </button>
-
-            {/* ✅ Show error message */}
             {error && <p className="error-message">{error}</p>}
           </form>
-
           <p className="signup-link-login-form">
             Don't have an account?{" "}
             <Link to="/signup" className="login-form-link-text">

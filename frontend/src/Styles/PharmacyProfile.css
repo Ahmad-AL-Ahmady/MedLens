@@ -38,6 +38,7 @@
   flex-direction: column;
   justify-content: center;
   text-align: left;
+  margin-bottom: 20px;
 }
 
 .pharmacy-profile-name {
@@ -58,7 +59,7 @@
   gap: 7px;
 }
 
-.pharmacy-profile-details svg {
+.pharmacy-header-top svg {
   margin-right: 7px;
 }
 
@@ -70,24 +71,43 @@
   color: #484848;
 }
 
+.pharmacy-profile-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.pharmacy-profile-info-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.top-right-buttons {
+  display: flex;
+  gap: 12px;
+  margin-left: 265px;
+  padding-bottom: 20px;
+}
+
+.edit-profile-btn,
 .operating-hours-title {
   display: flex;
   align-items: center;
+  gap: 6px;
   background: linear-gradient(135deg, #5795f9 0%, #1e56cf 100%);
   color: white;
-  padding: 12px 13px;
+  padding: 10px 14px;
+  border: none;
   border-radius: 8px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: bold;
   cursor: pointer;
-  border: none;
-  outline: none;
-  position: absolute;
-  right: 20px;
-  top: 15px;
   transition: background 0.3s ease;
 }
 
+.edit-profile-btn:hover,
 .operating-hours-title:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -167,6 +187,120 @@
   margin-top: 2px;
 }
 
+.edit-profile-btn svg {
+  vertical-align: middle;
+  margin-bottom: 1px;
+}
+
+/* ✅ Form Styles */
+.full-page-form {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  background-color: #fff;
+  border-radius: 10px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 5px;
+}
+
+.operating-hours-edit {
+  margin-top: 20px;
+}
+
+.day-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.day-label {
+  width: 100px;
+  font-weight: 500;
+}
+
+.edit-profile-form {
+  max-width: 600px;
+  margin: 25px auto;
+  background-color: #fff;
+  border-radius: 12px;
+  border: 1px solid #1f61a8;
+  box-shadow: 0 0 0 2.5px rgba(165, 207, 255, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.edit-profile-form label {
+  font-size: 14px;
+  color: #1f61a8;
+  margin-left: 3px;
+}
+
+.edit-profile-form h2 {
+  text-align: center;
+  color: #1f61a8;
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+
+.edit-profile-form input[type="text"],
+.edit-profile-form input[type="email"],
+.edit-profile-form input[type="file"] {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  outline: none;
+  transition: border 0.3s ease;
+}
+
+.edit-profile-form input:focus {
+  border-color: #1f61a8;
+}
+
+.form-btns {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.save-btn,
+.cancel-btn {
+  flex: 1;
+  padding: 10px 10px;
+  font-size: 14px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.save-btn {
+  background-color: #1f61a8;
+  color: white;
+}
+
+.save-btn:hover {
+  background-color: #1c5c9f;
+}
+
+.cancel-btn {
+  background-color: #f1f1f1;
+  color: #333;
+}
+
+.cancel-btn:hover {
+  background-color: #e0e0e0;
+}
+
 /* ✅ Stats Cards */
 .pharmacy-profile-stats {
   display: flex;
@@ -181,6 +315,13 @@
   border-radius: 10px;
   text-align: center;
   margin: 0 5px;
+  border: 0.01px solid #f8fafc;
+}
+
+.pharmacy-profile-card:hover {
+  outline: none;
+  border-color: #c0d7f2;
+  box-shadow: 0 0 0 2.5px rgba(147, 197, 253, 0.1);
 }
 
 .pharmacy-profile-card span {
@@ -315,5 +456,23 @@
 
   .pharmacy-profile-card {
     flex: 1 1 100%;
+  }
+
+  .top-right-buttons {
+    display: inline;
+    margin-left: 0;
+    padding-bottom: 10px;
+  }
+
+  .edit-profile-btn {
+    width: 100%;
+    justify-content: center;
+    margin-top: 7px;
+  }
+
+  .edit-profile-form input[type="text"],
+  .edit-profile-form input[type="email"],
+  .edit-profile-form input[type="file"] {
+    font-size: 12px;
   }
 }

@@ -15,11 +15,12 @@ export default function PharmacyDashboard() {
     "Dermatology",
     "Pediatrics",
   ]);
+  const [error, setError] = useState(null);
 
-  // Retrieve auth token (assuming it's stored after login)
+  // Retrieve auth token from localStorage (assumes it's stored after login)
   const authToken = localStorage.getItem("authToken");
 
-  // Fetch data on component mount
+  // Fetch inventory and all medications on component mount
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -46,19 +47,22 @@ export default function PharmacyDashboard() {
         setAllMedicines(medicationsData.data.medications);
       } catch (error) {
         console.error("Error fetching data:", error);
+        setError(error.message || "An error occurred while fetching data");
       }
     };
     fetchData();
   }, [authToken]);
 
-  // Filter medicines not in inventory
+  // Filter medicines not already in inventory for the "existing" mode dropdown
   const availableMedicines = allMedicines.filter(
-    (med) => !medicines.some((m) => m.medication._id === med._id)
+    (med) =>
+      !medicines.some((m) => m.medication._id.toString() === med._id.toString())
   );
 
-  // Handle adding a new or existing medicine
+  // Handle submission for adding a new or existing medicine
   const handleAddSubmit = async (e) => {
     e.preventDefault();
+    setError(null); // Clear previous errors
     const formData = new FormData(e.target);
     const price = parseFloat(formData.get("price"));
     const stock = parseInt(formData.get("stock"));
@@ -66,7 +70,7 @@ export default function PharmacyDashboard() {
 
     try {
       if (addMode === "new") {
-        // Create new medication
+        // Create a new medication
         const name = formData.get("name");
         const category = formData.get("category");
         const strength = formData.get("strength");
@@ -81,7 +85,7 @@ export default function PharmacyDashboard() {
               "Content-Type": "application/json",
               Authorization: `Bearer ${authToken}`,
             },
-            body: JSON.stringify({ name, description, strength }),
+            body: JSON.stringify({ name, description, strength, category }),
           }
         );
         if (!medicationResponse.ok)
@@ -89,10 +93,11 @@ export default function PharmacyDashboard() {
         const medicationData = await medicationResponse.json();
         medicationId = medicationData.data.medication._id;
       } else {
+        // Use existing medication ID
         medicationId = formData.get("medicineId");
       }
 
-      // Add to inventory
+      // Add the medication to inventory
       const inventoryResponse = await fetch(
         "http://localhost:3000/api/pharmacies/inventory",
         {
@@ -115,12 +120,14 @@ export default function PharmacyDashboard() {
       setShowAddForm(false);
     } catch (error) {
       console.error("Error adding medicine:", error);
+      setError(error.message || "An error occurred while adding the medicine");
     }
   };
 
-  // Handle editing an existing medicine
+  // Handle submission for editing an existing medicine
   const handleEditSubmit = async (e) => {
     e.preventDefault();
+    setError(null); // Clear previous errors
     const formData = new FormData(e.target);
     const updatedMedicine = {
       price: parseFloat(formData.get("price")),
@@ -154,6 +161,9 @@ export default function PharmacyDashboard() {
       setEditingMedicine(null);
     } catch (error) {
       console.error("Error updating medicine:", error);
+      setError(
+        error.message || "An error occurred while updating the medicine"
+      );
     }
   };
 
@@ -259,6 +269,7 @@ export default function PharmacyDashboard() {
               className="pharmacy-dashboard-form-content"
               onSubmit={handleEditSubmit}
             >
+              {error && <div className="pharmacy-dashboard-error">{error}</div>}
               <div className="pharmacy-dashboard-form-column">
                 <div className="pharmacy-dashboard-form-group">
                   <label>Price ($)</label>
@@ -335,6 +346,7 @@ export default function PharmacyDashboard() {
               className="pharmacy-dashboard-form-content"
               onSubmit={handleAddSubmit}
             >
+              {error && <div className="pharmacy-dashboard-error">{error}</div>}
               <div className="pharmacy-dashboard-form-group pharmacy-dashboard-form-group--radio">
                 <label>
                   <input
