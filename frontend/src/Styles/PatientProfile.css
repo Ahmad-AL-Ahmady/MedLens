@@ -14,7 +14,7 @@
   align-items: center;
   gap: 30px;
   border-bottom: 0.1px solid #eeeeee;
-  width: 97%;
+  width: 98%;
   padding-bottom: 20px;
   margin-bottom: 15px;
   margin-left: 12px;
@@ -25,6 +25,31 @@
   height: 100px;
   object-fit: cover;
   margin-right: 20px;
+}
+
+.patient-profile-edit-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.edit-patient-profile-button {
+  background: linear-gradient(135deg, #5795f9 0%, #1e56cf 100%);
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  gap: 7px;
+  margin-left: auto;
+  margin-bottom: 40px;
+}
+
+.edit-patient-profile-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .patient-profile-info h1 {
@@ -58,13 +83,110 @@
   margin-bottom: 3px;
 }
 
+/* Edit Patient Profile Form */
+.edit-patient-form-background {
+  background: #f6fafd;
+  padding: 50px 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.edit-patient-form-wrapperr {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 95vh;
+  width: 50%;
+  background-color: white;
+  box-shadow: 0 4px 12px rgba(3, 105, 161, 0.08);
+  backdrop-filter: blur(2px);
+  border-radius: 12px;
+}
+
+.edit-patient-profile-form {
+  background-color: #fff;
+  padding: 30px 40px;
+  border-radius: 12px;
+  border: 1px solid #1f61a8;
+  box-shadow: 0 0 0 2.5px rgba(165, 207, 255, 0.5);
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.edit-patient-profile-form h2 {
+  text-align: center;
+  margin-bottom: 10px;
+  color: #1f61a8;
+}
+
+.edit-patient-profile-form label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 5px;
+  display: block;
+  color: #1f61a8;
+}
+
+.edit-patient-profile-form input,
+.edit-patient-profile-form select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.edit-patient-profile-form input:focus,
+.edit-patient-profile-form select:focus {
+  border-color: #1f61a8;
+  outline: none;
+}
+
+.form-patient-profile-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.form-patient-profile-buttons button {
+  flex: 1;
+  margin: 0 5px;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.form-patient-profile-buttons button[type="submit"] {
+  background-color: #1f61a8;
+  color: white;
+}
+
+.form-patient-profile-buttons button[type="submit"]:hover {
+  background-color: #1c5c9f;
+}
+
+.form-patient-profile-buttons button[type="button"] {
+  background-color: #ccc;
+  color: #333;
+}
+
+.form-patient-profile-buttons button[type="button"]:hover {
+  background-color: #aaa;
+}
+
 /* Summary Cards */
 .patient-profile-summary-cards {
   display: flex;
   justify-content: space-between;
-  max-width: 500px;
   margin-bottom: 40px;
-  margin-left: 120px;
 }
 
 .patient-profile-card {
