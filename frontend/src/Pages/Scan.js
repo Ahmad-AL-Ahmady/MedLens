@@ -9,7 +9,7 @@ export default function ScanPage() {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [scanResult, setScanResult] = useState(null);
   const [confidence, setConfidence] = useState(null);
-  const [bodyArea, setBodyArea] = useState("");
+  const [bodyArea, setBodyArea] = useState("Chest"); // Default value set to Chest
   const [isScanning, setIsScanning] = useState(false);
 
   const handleFileChange = (event) => {
@@ -32,6 +32,7 @@ export default function ScanPage() {
     setIsScanning(true);
     const formData = new FormData();
     formData.append("file", selectedFile);
+    formData.append("bodyPart", bodyArea); // Add the selected body part to the form data
 
     try {
       const response = await fetch("http://127.0.0.1:8000/predict/", {
@@ -58,15 +59,22 @@ export default function ScanPage() {
           <p className="scan-subtitle">Upload an X-ray image for analysis</p>
         </div>
 
-        <label className="dropdown-label">Body Part</label>
+        <label className="dropdown-label">Select Body Part</label>
         <select
           className="body-part-select"
           value={bodyArea}
           onChange={(e) => setBodyArea(e.target.value)}
         >
-          <option value="chest">Chest</option>
-          <option value="dentist">Dentist</option>
-          <option value="bones">Bones</option>
+          <option value="Chest">Chest</option>
+          <option value="Eye">Eye</option>
+          <option value="Brain">Brain</option>
+          <option value="Bones">Bones</option>
+          <option value="Breast">Breast</option>
+          <option value="Lung">Lung</option>
+          <option value="Kidney">Kidney</option>
+          <option value="Nail">Nail</option>
+          <option value="Skin">Skin</option>
+          <option value="Alzheimer">Alzheimer</option>
         </select>
 
         <div className="upload-area">
@@ -129,7 +137,7 @@ export default function ScanPage() {
         />
       )}
 
-      {/* تمرير نتيجة التصنيف إلى ChatBot */}
+      {/* Pass the scan result to ChatBot */}
       <ChatBot classificationResult={scanResult} />
     </div>
   );
