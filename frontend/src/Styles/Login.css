@@ -219,17 +219,7 @@
   margin-top: 8px;
   text-align: left;
 }
-.custom-swal-popup {
-  border-radius: 10px;
-}
-.custom-swal-title {
-  font-size: 1.5rem;
-  color: #333;
-}
-.custom-swal-content {
-  font-size: 1rem;
-  color: #666;
-}
+
 /* Responsive Breakpoints */
 @media (max-width: 1200px) {
   .login-left {
