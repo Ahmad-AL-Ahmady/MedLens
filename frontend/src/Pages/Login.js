@@ -1,23 +1,25 @@
 import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { Link, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2"; // Import SweetAlert2 for professional alerts
 import InfoSection from "../components/InfoSection";
 import "../Styles/Login.css";
 
 function LoginForm() {
+  // State management for form inputs and UI
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  // Handle form submission for login
   async function handleSubmit(e) {
     e.preventDefault();
-    setError("");
     setIsLoading(true);
 
     try {
+      // Make API request to login endpoint
       const response = await fetch("http://localhost:4000/api/users/login", {
         method: "POST",
         headers: {
@@ -26,19 +28,34 @@ function LoginForm() {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
-      console.log("API Response:", data); // Log to inspect the response
-
+      // Check if the response is OK before parsing as JSON
       if (!response.ok) {
-        throw new Error(data.message || "Login failed");
+        if (response.status === 401) {
+          throw new Error("Invalid email or password");
+        } else if (response.status === 404) {
+          throw new Error("User not found");
+        } else {
+          // Try to parse the response as JSON to get the error message
+          const data = await response.json().catch(() => {
+            throw new Error("Server error: Unable to process the request");
+          });
+          throw new Error(data.message || "Login failed");
+        }
       }
+
+      // Parse the response as JSON, handle JSON parsing errors
+      const data = await response.json().catch((error) => {
+        throw new Error("Server error: Invalid response format");
+      });
+
+      console.log("API Response:", data);
 
       // Verify user and userType exist in the response
       if (!data.data?.user || !data.data.user.userType) {
         throw new Error("User role not found in response");
       }
 
-      // Store token and role
+      // Store token and role in localStorage or sessionStorage based on rememberMe
       const storage = rememberMe ? localStorage : sessionStorage;
       storage.setItem("authToken", data.token);
       storage.setItem("userRole", data.data.user.userType);
@@ -47,7 +64,6 @@ function LoginForm() {
       const userRole = data.data.user.userType;
       console.log("User role:", userRole);
 
-      // Important: Check capitalization of role names as they come from your API
       if (userRole === "Patient") {
         navigate("/patient-dashboard");
       } else if (userRole === "Doctor") {
@@ -58,18 +74,68 @@ function LoginForm() {
         console.error("Unknown role:", userRole);
         throw new Error("Unknown user role: " + userRole);
       }
+
+      // Show success alert on successful login
+      Swal.fire({
+        icon: "success",
+        title: "Login Successful",
+        text: "Welcome back to MedLens!",
+        timer: 2000,
+        showConfirmButton: false,
+      });
     } catch (error) {
-      setError(error.message || "An error occurred during login");
+      // Display professional alerts based on error type
+      let title = "Error";
+      let text = error.message || "An unexpected error occurred";
+
+      if (error.message.includes("Invalid email or password")) {
+        title = "Invalid Credentials";
+        text =
+          "The email or password you entered is incorrect. Please try again.";
+      } else if (error.message.includes("User not found")) {
+        title = "User Not Found";
+        text = "No account exists with this email. Please sign up.";
+      } else if (error.message.includes("User role not found")) {
+        title = "Role Error";
+        text = "Unable to determine user role. Please contact support.";
+      } else if (error.message.includes("Unknown user role")) {
+        title = "Invalid Role";
+        text = "The user role is not recognized. Please contact support.";
+      } else if (error.message.includes("NetworkError")) {
+        title = "Network Error";
+        text =
+          "Unable to connect to the server. Please check your internet connection.";
+      } else if (error.message.includes("Server error")) {
+        title = "Server Error";
+        text =
+          "We couldn't process your request due to a server issue. Please try again later.";
+      } else if (error.message.includes("Invalid response format")) {
+        title = "Server Error";
+        text =
+          "Received an invalid response from the server. Please try again later.";
+      }
+
+      // Show error alert using SweetAlert2
+      Swal.fire({
+        icon: "error",
+        title: title,
+        text: text,
+        confirmButtonText: "OK",
+        confirmButtonColor: "#3085d6",
+      });
+
       console.error("Login error:", error);
     } finally {
       setIsLoading(false);
     }
   }
 
+  // Handle Google login redirection
   const handleGoogleLogin = () => {
     navigate("/signup-google");
   };
 
+  // JSX for the login form UI
   return (
     <div className="login-container">
       <div className="login-left">
@@ -128,7 +194,6 @@ function LoginForm() {
             >
               {isLoading ? "Signing in..." : "Sign in"}
             </button>
-            {error && <p className="error-message">{error}</p>}
           </form>
           <p className="signup-link-login-form">
             Don't have an account?{" "}
