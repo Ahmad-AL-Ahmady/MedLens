@@ -86,6 +86,89 @@
   color: #1e56cf;
 }
 
+.edit-doctor-profile-button {
+  background: linear-gradient(135deg, #5795f9 0%, #1e56cf 100%);
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  gap: 7px;
+  margin-left: auto;
+  margin-bottom: 40px;
+}
+
+.edit-docror-profile-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* edit profile form */
+.edit-doctor-profile-form-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: white;
+  padding: 40px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.edit-doctor-profile-form {
+  max-width: 600px;
+  margin: auto;
+}
+
+.edit-doctor-profile-form h2 {
+  text-align: center;
+  margin-bottom: 10px;
+  color: #1f61a8;
+}
+
+.edit-doctor-profile-form label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.edit-doctor-profile-form input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.edit-doctor-profile-form button {
+  padding: 10px 20px;
+  margin-right: 10px;
+  border-radius: 5px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.edit-doctor-profile-form  button[type="submit"] {
+  background-color: #1f61a8;
+  color: white;
+}
+
+.edit-doctor-profile-form  button[type="submit"]:hover {
+  background-color: #1c5c9f;
+}
+
+.edit-doctor-profile-form  button[type="button"] {
+  background-color: #ccc;
+  color: #333;
+}
+
+.edit-doctor-profile-form  button[type="button"]:hover {
+  background-color: #aaa;
+}
+
 /* Working Hours */
 .modal-content {
   background: #fff;
@@ -105,7 +188,6 @@
   margin-left: -75px !important;
   cursor: pointer;
 }
-
 
 .operating-hours-grid {
   grid-template-columns: repeat(2, 1fr);
@@ -134,7 +216,6 @@
 
 }
 
-
 .status {
   font-size: 10px;
   font-weight: bold;
@@ -143,14 +224,11 @@
   margin-bottom: 3px;
 }
 
-
 .status.open {
   background-color: #e3fcef; 
   color: #1f9254; 
   border: 1px solid #69c493;
 }
-
-
 
 .status.closed {
   background-color: #e6f0ff; 
@@ -158,8 +236,6 @@
   border: 1px solid #7faaf0;
   padding: 0px 14px;
 }
-
-
 
 .close-btn {
   top: 1px;
@@ -284,8 +360,6 @@
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
 }
-
-
 
 /* Cards Section*/
 .doctor-profile-stats {

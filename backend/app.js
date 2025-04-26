@@ -35,8 +35,24 @@ app.use(
 app.use(passport.initialize());
 
 // Serve static files - Add this line
-app.use("/public", express.static(path.join(__dirname, "public")));
-
+app.use(
+  "/public",
+  express.static(path.join(__dirname, "public"), {
+    setHeaders: (res, path) => {
+      if (
+        path.endsWith(".jpg") ||
+        path.endsWith(".jpeg") ||
+        path.endsWith(".png") ||
+        path.endsWith(".gif")
+      ) {
+        // Prevent caching for image files
+        res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+        res.setHeader("Pragma", "no-cache");
+        res.setHeader("Expires", "0");
+      }
+    },
+  })
+);
 // Debug route to test base URL
 app.get("/", (req, res) => {
   res.send("Server is running");

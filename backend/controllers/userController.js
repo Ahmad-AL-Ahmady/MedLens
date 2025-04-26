@@ -13,6 +13,24 @@ exports.getMe = catchAsync(async (req, res, next) => {
     return next(new AppError("User not found", 404));
   }
 
+  // Check if avatar exists and fallback to default if needed
+  if (user.avatar && user.avatar !== "default.jpg") {
+    const avatarPath = path.join(
+      __dirname,
+      "..",
+      "public",
+      "uploads",
+      "users",
+      user.avatar
+    );
+    try {
+      await fs.access(avatarPath);
+    } catch (err) {
+      console.log(`Avatar not found: ${user.avatar}, falling back to default`);
+      user.avatar = "default.jpg";
+    }
+  }
+
   // Populate different profile data based on user type
   let populatedUser;
   if (user.userType === "Patient") {
@@ -85,12 +103,28 @@ exports.uploadAvatar = catchAsync(async (req, res, next) => {
     return next(new AppError("Please upload an image file.", 400));
   }
 
-  // If user already has an avatar, delete the old one
+  // Define absolute paths properly
+  const uploadsDir = path.join(__dirname, "..", "public", "uploads", "users");
+  const newAvatarPath = path.join(uploadsDir, req.file.filename);
+
+  // Check if new avatar file exists
+  try {
+    await fs.access(newAvatarPath);
+    console.log(`New avatar file exists at: ${newAvatarPath}`);
+  } catch (err) {
+    return next(new AppError("Error saving avatar file.", 500));
+  }
+
+  // Delete old avatar if it exists and isn't the default
   if (req.user.avatar && req.user.avatar !== "default.jpg") {
+    const oldAvatarPath = path.join(uploadsDir, req.user.avatar);
     try {
-      await fs.unlink(path.join("public/uploads/users", req.user.avatar));
+      await fs.access(oldAvatarPath);
+      await fs.unlink(oldAvatarPath);
+      console.log(`Deleted old avatar: ${oldAvatarPath}`);
     } catch (err) {
-      console.error("Error deleting old avatar:", err);
+      console.log(`Note: Could not delete old avatar: ${err.message}`);
+      // Continue even if deletion fails
     }
   }
 
@@ -104,10 +138,15 @@ exports.uploadAvatar = catchAsync(async (req, res, next) => {
     }
   );
 
+  // Add timestamp for cache busting
+  const timestamp = Date.now();
+  const avatarUrl = `/public/uploads/users/${req.file.filename}?t=${timestamp}`;
+
   res.status(200).json({
     status: "success",
     data: {
       user: updatedUser,
+      avatarUrl,
     },
   });
 });
