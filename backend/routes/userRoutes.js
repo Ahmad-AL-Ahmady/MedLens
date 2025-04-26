@@ -3,8 +3,16 @@ const passport = require("passport");
 const authController = require("../controllers/authController");
 const userController = require("../controllers/userController");
 const upload = require("../utils/multerConfig");
+const uploadConfig = require("../utils/multerConfig");
+const multer = require("multer");
 
 const router = express.Router();
+
+const avatarUpload = multer({
+  storage: uploadConfig.avatar.storage,
+  fileFilter: uploadConfig.avatar.fileFilter,
+  limits: uploadConfig.avatar.limits,
+}).single("avatar");
 
 // Public routes - no authentication required
 router.post("/signup", authController.signup);
@@ -35,7 +43,8 @@ router.patch("/completeProfile", authController.completeProfile);
 router.patch("/updatePassword", authController.updatePassword);
 router.patch(
   "/updateAvatar",
-  upload.avatar.single("avatar"),
+  avatarUpload,
+  uploadConfig.avatar.compressMiddleware,
   userController.uploadAvatar
 );
 router.delete("/deleteAvatar", userController.deleteAvatar);
