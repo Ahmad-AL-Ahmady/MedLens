@@ -85,6 +85,8 @@ exports.getMyProfile = catchAsync(async (req, res, next) => {
       country: pharmacyProfile.country,
     },
     profile: pharmacyProfile,
+    avatar: user.avatar,
+    createdAt: user.createdAt,
   };
 
   res.status(200).json({

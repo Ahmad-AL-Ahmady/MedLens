@@ -99,7 +99,7 @@ const PharmacyProfile = () => {
           state: data.data.profile?.state || "",
           country: data.data.profile?.country || "",
           operatingHours: formattedOperatingHours,
-          avatar: data.data.profile?.avatar || null,
+          avatar: data.data?.avatar || null,
           //avatar: null,
         });
       } else {
@@ -371,6 +371,10 @@ const PharmacyProfile = () => {
         <>
           <div className="pharmacy-profile-header">
             <div className="pharmacy-header-top">
+              {/* {console.log(
+                "Debugging avatar source:",
+                `http://localhost:4000/public/uploads/users/${pharmacy.avatar}`
+              )} */}
               <img
                 src={`http://localhost:4000/public/uploads/users/${pharmacy.avatar}`}
                 alt="Pharmacy"
