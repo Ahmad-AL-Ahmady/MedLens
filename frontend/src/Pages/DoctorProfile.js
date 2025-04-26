@@ -6,8 +6,9 @@ import {
   Clock,
   ThumbsUp,
   Star,
-  UserCheck,
+  DollarSign,
   BadgeCheck,
+  Edit,
 } from "lucide-react";
 import "../Styles/DoctorProfile.css";
 
@@ -23,6 +24,82 @@ const DoctorProfile = () => {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [reason, setReason] = useState("");
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [formData, setFormData] = useState({
+    city: "",
+    state: "",
+    country: "",
+    fees: "",
+    availability: {
+friday: {start: '', end: '', isAvailable: true},
+monday: {start: '', end: '', isAvailable: true},
+saturday: {start: '', end: '', isAvailable: true},
+sunday: {isAvailable: false},
+thursday: {start: '', end: '', isAvailable: true},
+tuesday: {start: '', end: '', isAvailable: true},
+wednesday: {start: '', end: '', isAvailable: true}
+},
+  });
+  const token =
+      localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
+  const fetchDoctorProfile = async () => {
+    try {
+      let apiUrl = id
+        ? `http://localhost:4000/api/doctors/${id}`
+        : "http://localhost:4000/api/doctors/profile";
+
+      const response = await fetch(apiUrl, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch doctor profile");
+
+      const data = await response.json();
+      //console.log("data:", data);
+
+      if (data.status === "success" && data.data) {
+        const defaultWorkingHours = {
+          friday: {start: '', end: '', isAvailable: true},
+          monday: {start: '', end: '', isAvailable: true},
+          saturday: {start: '', end: '', isAvailable: true},
+          sunday: {isAvailable: false},
+          thursday: {start: '', end: '', isAvailable: true},
+          tuesday: {start: '', end: '', isAvailable: true},
+          wednesday: {start: '', end: '', isAvailable: true}
+        };
+
+        const rawWorkingHours = data.data.profile?.availability || {};
+        const formattedWorkingHours = {};
+
+        Object.entries(defaultWorkingHours).forEach(([day, defaults]) => {
+          const lowerDay = day.toLowerCase();
+          const backendDay = rawWorkingHours[lowerDay] || {};
+          formattedWorkingHours[day] = {
+            start: backendDay.open || "",
+            end: backendDay.close || "",
+             isAvailable: backendDay.isAvailable || false,
+          };
+        });
+
+        setDoctor(data.data);
+        setProfile(data.data.profile);
+        setFormData({
+          city: data.data.profile?.city,
+          state: data.data.profile?.state,
+          country: data.data.profile?.country,
+          fees: data.data.fees,
+          availability:formattedWorkingHours,
+        });
+      } else {
+        setError("Failed to fetch doctor data");
+      }
+    } catch (error) {
+      console.error("Error fetching doctor profile:", error);
+      setError("Error fetching doctor profile");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const token =
@@ -34,35 +111,6 @@ const DoctorProfile = () => {
       setLoading(false);
       return;
     }
-
-    const fetchDoctorProfile = async () => {
-      try {
-        let apiUrl = id
-          ? `http://localhost:4000/api/doctors/${id}`
-          : "http://localhost:4000/api/doctors/profile";
-
-        const response = await fetch(apiUrl, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (!response.ok) throw new Error("Failed to fetch doctor profile");
-
-        const data = await response.json();
-        console.log("data:", data);
-
-        if (data.status === "success" && data.data) {
-          setDoctor(data.data);
-          setProfile(data.data.profile);
-        } else {
-          setError("Failed to fetch doctor data");
-        }
-      } catch (error) {
-        console.error("Error fetching doctor profile:", error);
-        setError("Error fetching doctor profile");
-      } finally {
-        setLoading(false);
-      }
-    };
 
     fetchDoctorProfile();
   }, [id]);
@@ -109,6 +157,36 @@ const DoctorProfile = () => {
       console.error("Error:", error);
       alert("Failed to book appointment. Error occurred in the request.");
     }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const edithandleSubmit = (e) => {
+    e.preventDefault();
+  
+    fetch("http://localhost:4000/api/doctors/profile", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(formData),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        alert("Profile updated!");
+        fetchDoctorProfile(); 
+        setShowEditForm(false);
+      })
+      .catch((error) => {
+        console.error("Error updating profile:", error);
+      });
   };
 
   if (loading) return <p>Loading...</p>;
@@ -193,13 +271,83 @@ const DoctorProfile = () => {
                   </div>
                 </>
               )}
-              <button
-                className="add-appointment-btn"
-                onClick={() => setShowModal(true)}
-              >
-                <FaRegCalendarAlt /> Add Appointment
-              </button>
-
+              {id ? (
+                <button
+                  className="add-appointment-btn"
+                  onClick={() => setShowModal(true)}
+                >
+                  <FaRegCalendarAlt /> Add Appointment
+                </button>
+              ) : (
+                <button
+                  className="edit-doctor-profile-button"
+                  onClick={() => setShowEditForm(true)}
+                >
+                  <Edit size={15} color="white" /> Edit Profile
+                </button>
+              )}
+              {!id && showEditForm && (
+                <div className="edit-doctor-profile-form-overlay">
+                  <h2>Edit Doctor Profile</h2>
+                  <form
+                    onSubmit={edithandleSubmit}
+                    className="edit-doctor-profile-form"
+                  >
+                    <div>
+                      <label> City </label>
+                      <input
+                        type="text"
+                        name="city"
+                        value={formData.city}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div>
+                      <label>State </label>
+                      <input
+                        type="text"
+                        name="state"
+                        value={formData.state}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div>
+                      <label>Country</label>
+                      <input
+                        type="text"
+                        name="country"
+                        value={formData.country}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div>
+                      <label>Fees</label>
+                      <input
+                        type="number"
+                        name="fees"
+                        value={formData.fees}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div>
+                      <label>Availability</label>
+                      <input
+                        type="text"
+                        name="availability"
+                        value={formData.availability}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <button type="submit">Save </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowEditForm(false)}
+                    >
+                      Cancel
+                    </button>
+                  </form>
+                </div>
+              )}
               {showModal && (
                 <div className="modal-overlay">
                   <div className="modal-container">
@@ -269,9 +417,9 @@ const DoctorProfile = () => {
         {/* stats card */}
         <div className="doctor-profile-stats">
           <div className="doctor-profile-card">
-            <UserCheck size={16} color="#1f61a8" />
-            <span>{profile?.patients ?? 0}+</span>
-            <p>Patients</p>
+            <DollarSign size={16} color="#1f61a8" />
+            <span>{profile?.fees ?? 0}</span>
+            <p>Fees</p>
           </div>
           <div className="doctor-profile-card">
             <BadgeCheck size={16} color="#1f61a8" />
