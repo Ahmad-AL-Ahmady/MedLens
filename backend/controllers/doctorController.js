@@ -70,6 +70,7 @@ exports.getMyProfile = catchAsync(async (req, res, next) => {
   const responseData = {
     id: user._id,
     firstName: user.firstName,
+    avatar: user.avatar,
     lastName: user.lastName,
     email: user.email,
     specialization: user.specialization,
