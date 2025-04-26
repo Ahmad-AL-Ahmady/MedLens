@@ -23,6 +23,7 @@
 .patient-profile-img {
   width: 100px;
   height: 100px;
+  border-radius: 50px;
   object-fit: cover;
   margin-right: 20px;
 }
@@ -232,6 +233,7 @@
 .patient-profile-scan-section svg {
   margin-bottom: 4px;
 }
+
 /* Tables */
 .patient-profile-data-table {
   border-collapse: separate;
