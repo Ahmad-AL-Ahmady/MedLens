@@ -23,7 +23,12 @@ export default function Navbar() {
         Authorization: `Bearer ${token}`,
       },
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Error: ${res.status} ${res.statusText}`);
+        }
+        return res.json();
+      })
       .then((data) => {
         // console.log("Profile data:", data);
         if (data.status === "success") {
@@ -75,6 +80,10 @@ export default function Navbar() {
                 alt="Profile"
                 className="profile-avatar"
                 onClick={() => {
+                  if (!user || !user.user) {
+                    alert("Please log in to view your profile.");
+                    return;
+                  }
                   switch (user.user.userType) {
                     case "Patient":
                       navigate("/profile/patient");
