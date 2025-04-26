@@ -2,6 +2,7 @@ const multer = require("multer");
 const AppError = require("./appError");
 const fs = require("fs");
 const path = require("path");
+const { processAvatar, processMedicalScan } = require("./imageProcessor");
 
 // Ensure directories exist
 const ensureDirectoryExists = (dirPath) => {
@@ -38,8 +39,6 @@ const medicalScanStorage = multer.diskStorage({
   },
 });
 
-// Removed medication image storage configuration as per request
-
 // Image file filter
 const imageFileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image/")) {
@@ -64,23 +63,78 @@ const scanFileFilter = (req, file, cb) => {
   }
 };
 
+// Middleware to compress images after upload
+const compressAvatar = async (req, res, next) => {
+  if (!req.file) return next();
+
+  try {
+    const filePath = req.file.path;
+    const filename = path.basename(filePath);
+
+    // Skip compression for default.jpg
+    if (filename === "default.jpg") {
+      console.log("Skipping compression for default avatar");
+      return next();
+    }
+
+    const processedPath = await processAvatar(filePath);
+
+    // Update file information in the request
+    if (processedPath !== filePath) {
+      req.file.path = processedPath;
+      req.file.filename = path.basename(processedPath);
+    }
+
+    next();
+  } catch (error) {
+    console.error("Error compressing avatar:", error);
+    next(); // Continue without compression if there's an error
+  }
+};
+
+// Middleware to compress medical scan images after upload
+const compressMedicalScan = async (req, res, next) => {
+  if (!req.file) return next();
+
+  try {
+    // Only compress image files, not PDFs
+    if (req.file.mimetype.startsWith("image/")) {
+      const filePath = req.file.path;
+      const processedPath = await processMedicalScan(filePath);
+
+      // Update file information in the request
+      if (processedPath !== filePath) {
+        req.file.path = processedPath;
+        req.file.filename = path.basename(processedPath);
+      }
+    }
+
+    next();
+  } catch (error) {
+    console.error("Error compressing medical scan:", error);
+    next(); // Continue without compression if there's an error
+  }
+};
+
 // Export configurations for different upload types
 module.exports = {
-  // For user avatars (existing functionality)
-  avatar: multer({
+  // For user avatars with compression
+  avatar: {
     storage: userAvatarStorage,
     fileFilter: imageFileFilter,
     limits: {
       fileSize: 5 * 1024 * 1024, // 5MB limit
     },
-  }),
+    compressMiddleware: compressAvatar,
+  },
 
-  // For medical scans
-  medicalScan: multer({
+  // For medical scans with compression
+  medicalScan: {
     storage: medicalScanStorage,
     fileFilter: scanFileFilter,
     limits: {
       fileSize: 20 * 1024 * 1024, // 20MB limit for scans
     },
-  }),
+    compressMiddleware: compressMedicalScan,
+  },
 };

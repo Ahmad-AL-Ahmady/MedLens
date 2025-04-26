@@ -2,6 +2,15 @@ const express = require("express");
 const medicalScanController = require("../controllers/medicalScanController");
 const authController = require("../controllers/authController");
 const upload = require("../utils/multerConfig");
+const uploadConfig = require("../utils/multerConfig");
+const multer = require("multer");
+
+// Configure the upload with Multer
+const scanUpload = multer({
+  storage: uploadConfig.medicalScan.storage,
+  fileFilter: uploadConfig.medicalScan.fileFilter,
+  limits: uploadConfig.medicalScan.limits,
+}).single("image");
 
 const router = express.Router();
 
@@ -62,7 +71,8 @@ router.delete("/:id", medicalScanController.deleteScan);
  */
 router.post(
   "/:id/upload-image",
-  upload.medicalScan.single("image"), // <- Changed from upload.scans
+  scanUpload,
+  uploadConfig.medicalScan.compressMiddleware,
   medicalScanController.uploadScanImage
 );
 
