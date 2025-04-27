@@ -24,6 +24,7 @@ export default function DoctorDashboard() {
       if (!response.ok) throw new Error("Failed to fetch appointments");
 
       const data = await response.json();
+      console.log(data);
       if (data.status === "success" && data.data) {
         setAppointments(data.data.profile?.appointments || []);
       } else {
