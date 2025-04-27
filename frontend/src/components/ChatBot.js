@@ -30,7 +30,7 @@ export default function ChatBot({ classificationResult }) {
     }
   }, [classificationResult, isOpen, currentDisease]);
 
-  // Fetch details when chat opens if there’s a classification result
+  // Fetch details when chat opens if there's a classification result
   useEffect(() => {
     if (isOpen && messages.length === 0 && classificationResult) {
       fetchDiagnosisDetails(classificationResult);
@@ -68,21 +68,41 @@ export default function ChatBot({ classificationResult }) {
   const fetchDiagnosisDetails = async (disease) => {
     setLoading(true);
     try {
+      // First check if we have a current diagnosis from the server
+      const diagnosisResponse = await fetch("http://127.0.0.1:8000/current-diagnosis");
+      const diagnosisData = await diagnosisResponse.json();
+      
+      // Now get information about the diagnosis
       const response = await fetch("http://127.0.0.1:8000/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          message: `Provide detailed information and treatments for ${disease}`,
+          message: `Provide information for ${diagnosisData.classification_result || disease}`,
         }),
       });
+      
       const data = await response.json();
-      setMessages([
-        { text: data.response || "No details available.", isBot: true },
-      ]);
+      
+      if (data.response) {
+        setMessages([{ text: data.response, isBot: true }]);
+      } else if (data.error) {
+        setMessages([{ 
+          text: `Sorry, I couldn't get information about this condition: ${data.error}. Please try again later.`, 
+          isBot: true 
+        }]);
+      } else {
+        setMessages([{ 
+          text: "I'm having trouble getting information about this condition. Please try asking a specific question.", 
+          isBot: true 
+        }]);
+      }
     } catch (error) {
       console.error("Error fetching diagnosis details:", error);
       setMessages([
-        { text: "⚠️ Failed to fetch details. Please try again.", isBot: true },
+        { 
+          text: "⚠️ Failed to connect to the medical database. Please check your internet connection and try again.", 
+          isBot: true 
+        },
       ]);
     } finally {
       setLoading(false);
@@ -103,19 +123,44 @@ export default function ChatBot({ classificationResult }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: input }),
       });
+      
       const data = await response.json();
-      setMessages((prev) => [
-        ...prev,
-        { text: data.response || "No response available.", isBot: true },
-      ]);
+      
+      if (data.response) {
+        setMessages((prev) => [
+          ...prev,
+          { text: data.response, isBot: true },
+        ]);
+      } else if (data.error) {
+        setMessages((prev) => [
+          ...prev,
+          { text: `Sorry, I couldn't process your question: ${data.error}`, isBot: true },
+        ]);
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          { text: "I didn't understand that. Could you rephrase your question?", isBot: true },
+        ]);
+      }
     } catch (error) {
       console.error("Error sending query:", error);
       setMessages((prev) => [
         ...prev,
-        { text: "⚠️ An error occurred. Please try again.", isBot: true },
+        { 
+          text: "⚠️ Connection error. Please check your internet connection and try again.", 
+          isBot: true 
+        },
       ]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Function to handle keypress events
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
     }
   };
 
@@ -194,7 +239,7 @@ export default function ChatBot({ classificationResult }) {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                onKeyDown={handleKeyPress}
                 placeholder="Ask more about your condition..."
                 className="chat-input"
                 disabled={loading}
@@ -203,7 +248,7 @@ export default function ChatBot({ classificationResult }) {
               <button
                 onClick={handleSend}
                 className="send-button"
-                disabled={loading}
+                disabled={loading || !input.trim()}
                 aria-label="Send Message"
               >
                 <Send size={18} />

@@ -4,27 +4,15 @@ from pydantic import BaseModel
 from PIL import Image
 import numpy as np
 import io
-import re
 import os
-import requests
-from dotenv import load_dotenv
-from keras.models import load_model
 import uvicorn
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+from keras.models import load_model
 
-# Load environment variables
-load_dotenv()
-HF_TOKEN = os.getenv("HF_TOKEN")
-HUGGINGFACE_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
-
-if not HUGGINGFACE_API_KEY:
-    raise ValueError("🚨 Hugging Face API key is missing! Please check your .env file.")
-
-# API Config
-HF_API_URL = "https://api-inference.huggingface.co/models/google/flan-t5-base"
-HEADERS = {"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
-
-# Initialize app
+# إعداد FastAPI
 app = FastAPI()
+
+# تكوين CORS Middleware للسماح بالاتصالات من جميع المصادر
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -32,13 +20,33 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Load models
-primary_model = load_model("Models_ai/RAy_not_Ray.h5")
-nail_model = load_model("Models_ai/nail.h5")
-chest_model = load_model("Models_ai/chest.h5")
-Eye_model = load_model("Models_ai/Eye.h5")
-skin_model = load_model("Models_ai/skin_1.h5")
+# تحميل النموذج من HuggingFace
+model_name = "D://AI Project//flan-t5-large"  # المسار إلى النموذج المحفوظ محليًا
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
 
+
+# تحميل النماذج المحلية (مثال لنماذج تصنيف الأشعة السينية)
+def load_local_model(model_name: str):
+    model_path = f"./{model_name}"
+    if os.path.exists(model_path):
+        print(f"Loading {model_name} from local storage...")
+        return load_model(model_path)
+    else:
+        print(f"Model {model_name} not found locally. Downloading...")
+        model = load_model(model_name)
+        model.save(model_path)  # حفظ النموذج محليًا
+        return model
+
+
+# تحميل النماذج
+primary_model = load_local_model("Models_ai/RAy_not_Ray.h5")
+nail_model = load_local_model("Models_ai/nail.h5")
+chest_model = load_local_model("Models_ai/chest.h5")
+Eye_model = load_local_model("Models_ai/Eye.h5")
+skin_model = load_local_model("Models_ai/skin_1.h5")
+
+# تعاريف الأسماء لكل تصنيف
 CLASS_NAMES = {
     "primary": ["Ray", "Not Ray"],
     "nail": ["Healthy", "Onychomycosis", "Psoriasis"],
@@ -80,7 +88,13 @@ BODY_PART_TO_MODEL = {
 }
 
 
-# Diagnosis info class
+# دالة لتحويل الصورة إلى شكل قابل للاستخدام
+def preprocess_image(image: Image.Image) -> np.ndarray:
+    image = image.resize((224, 224))
+    return np.expand_dims(np.array(image) / 255.0, axis=0)
+
+
+# فئة لتخزين معلومات التشخيص
 class DiagnosisInfo:
     def __init__(self):
         self.classification_result = "Unknown"
@@ -103,11 +117,15 @@ class DiagnosisInfo:
 diagnosis = DiagnosisInfo()
 
 
-def preprocess_image(image: Image.Image) -> np.ndarray:
-    image = image.resize((224, 224))
-    return np.expand_dims(np.array(image) / 255.0, axis=0)
+# دالة لتوليد الاستجابة من النموذج
+def generate_response(prompt: str):
+    inputs = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True)
+    outputs = model.generate(**inputs, max_length=500)
+    response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    return response
 
 
+# API للتنبؤ باستخدام نموذج الصور
 @app.post("/predict/")
 async def predict(file: UploadFile = File(...), bodyPart: str = Form("Chest")):
     global diagnosis
@@ -116,11 +134,13 @@ async def predict(file: UploadFile = File(...), bodyPart: str = Form("Chest")):
         img = Image.open(io.BytesIO(image_data)).convert("RGB")
         processed_img = preprocess_image(img)
 
+        # تصنيف الصورة باستخدام النموذج الأول
         primary_pred = primary_model.predict(processed_img)
         primary_class_idx = np.argmax(primary_pred[0])
         primary_class = CLASS_NAMES["primary"][primary_class_idx]
         primary_confidence = float(np.max(primary_pred[0]))
 
+        # التحقق من جزء الجسم واختيار النموذج المناسب
         if primary_class == "Ray" and bodyPart in BODY_PART_TO_MODEL:
             model_key = BODY_PART_TO_MODEL[bodyPart]
 
@@ -164,31 +184,12 @@ async def predict(file: UploadFile = File(...), bodyPart: str = Form("Chest")):
         return {"error": str(e)}
 
 
-def clean_response(text, is_info_request=False):
-    prompt_patterns = [
-        r"You are a medical assistant\. Provide a detailed explanation about.*?Be concise but informative\.",
-        r"You are a medical assistant\. The patient has been diagnosed with.*?Answer \(do not repeat the question in your answer\):",
-        r"The patient has been diagnosed with.*?Answer the following question concisely and professionally:",
-        r"Question:.*?\n",
-    ]
-
-    for pattern in prompt_patterns:
-        text = re.sub(pattern, "", text, flags=re.DOTALL)
-
-    if not is_info_request and "Answer:" in text:
-        text = text.split("Answer:")[1].strip()
-
-    lines = text.strip().split("\n")
-    while lines and not lines[0].strip():
-        lines.pop(0)
-
-    return "\n".join(lines).strip()
-
-
+# فئة لتمثيل طلبات المحادثة مع النموذج
 class ChatRequest(BaseModel):
     message: str
 
 
+# API للمحادثة مع النموذج بناءً على التشخيص
 @app.post("/chat")
 async def chat(request: ChatRequest):
     global diagnosis
@@ -226,34 +227,11 @@ async def chat(request: ChatRequest):
             "Answer (do not repeat the question in your answer):"
         )
 
-    payload = {"inputs": prompt}
-
-    try:
-        response = requests.post(HF_API_URL, headers=HEADERS, json=payload)
-        if response.status_code == 200:
-            raw_output = response.json()[0]["generated_text"]
-            return {"response": clean_response(raw_output, is_info_request)}
-        elif response.status_code == 503:
-            return {
-                "error": "Model is loading or temporarily unavailable. Please try again in a few seconds."
-            }
-        else:
-            return {
-                "error": f"Unexpected error: {response.status_code}, {response.text}"
-            }
-    except Exception as e:
-        return {"response": f"Error processing your request: {str(e)}"}
+    # استخدام النموذج لتوليد الرد
+    response = generate_response(prompt)
+    return {"response": response}
 
 
-@app.get("/current-diagnosis")
-async def get_current_diagnosis():
-    global diagnosis
-    return {
-        "classification_result": diagnosis.get_full_description(),
-        "confidence_score": round(diagnosis.confidence_score * 100, 2),
-        "body_part": diagnosis.body_part,
-    }
-
-
+# تشغيل السيرفر
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
