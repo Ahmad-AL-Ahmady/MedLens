@@ -99,7 +99,7 @@ const PharmacyProfile = () => {
           state: data.data.profile?.state || "",
           country: data.data.profile?.country || "",
           operatingHours: formattedOperatingHours,
-          avatar: data.data.profile?.avatar || null,
+          avatar: data.data?.avatar || null,
           //avatar: null,
         });
       } else {
@@ -151,6 +151,7 @@ const PharmacyProfile = () => {
         };
       }
     });
+
     //console.log("Final Operating Hours being sent:", transformedOperatingHours);
 
     form.append("operatingHours", JSON.stringify(transformedOperatingHours));
@@ -315,6 +316,7 @@ const PharmacyProfile = () => {
                     })
                   }
                 />
+
                 {info.isOpen && (
                   <>
                     <input
@@ -371,90 +373,92 @@ const PharmacyProfile = () => {
         <>
           <div className="pharmacy-profile-header">
             <div className="pharmacy-header-top">
+              {/* {console.log(
+                "Debugging avatar source:",
+                http://localhost:4000/public/uploads/users/${pharmacy.avatar}
+              )} */}
               <img
                 src={`http://localhost:4000/public/uploads/users/${pharmacy.avatar}`}
                 alt="Pharmacy"
                 className="pharmacy-profile-image"
               />
               <div className="pharmacy-profile-info">
-                <div className="pharmacy-profile-info-row">
-                  <div className="pharmacy-profile-info-text">
-                    <h1 className="pharmacy-profile-name">
-                      {pharmacy.firstName} {pharmacy.lastName}
-                    </h1>
-                    <p className="pharmacy-profile-usertype">Pharmacist</p>
-                  </div>
-
-                  <div className="top-right-buttons">
-                    <button
-                      onClick={() => setIsModalOpen(true)}
-                      className="operating-hours-title"
-                    >
-                      <Clock size={15} color="white" />
-                      Operating Hours
-                    </button>
-
-                    {isModalOpen && (
-                      <>
-                        <div
-                          className="modal-overlay"
-                          onClick={() => setIsModalOpen(false)}
-                        ></div>
-                        <div className="modal-content">
-                          <span
-                            className="close-btn"
-                            onClick={() => setIsModalOpen(false)}
-                          >
-                            &times;
-                          </span>
-                          <h2>Operating Hours</h2>
-                          <div className="operating-hours-grid">
-                            {profile?.operatingHours ? (
-                              Object.entries(profile.operatingHours).map(
-                                ([day, info]) => (
-                                  <div
-                                    key={day}
-                                    className="operating-hours-item"
-                                  >
-                                    <span className="day">
-                                      {day.charAt(0).toUpperCase() +
-                                        day.slice(1)}
-                                      :
-                                    </span>
-                                    <span
-                                      className={`status ${
-                                        info.isOpen ? "open" : "closed"
-                                      }`}
-                                    >
-                                      {info.isOpen
-                                        ? `${info.startTime} - ${info.endTime}`
-                                        : "Closed"}
-                                    </span>
-                                  </div>
-                                )
-                              )
-                            ) : (
-                              <p>No operating hours available</p>
-                            )}
-                          </div>
-                        </div>
-                      </>
-                    )}
-                    <button
-                      className="edit-profile-btn"
-                      onClick={() => setShowEditForm(true)}
-                    >
-                      <Edit size={15} color="white" />
-                      Edit Profile
-                    </button>
-                  </div>
+                <div className="pharmacy-profile-info-text">
+                  <h1 className="pharmacy-profile-name">
+                    {pharmacy.firstName} {pharmacy.lastName}
+                  </h1>
+                  <p className="pharmacy-profile-usertype">Pharmacist</p>
                 </div>
+                <div className="top-right-buttons">
+                  <p className="pharmacy-profile-email">
+                    <Mail size={16} color="#1e56cf" />
+                    {pharmacy.email}
+                  </p>
+                  <p
+                    className="operating-hours-text"
+                    onClick={() => setIsModalOpen(true)}
+                    style={{
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.8px",
+                    }}
+                  >
+                    <Clock size={15} color="#1e56cf" />
+                    Operating Hours
+                  </p>
 
-                <p className="pharmacy-profile-email">
-                  <Mail size={16} color="#1e56cf" />
-                  {pharmacy.email}
-                </p>
+                  {isModalOpen && (
+                    <>
+                      <div
+                        className="modal-overlay"
+                        onClick={() => setIsModalOpen(false)}
+                      ></div>
+                      <div className="modal-content">
+                        <span
+                          className="close-btn"
+                          onClick={() => setIsModalOpen(false)}
+                        >
+                          &times;
+                        </span>
+                        <h2>Operating Hours</h2>
+                        <div className="operating-hours-grid">
+                          {profile?.operatingHours ? (
+                            Object.entries(profile.operatingHours).map(
+                              ([day, info]) => (
+                                <div key={day} className="operating-hours-item">
+                                  <span className="day">
+                                    {day.charAt(0).toUpperCase() + day.slice(1)}
+                                    :
+                                  </span>
+                                  <span
+                                    className={`status ${
+                                      info.isOpen ? "open" : "closed"
+                                    }`}
+                                  >
+                                    {info.isOpen
+                                      ? `${info.startTime} - ${info.endTime}`
+                                      : "Closed"}
+                                  </span>
+                                </div>
+                              )
+                            )
+                          ) : (
+                            <p>No operating hours available</p>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
+              <button
+                className="edit-profile-btn"
+                onClick={() => setShowEditForm(true)}
+              >
+                <Edit size={15} color="white" />
+                Edit Profile
+              </button>
             </div>
 
             {/* Stats */}

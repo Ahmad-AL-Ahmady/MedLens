@@ -9,6 +9,7 @@ import {
   ScanBarcode,
   Edit,
 } from "lucide-react";
+import Swal from "sweetalert2";
 import "../Styles/PatientProfile.css";
 
 export default function PatientProfile() {
@@ -29,46 +30,6 @@ export default function PatientProfile() {
   const token =
     localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
 
-  useEffect(() => {
-    const token =
-      localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
-
-    if (!token) {
-      console.error("No token found");
-      setError("No token found");
-      setLoading(false);
-      return;
-    }
-
-    const fetchScans = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:4000/api/medical-scans",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-          }
-        );
-
-        const data = await response.json();
-        if (data.status === "success") {
-          setScans(data.data.scans || []);
-        } else {
-          setScans([]);
-        }
-      } catch (error) {
-        console.error("Error fetching medical scans:", error);
-        setScans([]);
-      }
-    };
-
-    fetchProfile();
-    fetchScans();
-  }, []);
-
   const fetchProfile = async () => {
     try {
       const response = await fetch(
@@ -81,27 +42,85 @@ export default function PatientProfile() {
       );
 
       const data = await response.json();
-      //console.log("Patient Data:", data);
-
-      if (data.status === "success" && data.data?.profile) {
+      if (data.status === "success" && data.data) {
         setPatientData(data.data);
-        setAppointments(data.data.profile.appointments || []);
+        setAppointments(data.data.profile?.appointments || []);
         setFormData({
-          firstName: data.data.firstName,
-          lastName: data.data.lastName,
-          gender: data.data.gender,
-          age: data.data.age,
+          firstName: data.data.firstName || "",
+          lastName: data.data.lastName || "",
+          gender: data.data.gender || "",
+          age: data.data.age || "",
         });
       } else {
-        setError("Failed to fetch patient data");
+        throw new Error("No profile data found");
       }
     } catch (error) {
-      console.error("Error fetching patient data:", error);
-      setError(error.message);
-    } finally {
-      setLoading(false);
+      console.error("Error fetching profile:", error);
+      throw error; // Let the caller handle the error
     }
   };
+
+  const fetchScans = async () => {
+    try {
+      const response = await fetch("http://localhost:4000/api/medical-scans", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      const data = await response.json();
+      if (data.status === "success" && data.data?.scans) {
+        setScans(data.data.scans);
+      } else {
+        setScans([]);
+      }
+    } catch (error) {
+      console.error("Error fetching scans:", error);
+      throw error; // Let the caller handle the error
+    }
+  };
+
+  useEffect(() => {
+    if (!token) {
+      Swal.fire({
+        icon: "error",
+        title: "Please Log In",
+        text: "You need to log in to see your profile.",
+      });
+      setError("No token found");
+      setLoading(false);
+      return;
+    }
+
+    const fetchData = async () => {
+      Swal.fire({
+        title: "Loading Your Info...",
+        text: "Please wait a moment",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      try {
+        await Promise.all([fetchProfile(), fetchScans()]);
+        Swal.close(); // Close the loading pop-up on success
+      } catch (error) {
+        setError(error.message || "Failed to load data");
+        Swal.fire({
+          icon: "error",
+          title: "Oops!",
+          text: "We couldn't load your info. Please try again.",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [token]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -110,13 +129,38 @@ export default function PatientProfile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    //console.log("Form Data:", formData);
     if (!token) {
-      console.error("No token found");
-      setError("No token found");
-      setLoading(false);
+      Swal.fire({
+        icon: "error",
+        title: "Please Log In",
+        text: "You need to log in to update your profile.",
+      });
       return;
     }
+
+    if (
+      !formData.firstName ||
+      !formData.lastName ||
+      !formData.gender ||
+      !formData.age
+    ) {
+      Swal.fire({
+        icon: "warning",
+        title: "Missing Info",
+        text: "Please fill in all fields to update your profile.",
+      });
+      return;
+    }
+
+    Swal.fire({
+      title: "Saving Changes...",
+      text: "Please wait while we update your profile",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
     try {
       const res = await fetch("http://localhost:4000/api/patients/profile", {
         method: "PATCH",
@@ -131,20 +175,29 @@ export default function PatientProfile() {
         throw new Error("Failed to update profile");
       }
 
-      const data = await res.json();
-      alert("Profile updated successfully!");
+      await res.json();
+      Swal.fire({
+        icon: "success",
+        title: "Changes Saved!",
+        text: "Your profile has been updated.",
+        timer: 1500,
+        showConfirmButton: false,
+      });
       await fetchProfile();
       setShowEditForm(false);
     } catch (error) {
-      alert("Error updating profile");
-      console.error(error);
+      console.error("Error updating profile:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Oops!",
+        text: "We couldn't save your changes. Please try again.",
+      });
     }
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
-  if (!patientData) return <p>No patient data available</p>;
-  //console.log(" rendring Patient Data:", patientData);
+  if (loading) return null; // Swal handles loading
+  if (error) return null; // Swal handles errors
+  if (!patientData) return null; // Swal handles no data
 
   return (
     <div className="patient-profile-container">
@@ -152,7 +205,7 @@ export default function PatientProfile() {
         <div className="edit-patient-form-background">
           <div className="edit-patient-form-wrapperr">
             <form onSubmit={handleSubmit} className="edit-patient-profile-form">
-              <h2>Edit Patient Profile</h2>
+              <h2>Update Your Profile</h2>
               <div>
                 <label>First Name</label>
                 <input
@@ -175,7 +228,11 @@ export default function PatientProfile() {
               </div>
               <div>
                 <label>Gender</label>
-                <select value={formData.gender} onChange={handleChange}>
+                <select
+                  name="gender"
+                  value={formData.gender}
+                  onChange={handleChange}
+                >
                   <option value="">Select</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
@@ -192,7 +249,7 @@ export default function PatientProfile() {
                 />
               </div>
               <div className="form-patient-profile-buttons">
-                <button type="submit">Save</button>
+                <button type="submit">Save Changes</button>
                 <button type="button" onClick={() => setShowEditForm(false)}>
                   Cancel
                 </button>
@@ -205,11 +262,19 @@ export default function PatientProfile() {
           {/* Personal Data */}
           <div className="patient-profile-edit-icon">
             <div className="patient-profile-header">
-              <img
-                src={`http://localhost:4000/public/uploads/users/${patientData.avatar}`}
-                alt="Profile"
-                className="patient-profile-img"
-              />
+              {patientData.avatar ? (
+                <img
+                  src={`http://localhost:4000/public/uploads/users/${patientData.avatar}`}
+                  alt="Profile"
+                  className="patient-profile-img"
+                />
+              ) : (
+                <img
+                  src="https://via.placeholder.com/100"
+                  alt="Default Profile"
+                  className="patient-profile-img"
+                />
+              )}
               <div className="patient-profile-info">
                 <h1>{`${patientData.firstName} ${patientData.lastName}`}</h1>
                 <p className="email">
@@ -229,7 +294,7 @@ export default function PatientProfile() {
                     {patientData.userType}
                   </p>
                 </div>
-              </div>{" "}
+              </div>
               <div className="patient-profile-edit-btn">
                 <button
                   onClick={() => setShowEditForm(true)}
@@ -284,15 +349,17 @@ export default function PatientProfile() {
                 {scans.length > 0 ? (
                   scans.map((scan) => (
                     <tr key={scan.id}>
-                      <td>{scan?.date}</td>
-                      <td>{scan?.type}</td>
-                      <td>{scan?.bodyPart}</td>
-                      <td className="patient-profile-status">{scan?.status}</td>
+                      <td>{scan?.date || "N/A"}</td>
+                      <td>{scan?.type || "N/A"}</td>
+                      <td>{scan?.bodyPart || "N/A"}</td>
+                      <td className="patient-profile-status">
+                        {scan?.status || "N/A"}
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="5">No scans found for this patient.</td>
+                    <td colSpan="4">No scans found for this patient.</td>
                   </tr>
                 )}
               </tbody>
@@ -318,13 +385,14 @@ export default function PatientProfile() {
                 {appointments.length > 0 ? (
                   appointments.map((appointment) => (
                     <tr key={appointment?.id}>
-                      <td>{appointment?.date?.split("T")[0]}</td>
+                      <td>{appointment?.date?.split("T")[0] || "N/A"}</td>
                       <td>
-                        {appointment?.doctor?.firstName}{" "}
-                        {appointment?.doctor?.lastName}
+                        {appointment?.doctor
+                          ? `${appointment.doctor.firstName} ${appointment.doctor.lastName}`
+                          : "N/A"}
                       </td>
-                      <td>{appointment?.doctor?.specialization}</td>
-                      <td>{appointment?.notes}</td>
+                      <td>{appointment?.doctor?.specialization || "N/A"}</td>
+                      <td>{appointment?.notes || "N/A"}</td>
                     </tr>
                   ))
                 ) : (

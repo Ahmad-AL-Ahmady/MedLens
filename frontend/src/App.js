@@ -12,12 +12,15 @@ import DoctorPage from "./Pages/Doctor";
 import PharmacyPage from "./Pages/Pharmacy";
 import PatientPage from "./Pages/Patient";
 import PatientDashboard from "./Pages/PatientDashbord"; // Fixed typo
-import GoogleSignUpForm from "./Pages/Signupgoogel";
+import GoogleSignUpForm from "./Pages/Signupgoogel"; // Fixed typo
 import DoctorDashboard from "./Pages/DoctorDashbord"; // Fixed typo
 import PharmacyDashboard from "./Pages/PharmacyDashboard";
-import MedicineDetails from "./components/MedecienDetails";
-import ProtectedRoute from "./components/ProtectedRoute";
+import MedicineDetails from "./components/MedecienDetails"; // Fixed typo
+import PatientProfile from "./Pages/PatientProfile";
+import DoctorProfile from "./Pages/DoctorProfile";
+import PharmacyProfile from "./Pages/PharmacyProfile";
 import AuthenticatedRoute from "./components/AuthenticatedRoute";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -34,12 +37,15 @@ function App() {
           path="/verify-email-instructions"
           element={<VerifyEmailInstructions />}
         />
+        <Route path="/profile/patient" element={<PatientProfile />} />
+        <Route path="/profile/doctor" element={<DoctorProfile />} />
+        <Route path="/profile/pharmacy" element={<PharmacyProfile />} />
+        <Route path="/doctors/:id" element={<DoctorProfile />} />
         <Route path="/signup-google" element={<GoogleSignUpForm />} />
-
         {/* Protected Routes Wrapped in Layout */}
-        <Route path="/" element={<Layout />}>
+        <Route element={<Layout />}>
           <Route
-            path="patient-dashboard"
+            path="/patient-dashboard"
             element={
               <ProtectedRoute requiredRole="Patient">
                 <PatientDashboard />
@@ -47,7 +53,7 @@ function App() {
             }
           />
           <Route
-            path="doctor-dashboard"
+            path="/doctor-dashboard"
             element={
               <ProtectedRoute requiredRole="Doctor">
                 <DoctorDashboard />
@@ -55,7 +61,7 @@ function App() {
             }
           />
           <Route
-            path="pharmacy-dashboard"
+            path="/pharmacy-dashboard"
             element={
               <ProtectedRoute requiredRole="Pharmacy">
                 <PharmacyDashboard />
@@ -63,7 +69,7 @@ function App() {
             }
           />
           <Route
-            path="scan"
+            path="/scan"
             element={
               <AuthenticatedRoute>
                 <ScanPage />
@@ -71,7 +77,7 @@ function App() {
             }
           />
           <Route
-            path="doctor"
+            path="/doctor"
             element={
               <AuthenticatedRoute>
                 <DoctorPage />
@@ -79,7 +85,7 @@ function App() {
             }
           />
           <Route
-            path="patient"
+            path="/patient"
             element={
               <AuthenticatedRoute>
                 <PatientPage />
@@ -87,18 +93,10 @@ function App() {
             }
           />
           <Route
-            path="pharmacy"
+            path="/pharmacy"
             element={
               <AuthenticatedRoute>
                 <PharmacyPage />
-              </AuthenticatedRoute>
-            }
-          />
-          <Route
-            path="medicines/:id"
-            element={
-              <AuthenticatedRoute>
-                <MedicineDetails />
               </AuthenticatedRoute>
             }
           />

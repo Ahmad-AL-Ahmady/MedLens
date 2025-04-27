@@ -70,6 +70,7 @@ exports.getMyProfile = catchAsync(async (req, res, next) => {
   const responseData = {
     id: user._id,
     firstName: user.firstName,
+    avatar: user.avatar,
     lastName: user.lastName,
     email: user.email,
     specialization: user.specialization,
@@ -111,13 +112,16 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
     doctorProfile = await DoctorProfile.create({ user: user._id });
   }
 
-  // Update user's specialization if provided
-  if (req.body.specialization) {
-    await User.findByIdAndUpdate(
-      user._id,
-      { specialization: req.body.specialization },
-      { runValidators: true }
-    );
+  // Update user's specialization and username if provided
+  if (req.body.specialization || req.body.username) {
+    const updateFields = {};
+    if (req.body.specialization)
+      updateFields.specialization = req.body.specialization;
+    if (req.body.username) updateFields.username = req.body.username;
+
+    await User.findByIdAndUpdate(user._id, updateFields, {
+      runValidators: true,
+    });
   }
 
   // Handle location update
@@ -194,6 +198,7 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
     "city",
     "state",
     "country",
+    "experienceYears", // Added experienceYears
   ];
 
   // Filter request body to only include allowed fields
@@ -211,7 +216,7 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
     { new: true, runValidators: true }
   );
 
-  // Get updated user (for specialization changes)
+  // Get updated user (for specialization and username changes)
   const updatedUser = await User.findById(user._id);
 
   res.status(200).json({
@@ -220,6 +225,7 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
       id: updatedUser._id,
       firstName: updatedUser.firstName,
       lastName: updatedUser.lastName,
+      username: updatedUser.username,
       specialization: updatedUser.specialization,
       location: updatedUser.location,
       locationDetails: {
@@ -230,6 +236,7 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
         country: updatedProfile.country,
       },
       locationUpdated,
+      experienceYears: updatedProfile.experienceYears,
       profile: updatedProfile,
     },
   });

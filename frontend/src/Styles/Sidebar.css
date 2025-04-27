@@ -12,6 +12,8 @@ body {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
   position: relative;
   z-index: 50;
+  display: flex;
+  flex-direction: column;
 }
 .sidebar.expanded {
   width: 16rem;
@@ -154,7 +156,16 @@ body {
   color: #334155;
   transition: color 0.2s ease-in-out;
 }
+.logout-button {
+  margin-top: auto;
+  margin-bottom: 1rem;
+}
 
+/* Ensure hover states work for logout button */
+.logout-button:hover {
+  background-color: #f8fafc !important;
+  transform: translateX(2px) !important;
+}
 .nav-item.active .nav-label {
   color: #7096d1;
   font-weight: 600;

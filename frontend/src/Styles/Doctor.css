@@ -10,9 +10,12 @@
   display: flex;
   overflow: hidden;
   white-space: nowrap;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
   position: relative;
+  width:100%;
+  padding: 8px 0;
   gap: 15px;
   margin-bottom: 35px;
 }
@@ -25,7 +28,7 @@
   background: white;
   cursor: pointer;
   transition: all 0.4s ease;
-  max-width: 320px;
+  max-width: 100%;
   text-overflow: ellipsis;
 }
 
@@ -87,7 +90,7 @@
   width: 94%;
   margin-top: 20px;
   margin-bottom: 40px;
-  margin-left: 33px;
+  margin-left: 35px;
   gap: 10px;
 }
 
@@ -229,6 +232,7 @@
 .doctor-img {
   width: 70px;
   height: 70px;
+  border-radius: 50px;
   object-fit: cover;
 }
 
@@ -295,6 +299,18 @@
   color: #777;
 }
 
+@media (max-width: 1024px) {
+  .specialty-container {
+    gap: 20px;
+    padding: 10px 0;
+    margin: 0 auto 35px auto;
+    max-width: 1200px;
+  }
+  .specialty-btn {
+    padding: 9px 14px;
+    font-size: 14px;
+  }
+}
 @media (max-width: 1200px) {
   .doctor-card {
     width: 280px;
@@ -338,12 +354,17 @@
     flex: 1;
   }
 }
-
 @media (max-width: 768px) {
   .specialty-container {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding: 5px 10px;
+  }
+  .specialty-btn {
+    padding: 5px 8px;
+    font-size: 13px;
+    min-width: 140px;
   }
 
   .search-wrapper {
@@ -476,5 +497,15 @@
   .search-box {
     font-size: 14px;
   }
-}
 
+}
+@media (max-width: 992px) {
+  .specialty-container {
+    gap: 10px;
+  }
+  .specialty-btn {
+    font-size: 14px;
+    max-width: 240px;
+    padding: 7px 10px;
+  }
+}

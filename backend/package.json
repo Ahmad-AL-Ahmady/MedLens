@@ -25,6 +25,7 @@
     "nodemailer": "^6.10.0",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
+    "sharp": "^0.34.1",
     "slugify": "^1.6.6",
     "validator": "^13.12.0"
   }

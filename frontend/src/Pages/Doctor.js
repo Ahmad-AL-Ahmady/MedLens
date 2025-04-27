@@ -83,7 +83,7 @@ export default function DoctorPage() {
         return res.json();
       })
       .then((data) => {
-        console.log("Doctors API Response:", data);
+        // console.log("Doctors API Response:", data);
         setDoctors(data.data.doctors);
         setFilteredDoctors(
           data.data.doctors.filter(
@@ -149,8 +149,8 @@ export default function DoctorPage() {
           const fullName = `${firstName} ${lastName}`;
 
           return (
-            firstName.includes(searchLower)||
-             lastName.includes(searchLower) ||
+            firstName.includes(searchLower) ||
+            lastName.includes(searchLower) ||
             fullName.includes(searchLower)
           );
         });
@@ -168,7 +168,6 @@ export default function DoctorPage() {
       setDoctors([]);
     }
   };
-
 
   const nextSpecialty = () => {
     if (startIndex + 1 < specializations.length) {
@@ -195,78 +194,78 @@ export default function DoctorPage() {
           &gt;
         </button>
       </div>
+     
+        {/* ✅ Specialization bar */}
+        <div className="specialty-container">
+          {specializations
+            .slice(startIndex, startIndex + itemsPerPage)
+            .map((specialty) => {
+              const isActive = selectedSpecialization === specialty.name;
+              const icon = specialtyIcons[specialty.name]
+                ? React.cloneElement(specialtyIcons[specialty.name], {
+                    color: isActive
+                      ? "white"
+                      : specialtyIcons[specialty.name].props.color,
+                  })
+                : null;
 
-      {/* ✅ Specialization bar */}
-      <div className="specialty-container">
-        {specializations
-          .slice(startIndex, startIndex + itemsPerPage)
-          .map((specialty) => {
-            const isActive = selectedSpecialization === specialty.name;
-            const icon = specialtyIcons[specialty.name]
-              ? React.cloneElement(specialtyIcons[specialty.name], {
-                  color: isActive
-                    ? "white"
-                    : specialtyIcons[specialty.name].props.color,
-                })
-              : null;
+              return (
+                <button
+                  key={specialty.name}
+                  className={`specialty-btn ${isActive ? "active" : ""}`}
+                  onClick={() => setSelectedSpecialization(specialty.name)}
+                >
+                  {icon}
+                  {specialty.name}
+                </button>
+              );
+            })}
+        </div>
 
-            return (
-              <button
-                key={specialty.name}
-                className={`specialty-btn ${isActive ? "active" : ""}`}
-                onClick={() => setSelectedSpecialization(specialty.name)}
-              >
-                {icon}
-                {specialty.name}
-              </button>
-            );
-          })}
-      </div>
+        {/* ✅ Search bar */}
+        <div className="search-wrapper">
+          <input
+            type="text"
+            placeholder="Search name"
+            className="search-input search-box "
+            value={searchName}
+            onChange={(e) => setSearchName(e.target.value)}
+          />
 
-      {/* ✅ Search bar */}
-      <div className="search-wrapper">
-        <input
-          type="text"
-          placeholder="Search name"
-          className="search-input search-box "
-          value={searchName}
-          onChange={(e) => setSearchName(e.target.value)}
-        />
-
-        <select
-          className="distance-select"
-          value={distance}
-          onChange={(e) => setDistance(e.target.value)}
-        >
-          <option value="">Select Distance</option>
-          <option value="5">5 km</option>
-          <option value="10">10 km</option>
-          <option value="20">20 km</option>
-          <option value="50">50 km</option>
-        </select>
-
-        <div className="signup-location-container">
-          <button
-            type="button"
-            className="signup-location-button"
-            onClick={() => setShowMap(!showMap)}
+          <select
+            className="distance-select"
+            value={distance}
+            onChange={(e) => setDistance(e.target.value)}
           >
-            <CiLocationOn className="signup-location-icon" />
-            {location ? "Location Selected" : "Select Location"}
+            <option value="">Select Distance</option>
+            <option value="5">5 km</option>
+            <option value="10">10 km</option>
+            <option value="20">20 km</option>
+            <option value="50">50 km</option>
+          </select>
+
+          <div className="signup-location-container">
+            <button
+              type="button"
+              className="signup-location-button"
+              onClick={() => setShowMap(!showMap)}
+            >
+              <CiLocationOn className="signup-location-icon" />
+              {location ? "Location Selected" : "Select Location"}
+            </button>
+          </div>
+          {showMap && (
+            <LocationPicker
+              onSelect={setLocation}
+              onClose={() => setShowMap(false)}
+            />
+          )}
+
+          <button className="search-button" onClick={handleSearch}>
+            <Search size={16} />
           </button>
         </div>
-        {showMap && (
-          <LocationPicker
-            onSelect={setLocation}
-            onClose={() => setShowMap(false)}
-          />
-        )}
-
-        <button className="search-button" onClick={handleSearch}>
-          <Search size={16} />
-        </button>
-      </div>
-
+      
       {/* ✅ Doctors List */}
       <div className="doctors-section">
         <div className="header">
@@ -320,4 +319,3 @@ export default function DoctorPage() {
     </div>
   );
 }
-
