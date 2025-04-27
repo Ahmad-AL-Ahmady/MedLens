@@ -50,45 +50,25 @@ export default function Sidebar() {
     return "/";
   };
 
-  const handleLogout = async () => {
-    try {
-      const response = await fetch("/api/users/logout", {
-        method: "POST",
-        credentials: "include",
-      });
+  const handleLogout = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You will be logged out!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, logout!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Clear user info
+        localStorage.removeItem("userRole");
+        sessionStorage.removeItem("userRole");
 
-      if (!response.ok) {
-        throw new Error("Logout failed");
+        // Redirect to login page directly
+        navigate("/login");
       }
-
-      localStorage.removeItem("userRole");
-      sessionStorage.removeItem("userRole");
-
-      await Swal.fire({
-        icon: "success",
-        title: "Logged out",
-        text: "You have been successfully logged out.",
-        confirmButtonColor: "#3085d6",
-        confirmButtonText: "OK",
-      });
-
-      navigate("/login");
-    } catch (error) {
-      console.error("Logout error:", error);
-
-      localStorage.removeItem("userRole");
-      sessionStorage.removeItem("userRole");
-
-      await Swal.fire({
-        icon: "error",
-        title: "Logout Error",
-        text: "Something went wrong during logout. Please try again.",
-        confirmButtonColor: "#d33",
-        confirmButtonText: "OK",
-      });
-
-      navigate("/login");
-    }
+    });
   };
 
   const menuItems = [
