@@ -67,12 +67,6 @@ export default function Navbar() {
       <div className="navbar-container">
         <h1 className="navbar-title">{getPageTitle(location.pathname)}</h1>
         <div className="navbar-actions">
-          <button className="navbar-button" title="Notifications">
-            <Bell className="navbar-icon" />
-          </button>
-          <button className="navbar-button" title="Setting">
-            <Settings className="navbar-icon" />
-          </button>
           <div className="navbar-avatar">
             <div className="navbar-avatar">
               <img

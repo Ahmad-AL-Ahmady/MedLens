@@ -31,17 +31,17 @@ const DoctorProfile = () => {
     country: "",
     fees: "",
     availability: {
-friday: {start: '', end: '', isAvailable: true},
-monday: {start: '', end: '', isAvailable: true},
-saturday: {start: '', end: '', isAvailable: true},
-sunday: {isAvailable: false},
-thursday: {start: '', end: '', isAvailable: true},
-tuesday: {start: '', end: '', isAvailable: true},
-wednesday: {start: '', end: '', isAvailable: true}
-},
+      friday: { start: "", end: "", isAvailable: true },
+      monday: { start: "", end: "", isAvailable: true },
+      saturday: { start: "", end: "", isAvailable: true },
+      sunday: { isAvailable: false },
+      thursday: { start: "", end: "", isAvailable: true },
+      tuesday: { start: "", end: "", isAvailable: true },
+      wednesday: { start: "", end: "", isAvailable: true },
+    },
   });
   const token =
-      localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
+    localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
   const fetchDoctorProfile = async () => {
     try {
       let apiUrl = id
@@ -55,17 +55,17 @@ wednesday: {start: '', end: '', isAvailable: true}
       if (!response.ok) throw new Error("Failed to fetch doctor profile");
 
       const data = await response.json();
-      //console.log("data:", data);
+      console.log("data:", data);
 
       if (data.status === "success" && data.data) {
         const defaultWorkingHours = {
-          friday: {start: '', end: '', isAvailable: true},
-          monday: {start: '', end: '', isAvailable: true},
-          saturday: {start: '', end: '', isAvailable: true},
-          sunday: {isAvailable: false},
-          thursday: {start: '', end: '', isAvailable: true},
-          tuesday: {start: '', end: '', isAvailable: true},
-          wednesday: {start: '', end: '', isAvailable: true}
+          friday: { start: "", end: "", isAvailable: true },
+          monday: { start: "", end: "", isAvailable: true },
+          saturday: { start: "", end: "", isAvailable: true },
+          sunday: { isAvailable: false },
+          thursday: { start: "", end: "", isAvailable: true },
+          tuesday: { start: "", end: "", isAvailable: true },
+          wednesday: { start: "", end: "", isAvailable: true },
         };
 
         const rawWorkingHours = data.data.profile?.availability || {};
@@ -77,7 +77,7 @@ wednesday: {start: '', end: '', isAvailable: true}
           formattedWorkingHours[day] = {
             start: backendDay.open || "",
             end: backendDay.close || "",
-             isAvailable: backendDay.isAvailable || false,
+            isAvailable: backendDay.isAvailable || false,
           };
         });
 
@@ -88,7 +88,7 @@ wednesday: {start: '', end: '', isAvailable: true}
           state: data.data.profile?.state,
           country: data.data.profile?.country,
           fees: data.data.fees,
-          availability:formattedWorkingHours,
+          availability: formattedWorkingHours,
         });
       } else {
         setError("Failed to fetch doctor data");
@@ -169,7 +169,7 @@ wednesday: {start: '', end: '', isAvailable: true}
 
   const edithandleSubmit = (e) => {
     e.preventDefault();
-  
+
     fetch("http://localhost:4000/api/doctors/profile", {
       method: "PATCH",
       headers: {
@@ -181,7 +181,7 @@ wednesday: {start: '', end: '', isAvailable: true}
       .then((response) => response.json())
       .then((data) => {
         alert("Profile updated!");
-        fetchDoctorProfile(); 
+        fetchDoctorProfile();
         setShowEditForm(false);
       })
       .catch((error) => {
