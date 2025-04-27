@@ -157,7 +157,7 @@ body {
   transition: color 0.2s ease-in-out;
 }
 .logout-button {
-  margin-top: auto;
+  margin-top: 15rem;
   margin-bottom: 1rem;
 }
 

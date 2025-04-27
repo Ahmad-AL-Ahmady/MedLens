@@ -10,7 +10,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
-import Swal from "sweetalert2"; // <- import sweetalert2
+import Swal from "sweetalert2";
 import "../Styles/Sidebar.css";
 import Final from "../Images/Final.png";
 
@@ -24,7 +24,6 @@ export default function Sidebar() {
       const roleFromLocal = localStorage.getItem("userRole");
       const roleFromSession = sessionStorage.getItem("userRole");
       const role = roleFromLocal || roleFromSession || null;
-
       console.log("Current user role from storage:", role);
       return role;
     };
@@ -45,14 +44,51 @@ export default function Sidebar() {
   }, []);
 
   const getDashboardPath = () => {
-    if (userRole === "Patient") {
-      return "/patient-dashboard";
-    } else if (userRole === "Doctor") {
-      return "/doctor-dashboard";
-    } else if (userRole === "Pharmacy") {
-      return "/pharmacy-dashboard";
-    }
+    if (userRole === "Patient") return "/patient-dashboard";
+    if (userRole === "Doctor") return "/doctor-dashboard";
+    if (userRole === "Pharmacy") return "/pharmacy-dashboard";
     return "/";
+  };
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("/api/users/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Logout failed");
+      }
+
+      localStorage.removeItem("userRole");
+      sessionStorage.removeItem("userRole");
+
+      await Swal.fire({
+        icon: "success",
+        title: "Logged out",
+        text: "You have been successfully logged out.",
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "OK",
+      });
+
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+
+      localStorage.removeItem("userRole");
+      sessionStorage.removeItem("userRole");
+
+      await Swal.fire({
+        icon: "error",
+        title: "Logout Error",
+        text: "Something went wrong during logout. Please try again.",
+        confirmButtonColor: "#d33",
+        confirmButtonText: "OK",
+      });
+
+      navigate("/login");
+    }
   };
 
   const menuItems = [
@@ -92,53 +128,9 @@ export default function Sidebar() {
     ? menuItems.filter((item) => item.roles.includes(userRole))
     : [];
 
-  const handleLogout = async () => {
-    try {
-      const response = await fetch("/api/users/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error("Logout failed");
-      }
-
-      // Clear storage
-      localStorage.removeItem("userRole");
-      sessionStorage.removeItem("userRole");
-
-      // Show success alert
-      await Swal.fire({
-        icon: "success",
-        title: "Logged out",
-        text: "You have been successfully logged out.",
-        confirmButtonColor: "#3085d6",
-        confirmButtonText: "OK",
-      });
-
-      navigate("/login");
-    } catch (error) {
-      console.error("Logout error:", error);
-
-      // Even if logout fails, clear storage
-      localStorage.removeItem("userRole");
-      sessionStorage.removeItem("userRole");
-
-      // Show error alert
-      await Swal.fire({
-        icon: "error",
-        title: "Logout Error",
-        text: "Something went wrong during logout. Please try again.",
-        confirmButtonColor: "#d33",
-        confirmButtonText: "OK",
-      });
-
-      navigate("/login");
-    }
-  };
-
   return (
     <aside className={`sidebar ${isExpanded ? "expanded" : "collapsed"}`}>
+      {/* Header */}
       <div className="sidebar-header">
         {isExpanded && (
           <div className="logo-container">
@@ -158,6 +150,7 @@ export default function Sidebar() {
         </button>
       </div>
 
+      {/* Navigation */}
       <nav className="nav-container">
         {filteredMenuItems.map((item) => (
           <NavLink
@@ -173,18 +166,18 @@ export default function Sidebar() {
             {isExpanded && <span className="nav-label">{item.label}</span>}
           </NavLink>
         ))}
-      </nav>
 
-      {/* Logout button */}
-      <button
-        onClick={handleLogout}
-        className={`nav-item logout-button ${
-          isExpanded ? "expanded" : "collapsed"
-        }`}
-      >
-        <LogOut className="nav-icon" />
-        {isExpanded && <span className="nav-label">Logout</span>}
-      </button>
+        {/* Logout Button */}
+        <button
+          onClick={handleLogout}
+          className={`nav-item logout-button ${
+            isExpanded ? "expanded" : "collapsed"
+          }`}
+        >
+          <LogOut className="nav-icon" />
+          {isExpanded && <span className="nav-label">Logout</span>}
+        </button>
+      </nav>
     </aside>
   );
 }
