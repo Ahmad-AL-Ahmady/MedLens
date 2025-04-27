@@ -10,7 +10,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
+import Swal from "sweetalert2"; // <- import sweetalert2
 import "../Styles/Sidebar.css";
 import Final from "../Images/Final.png";
 
@@ -93,88 +93,47 @@ export default function Sidebar() {
     : [];
 
   const handleLogout = async () => {
-    // Confirm logout
-    const confirmLogout = await Swal.fire({
-      title: "Are you sure?",
-      text: "You will be logged out of your account.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, log out",
-    });
-
-    if (!confirmLogout.isConfirmed) {
-      return;
-    }
-
     try {
-      // Call backend logout endpoint
       const response = await fetch("/api/users/logout", {
         method: "POST",
-        credentials: "include", // Ensure cookies are sent
-        headers: {
-          "Content-Type": "application/json",
-        },
+        credentials: "include",
       });
 
-      // Log response details for debugging
-      console.log("Logout response:", {
-        status: response.status,
-        statusText: response.statusText,
-        ok: response.ok,
-        headers: Object.fromEntries(response.headers.entries()),
-      });
-
-      let responseData = {};
-      try {
-        responseData = await response.json();
-        console.log("Logout response data:", responseData);
-      } catch (jsonError) {
-        console.error("Error parsing JSON response:", jsonError);
-        throw new Error("Invalid server response format");
-      }
-
-      // Check if the response is successful
       if (!response.ok) {
-        throw new Error(
-          responseData.message ||
-            `Logout failed with status ${response.status}: ${response.statusText}`
-        );
+        throw new Error("Logout failed");
       }
 
-      // Verify the expected response structure
-      if (responseData.status !== "success") {
-        throw new Error("Unexpected response from server");
-      }
-
-      // Clear client-side storage
+      // Clear storage
       localStorage.removeItem("userRole");
       sessionStorage.removeItem("userRole");
 
-      // Show success message
+      // Show success alert
       await Swal.fire({
-        title: "Logged Out",
-        text: "You have been successfully logged out.",
         icon: "success",
-        timer: 1500,
-        showConfirmButton: false,
+        title: "Logged out",
+        text: "You have been successfully logged out.",
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "OK",
       });
 
-      // Redirect to login
       navigate("/login");
     } catch (error) {
       console.error("Logout error:", error);
 
-      // Show error message
+      // Even if logout fails, clear storage
+      localStorage.removeItem("userRole");
+      sessionStorage.removeItem("userRole");
+
+      // Show error alert
       await Swal.fire({
-        title: "Logout Failed",
-        text:
-          error.message ||
-          "An error occurred while logging out. Please try again.",
         icon: "error",
+        title: "Logout Error",
+        text: "Something went wrong during logout. Please try again.",
+        confirmButtonColor: "#d33",
         confirmButtonText: "OK",
       });
+
+      navigate("/login");
     }
   };
 
@@ -216,6 +175,7 @@ export default function Sidebar() {
         ))}
       </nav>
 
+      {/* Logout button */}
       <button
         onClick={handleLogout}
         className={`nav-item logout-button ${
