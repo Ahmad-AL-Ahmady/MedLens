@@ -240,6 +240,24 @@ exports.createAppointment = catchAsync(async (req, res, next) => {
     isFirstVisit: previousAppointments === 0,
   });
 
+  // Populate the doctor and patient information
+  const populatedAppointment = await Appointment.findById(appointment._id)
+    .populate({
+      path: "doctor",
+      select: "firstName lastName avatar specialization",
+    })
+    .populate({
+      path: "patient",
+      select: "firstName lastName avatar",
+    });
+
+  res.status(201).json({
+    status: "success",
+    data: {
+      appointment: populatedAppointment,
+    },
+  });
+
   res.status(201).json({
     status: "success",
     data: {
