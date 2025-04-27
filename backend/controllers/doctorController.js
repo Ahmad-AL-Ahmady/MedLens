@@ -24,6 +24,10 @@ exports.getMyProfile = catchAsync(async (req, res, next) => {
       options: { sort: { date: 1 }, limit: 10 },
     })
     .populate({
+      path: "patient",
+      select: "firstName lastName avatar",
+    })
+    .populate({
       path: "reviews",
       options: { sort: { createdAt: -1 }, limit: 5 },
       populate: {
