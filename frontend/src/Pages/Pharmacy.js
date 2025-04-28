@@ -1,31 +1,52 @@
 import React, { useState, useEffect } from "react";
 import "../Styles/Pharmacy.css";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2"; // Import SweetAlert2
 
 export default function PharmacyPage() {
-  const [searchQuery, setSearchQuery] = useState(""); // لحفظ استعلام البحث
-  const [medicines, setMedicines] = useState([]); // لتخزين الأدوية المسترجعة من الـ API
-  const [loading, setLoading] = useState(true); // لتحديد حالة التحميل
+  const [searchQuery, setSearchQuery] = useState(""); // To store the search query
+  const [medicines, setMedicines] = useState([]); // To store medicines from the API
+  const [loading, setLoading] = useState(true); // To manage loading state
   const navigate = useNavigate();
 
-  // استدعاء الـ API لجلب الأدوية باستخدام دالة getAllMedications
+  // Fetch medicines from the API
   useEffect(() => {
-    setLoading(true); // تعيين التحميل إلى true عند بدء الاستدعاء
+    // Show loading alert
+    Swal.fire({
+      title: "Loading Medicines...",
+      text: "Please wait while we fetch the medicines for you!",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading(); // Show loading spinner
+      },
+    });
 
-    fetch("http://localhost:4000/api/medications") // هنا استدعاء الـ API
-      .then((response) => response.json())
+    fetch("http://localhost:4000/api/medications")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch medicines");
+        }
+        return response.json();
+      })
       .then((data) => {
-        setMedicines(data.data.medications); // حفظ الأدوية في الـ state
-        setLoading(false); // تعيين التحميل إلى false بعد استرجاع البيانات
+        setMedicines(data.data.medications); // Store medicines in state
+        setLoading(false); // Update loading state
+        Swal.close(); // Close loading alert
         console.log("Medications data:", data);
       })
       .catch((error) => {
         console.error("Error fetching medications:", error);
-        setLoading(false); // تعيين التحميل إلى false في حال حدوث خطأ
+        setLoading(false); // Update loading state
+        Swal.fire({
+          icon: "error",
+          title: "Oops, something went wrong!",
+          text: "We couldn't load the medicines. Please try again later.",
+          confirmButtonText: "Okay",
+        });
       });
   }, []);
 
-  // تصفية الأدوية بناءً على استعلام البحث
+  // Filter medicines based on search query
   const filteredMedicines = medicines.filter(
     (medicine) =>
       medicine.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -41,22 +62,20 @@ export default function PharmacyPage() {
           type="text"
           placeholder="Search medicine or category..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)} // تحديث استعلام البحث
+          onChange={(e) => setSearchQuery(e.target.value)} // Update search query
           className="pharmacy-page__search-input"
         />
       </div>
 
-      {/* عرض حالة التحميل */}
-      {loading ? (
-        <p>Loading medicines...</p>
-      ) : (
+      {/* Display medicines or no results message */}
+      {!loading && (
         <div className="pharmacy-page__medicine-grid">
           {filteredMedicines.length > 0 ? (
             filteredMedicines.map((medicine) => (
               <div
-                key={medicine._id} // _id هو المعرف الفريد لكل دواء
+                key={medicine._id} // Unique ID for each medicine
                 className="pharmacy-page__medicine-card"
-                onClick={() => navigate(`/medicines/${medicine._id}`)} // الانتقال إلى صفحة تفاصيل الدواء
+                onClick={() => navigate(`/medicines/${medicine._id}`)} // Navigate to medicine details
                 role="button"
                 tabIndex={0}
               >
@@ -74,7 +93,7 @@ export default function PharmacyPage() {
               </div>
             ))
           ) : (
-            <p>No medications found</p> // رسالة في حال عدم وجود أدوية تطابق البحث
+            <p>No medications found. Try searching with a different term!</p> // User-friendly message
           )}
         </div>
       )}

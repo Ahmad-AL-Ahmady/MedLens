@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Activity, Plus, Edit2, X } from "lucide-react";
 import "../Styles/PharmacyDashboard.css";
 
@@ -6,52 +6,134 @@ export default function PharmacyDashboard() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingMedicine, setEditingMedicine] = useState(null);
   const [addMode, setAddMode] = useState("new");
-  const [medicines, setMedicines] = useState([]);
-  const [allMedicines, setAllMedicines] = useState([]);
+  const [medicines, setMedicines] = useState([
+    {
+      _id: "1",
+      medication: {
+        _id: "m1",
+        name: "Amoxicillin",
+        category: "Antibiotics",
+        strength: "500mg",
+        description: "Amoxicillin 500mg capsules",
+      },
+      stock: 100,
+      price: 12.99,
+      expiryDate: "2026-04-01",
+    },
+    {
+      _id: "2",
+      medication: {
+        _id: "m2",
+        name: "Ibuprofen",
+        category: "Pain Relief",
+        strength: "200mg",
+        description: "Ibuprofen 200mg tablets",
+      },
+      stock: 50,
+      price: 8.49,
+      expiryDate: "2025-12-15",
+    },
+    {
+      _id: "3",
+      medication: {
+        _id: "m3",
+        name: "Lisinopril",
+        category: "Cardiology",
+        strength: "10mg",
+        description: "Lisinopril 10mg tablets",
+      },
+      stock: 75,
+      price: 15.75,
+      expiryDate: "2026-03-10",
+    },
+    {
+      _id: "4",
+      medication: {
+        _id: "m4",
+        name: "Hydrocortisone",
+        category: "Dermatology",
+        strength: "1% cream",
+        description: "Hydrocortisone 1% cream",
+      },
+      stock: 20,
+      price: 9.99,
+      expiryDate: "2025-11-20",
+    },
+    {
+      _id: "5",
+      medication: {
+        _id: "m5",
+        name: "Paracetamol",
+        category: "Pediatrics",
+        strength: "120mg/5ml",
+        description: "Paracetamol 120mg/5ml syrup",
+      },
+      stock: 30,
+      price: 6.99,
+      expiryDate: "2025-10-05",
+    },
+  ]);
+  const [allMedicines, setAllMedicines] = useState([
+    {
+      _id: "m1",
+      name: "Amoxicillin",
+      category: "Antibiotics",
+      strength: "500mg",
+      description: "Amoxicillin 500mg capsules",
+    },
+    {
+      _id: "m2",
+      name: "Ibuprofen",
+      category: "Pain Relief",
+      strength: "200mg",
+      description: "Ibuprofen 200mg tablets",
+    },
+    {
+      _id: "m3",
+      name: "Lisinopril",
+      category: "Cardiology",
+      strength: "10mg",
+      description: "Lisinopril 10mg tablets",
+    },
+    {
+      _id: "m4",
+      name: "Hydrocortisone",
+      category: "Dermatology",
+      strength: "1% cream",
+      description: "Hydrocortisone 1% cream",
+    },
+    {
+      _id: "m5",
+      name: "Paracetamol",
+      category: "Pediatrics",
+      strength: "120mg/5ml",
+      description: "Paracetamol 120mg/5ml syrup",
+    },
+    {
+      _id: "m6",
+      name: "Metformin",
+      category: "Endocrinology",
+      strength: "500mg",
+      description: "Metformin 500mg tablets",
+    },
+    {
+      _id: "m7",
+      name: "Salbutamol",
+      category: "Respiratory",
+      strength: "100mcg",
+      description: "Salbutamol 100mcg inhaler",
+    },
+  ]);
   const [categories] = useState([
     "Antibiotics",
     "Pain Relief",
     "Cardiology",
     "Dermatology",
     "Pediatrics",
+    "Endocrinology",
+    "Respiratory",
   ]);
   const [error, setError] = useState(null);
-
-  // Retrieve auth token from localStorage (assumes it's stored after login)
-  const authToken = localStorage.getItem("authToken");
-
-  // Fetch inventory and all medications on component mount
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch pharmacy inventory
-        const inventoryResponse = await fetch(
-          "http://localhost:3000/api/pharmacies/inventory",
-          {
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-            },
-          }
-        );
-        if (!inventoryResponse.ok) throw new Error("Failed to fetch inventory");
-        const inventoryData = await inventoryResponse.json();
-        setMedicines(inventoryData.data.inventory);
-
-        // Fetch all medications
-        const medicationsResponse = await fetch(
-          "http://localhost:3000/api/medications"
-        );
-        if (!medicationsResponse.ok)
-          throw new Error("Failed to fetch medications");
-        const medicationsData = await medicationsResponse.json();
-        setAllMedicines(medicationsData.data.medications);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setError(error.message || "An error occurred while fetching data");
-      }
-    };
-    fetchData();
-  }, [authToken]);
 
   // Filter medicines not already in inventory for the "existing" mode dropdown
   const availableMedicines = allMedicines.filter(
@@ -62,7 +144,7 @@ export default function PharmacyDashboard() {
   // Handle submission for adding a new or existing medicine
   const handleAddSubmit = async (e) => {
     e.preventDefault();
-    setError(null); // Clear previous errors
+    setError(null);
     const formData = new FormData(e.target);
     const price = parseFloat(formData.get("price"));
     const stock = parseInt(formData.get("stock"));
@@ -70,53 +152,37 @@ export default function PharmacyDashboard() {
 
     try {
       if (addMode === "new") {
-        // Create a new medication
+        // Simulate creating a new medication
         const name = formData.get("name");
         const category = formData.get("category");
         const strength = formData.get("strength");
         const description =
           formData.get("description") || `${name} ${strength}`;
-
-        const medicationResponse = await fetch(
-          "http://localhost:3000/api/medications",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${authToken}`,
-            },
-            body: JSON.stringify({ name, description, strength, category }),
-          }
-        );
-        if (!medicationResponse.ok)
-          throw new Error("Failed to create medication");
-        const medicationData = await medicationResponse.json();
-        medicationId = medicationData.data.medication._id;
+        const newMedication = {
+          _id: `m${allMedicines.length + 1}`,
+          name,
+          description,
+          strength,
+          category,
+        };
+        setAllMedicines([...allMedicines, newMedication]);
+        medicationId = newMedication._id;
       } else {
         // Use existing medication ID
         medicationId = formData.get("medicineId");
       }
 
-      // Add the medication to inventory
-      const inventoryResponse = await fetch(
-        "http://localhost:3000/api/pharmacies/inventory",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`,
-          },
-          body: JSON.stringify({
-            medicationId,
-            stock,
-            price,
-            expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days expiry
-          }),
-        }
-      );
-      if (!inventoryResponse.ok) throw new Error("Failed to add to inventory");
-      const inventoryData = await inventoryResponse.json();
-      setMedicines([...medicines, inventoryData.data.inventoryItem]);
+      // Add to inventory
+      const newInventoryItem = {
+        _id: `i${medicines.length + 1}`,
+        medication: allMedicines.find((m) => m._id === medicationId),
+        stock,
+        price,
+        expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+          .toISOString()
+          .split("T")[0],
+      };
+      setMedicines([...medicines, newInventoryItem]);
       setShowAddForm(false);
     } catch (error) {
       console.error("Error adding medicine:", error);
@@ -127,7 +193,7 @@ export default function PharmacyDashboard() {
   // Handle submission for editing an existing medicine
   const handleEditSubmit = async (e) => {
     e.preventDefault();
-    setError(null); // Clear previous errors
+    setError(null);
     const formData = new FormData(e.target);
     const updatedMedicine = {
       price: parseFloat(formData.get("price")),
@@ -138,24 +204,14 @@ export default function PharmacyDashboard() {
     };
 
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/pharmacies/inventory/${editingMedicine.medication._id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`,
-          },
-          body: JSON.stringify(updatedMedicine),
-        }
-      );
-      if (!response.ok) throw new Error("Failed to update medicine");
-      const updatedData = await response.json();
+      const updatedInventoryItem = {
+        ...editingMedicine,
+        price: updatedMedicine.price,
+        stock: updatedMedicine.stock,
+      };
       setMedicines(
         medicines.map((m) =>
-          m.medication._id === updatedData.data.inventoryItem.medication._id
-            ? updatedData.data.inventoryItem
-            : m
+          m._id === editingMedicine._id ? updatedInventoryItem : m
         )
       );
       setEditingMedicine(null);
@@ -281,7 +337,7 @@ export default function PharmacyDashboard() {
                     required
                   />
                 </div>
-                <div className="pharmacy-dashboard-form-group">
+                <div class Ted className="pharmacy-dashboard-form-group">
                   <label>Stock Quantity</label>
                   <input
                     type="number"
