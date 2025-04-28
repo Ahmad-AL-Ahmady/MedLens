@@ -90,12 +90,7 @@ export default function Sidebar() {
       path: "/pharmacy",
       roles: ["Patient", "Doctor", "Pharmacy"],
     },
-    {
-      icon: Users,
-      label: "Patient",
-      path: "/patient",
-      roles: ["Patient", "Doctor", "Pharmacy"],
-    },
+
     {
       icon: Stethoscope,
       label: "Doctor",
