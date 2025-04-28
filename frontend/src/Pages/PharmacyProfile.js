@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Mail, Clock, ThumbsUp, Star, Pill, Edit } from "lucide-react";
+import { useParams } from "react-router-dom";
+import { Mail, Clock, ThumbsUp, Star, Calendar, Edit } from "lucide-react";
 import "../Styles/PharmacyProfile.css";
 
 const PharmacyProfile = () => {
+  const { id } = useParams();
   const [pharmacy, setPharmacy] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [error, setError] = useState(null);
-
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -183,6 +186,69 @@ const PharmacyProfile = () => {
     }
   };
 
+  const handlePhotoChange = async (e) => {
+    const file = e.target.files[0];
+
+    if (file) {
+      const formData = new FormData();
+      formData.append("avatar", file);
+
+      try {
+        const response = await fetch(
+          "http://localhost:4000/api/users/updateAvatar",
+          {
+            method: "PATCH",
+            body: formData,
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          // console.log("Avatar updated successfully!", data);
+          alert("Avatar updated successfully!");
+          setSelectedImage(URL.createObjectURL(file));
+          await fetchPharmacyProfile();
+        } else {
+          console.error("Failed to update avatar");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    }
+  };
+
+  const toggleMenu = () => {
+    setMenuOpen((prev) => !prev);
+  };
+
+  const handleDeleteAvatar = async () => {
+    if (window.confirm("Do you want to delete your avatar?")) {
+      try {
+        const response = await fetch(
+          "http://localhost:4000/api/users/deleteAvatar",
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          alert("Avatar deleted successfully!");
+          setSelectedImage(null);
+        } else {
+          console.error("Failed to delete avatar");
+        }
+      } catch (error) {
+        console.error("Error while deleting avatar:", error);
+      }
+    }
+  };
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
   if (!pharmacy) {
@@ -197,7 +263,7 @@ const PharmacyProfile = () => {
           onSubmit={handleSubmit}
           className="edit-profile-form full-page-form"
         >
-          <h2>Edit Profile</h2>
+          <h2>Update Your Profile</h2>
           <div className="form-group">
             <label htmlFor="firstName">First Name</label>
             <input
@@ -288,10 +354,6 @@ const PharmacyProfile = () => {
               onChange={handleChange}
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="avatar">Avatar</label>
-            <input type="file" name="avatar" onChange={handleChange} />
-          </div>
 
           <div className="operating-hours-edit">
             <h3>Operating Hours</h3>
@@ -358,7 +420,7 @@ const PharmacyProfile = () => {
           </div>
           <div className="form-btns">
             <button type="submit" className="save-btn">
-              Save
+              Save Changes
             </button>
             <button
               type="button"
@@ -377,11 +439,57 @@ const PharmacyProfile = () => {
                 "Debugging avatar source:",
                 http://localhost:4000/public/uploads/users/${pharmacy.avatar}
               )} */}
-              <img
-                src={`http://localhost:4000/public/uploads/users/${pharmacy.avatar}`}
-                alt="Pharmacy"
-                className="pharmacy-profile-image"
-              />
+              <div className="pharmacy-profile-image-container">
+                <img
+                  src={
+                    selectedImage || pharmacy.avatar
+                      ? `http://localhost:4000/public/uploads/users/${
+                          selectedImage || pharmacy.avatar
+                        }`
+                      : "http://localhost:4000/public/uploads/users/default.jpg"
+                  }
+                  alt="Pharmacy"
+                  className="pharmacy-profile-image"
+                />
+                {!id && (
+                  <div className="pharmacy-camera-menu">
+                    <button
+                      onClick={toggleMenu}
+                      className="pharmacy-camera-icon"
+                    >
+                      <img
+                        src="https://img.icons8.com/ios-filled/50/000000/camera.png"
+                        alt="Edit"
+                      />
+                    </button>
+
+                    {menuOpen && (
+                      <>
+                        <div className="overlay" onClick={toggleMenu}></div>
+                        <div className="pharmacy-camera-options">
+                          <button
+                            onClick={() =>
+                              document.getElementById("upload-photo").click()
+                            }
+                          >
+                            Upload
+                          </button>
+                          <button onClick={handleDeleteAvatar}>Delete</button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+
+                <input
+                  type="file"
+                  id="upload-photo"
+                  accept="image/*"
+                  capture="user"
+                  style={{ display: "none" }}
+                  onChange={(e) => handlePhotoChange(e)}
+                />
+              </div>
               <div className="pharmacy-profile-info">
                 <div className="pharmacy-profile-info-text">
                   <h1 className="pharmacy-profile-name">
@@ -464,9 +572,31 @@ const PharmacyProfile = () => {
             {/* Stats */}
             <div className="pharmacy-profile-stats">
               <div className="pharmacy-profile-card">
-                <Pill size={16} color="#1f61a8" />
-                <span>0+</span>
-                <p>Prescriptions</p>
+                <Calendar size={16} color="#1f61a8" />
+                <h3 className="pharmacy-profile-card-title">
+                  {profile?.createdAt
+                    ? (() => {
+                        const now = new Date();
+                        const createdDate = new Date(profile?.createdAt);
+                        const years =
+                          now.getFullYear() - createdDate.getFullYear();
+                        const months = now.getMonth() - createdDate.getMonth();
+
+                        if (years > 0) {
+                          return years === 1
+                            ? "Joined 1 year ago"
+                            : `Joined ${years} years ago`;
+                        } else if (months > 0) {
+                          return months === 1
+                            ? "Joined 1 month ago"
+                            : `Joined ${months} months ago`;
+                        } else {
+                          return "Joined less than a month ago";
+                        }
+                      })()
+                    : "N/A"}
+                </h3>
+                <p>Pharmacy Since</p>
               </div>
               <div className="pharmacy-profile-card">
                 <ThumbsUp size={16} color="#1f61a8" />
