@@ -10,7 +10,6 @@ import ScanPage from "./Pages/Scan";
 import Layout from "./components/Layout";
 import DoctorPage from "./Pages/Doctor";
 import PharmacyPage from "./Pages/Pharmacy";
-import PatientPage from "./Pages/Patient";
 import PatientDashboard from "./Pages/PatientDashbord"; // Fixed typo
 import GoogleSignUpForm from "./Pages/Signupgoogel"; // Fixed typo
 import DoctorDashboard from "./Pages/DoctorDashbord"; // Fixed typo
@@ -84,14 +83,7 @@ function App() {
               </AuthenticatedRoute>
             }
           />
-          <Route
-            path="/patient"
-            element={
-              <AuthenticatedRoute>
-                <PatientPage />
-              </AuthenticatedRoute>
-            }
-          />
+
           <Route
             path="/pharmacy"
             element={
