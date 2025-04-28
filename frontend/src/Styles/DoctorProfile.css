@@ -405,7 +405,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #639efd 0%, #425f9f 100%);
+  background: linear-gradient(135deg, #377be8 0%, #1c5c9f 100%);
   color: white;
   font-size: 12px;
   font-weight: bold;
@@ -567,10 +567,135 @@
   border-radius: 10px;
   border: 0.8px solid #ebebeb;
 }
-
 .doctor-profile-reviews h2 {
-  font-size: 15px;
-  color: black;
+  font-size: 16px;
+  color: #1c5c9f;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.doctor-profile-review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.add-review-button {
+  background: linear-gradient(135deg, #377be8 0%, #1c5c9f 100%);
+  color: white;
+  padding: 10px 20px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.add-review-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+.review-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.review-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.review-modal {
+  background: white;
+  padding: 20px;
+  border-radius: 6px;
+  width: 350px;
+  max-width: 90%;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+.review-modal-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #175392;
+  margin-bottom: 15px;
+  text-align: center;
+}
+.review-modal textarea {
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  margin-bottom: 10px;
+  resize: none;
+  border: 1px solid rgb(207, 207, 207);
+  border-radius: 5px;
+}
+.review-modal textarea:focus,
+.rating-input input:focus {
+  border-color: #066edc;
+  outline: none;
+}
+
+.rating-input {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.rating-input input {
+  width: 80px;
+  padding: 5px;
+  border: 1px solid rgb(207, 207, 207);
+  border-radius: 5px;
+}
+.review-rating-buttons {
+  display: flex;
+  color: white;
+  border: none;
+  font-size: 10px;
+  cursor: pointer;
+  margin-left: 47px;
+  transition: background-color 0.3s ease;
+}
+
+.submit-review-button,
+.close-modal-button {
+  padding: 8px 16px;
+  margin-right: 7px;
+  border-radius: 5px;
+  border: none;
+  font-size: 12px;
+}
+
+.submit-review-button {
+  background-color: #1c5c9f;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.close-modal-button {
+  background-color: #666;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.submit-review-button:hover,
+.close-modal-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .doctor-profile-reviews p {
@@ -580,27 +705,38 @@
 
 .doctor-profile-review {
   padding: 10px;
-  border-bottom: 1px solid #ddd;
+  border: 1px solid #dedede;
+  border-radius: 8px;
 }
-
-.doctor-profile-review:last-child {
-  border-bottom: none;
+.doctor-profile-review:hover {
+  border-color: #b6b5b5;
+  transform: translateY(-1px);
 }
-
+.review-header {
+  display: flex;
+  gap: 10px;
+}
+.reviewer-section {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
 .doctor-profile-review strong {
-  font-size: 11px;
-  color: #1f61a8;
+  font-size: 12px;
+  color: #444;
 }
 
-.doctor-profile-review p {
-  font-size: 11px;
+.review-comment {
+  font-size: 10px;
+  font-weight: normal;
   color: #444;
-  margin: 5px 0;
 }
 
 .doctor-profile-rating {
-  font-size: 14px;
-  color: #fad955;
+  font-size: 12px;
+  font-weight: bold;
+  color: #1c5c9f;
+  margin-left: 5px;
 }
 
 @media (max-width: 599px) {
