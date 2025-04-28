@@ -27,11 +27,104 @@
   justify-content: flex-start;
 }
 
-.pharmacy-profile-image {
+.pharmacy-profile-image-container {
+  position: relative;
   width: 100px;
   height: 100px;
   margin-right: 30px;
-  border-radius: 50px;
+  margin-bottom: 32px;
+}
+.pharmacy-profile-image-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.pharmacy-profile-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 30px;
+  margin-bottom: 32px;
+}
+
+.pharmacy-camera-icon {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: #edecec;
+  border-radius: 50%;
+  padding: 5px;
+  border: 1px solid #edecec;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pharmacy-camera-icon img {
+  width: 20px;
+  height: 20px;
+}
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 999;
+}
+.pharmacy-camera-options {
+  position: absolute;
+  top: 80px;
+  right: 0;
+  background-color: #666;
+  border: 1px solid #666;
+  border-radius: 4px;
+  width: 103px;
+  height: 20px;
+  display: flex;
+  z-index: 1000;
+  gap: 5px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.3s ease-in-out;
+}
+.pharmacy-camera-options button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: -4px;
+  margin-bottom: -1px;
+  padding: 8px 12px;
+  background-color: #f3f3f3;
+  color: #666;
+  border: none;
+  border-radius: 3px 0px 0px 3px;
+  font-size: 9px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 50px;
+  height: 18px;
+  transition: background-color 0.3s;
+}
+
+.pharmacr-camera-options button:last-child {
+  margin-bottom: 10px;
+  background-color: #f3f3f3;
+  border-radius: 0px 3px 3px 0px;
+  width: 50px;
+  height: 18px;
+}
+
+.pharmacy-camera-options button:hover {
+  background-color: #d9d9d9;
+}
+
+.pharmacy-camera-options button:last-child:hover {
+  background-color: #d9d9d9;
 }
 
 .pharmacy-profile-info {
@@ -325,6 +418,12 @@
   text-align: center;
   margin: 0 5px;
   border: 0.01px solid #f8fafc;
+}
+
+.pharmacy-profile-card-title {
+  font-size: 12px;
+  color: black;
+  margin-bottom: 5px;
 }
 
 .pharmacy-profile-card:hover {

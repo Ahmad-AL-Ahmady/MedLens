@@ -13,13 +13,15 @@ import Swal from "sweetalert2";
 import "../Styles/PatientProfile.css";
 
 export default function PatientProfile() {
+  const id = localStorage.getItem("userId") || sessionStorage.getItem("userId");
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [patientData, setPatientData] = useState(null);
   const [scans, setScans] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showEditForm, setShowEditForm] = useState(false);
-
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -42,6 +44,7 @@ export default function PatientProfile() {
       );
 
       const data = await response.json();
+      console.log("Profile data:", data); // Debugging line
       if (data.status === "success" && data.data) {
         setPatientData(data.data);
         setAppointments(data.data.profile?.appointments || []);
@@ -195,6 +198,69 @@ export default function PatientProfile() {
     }
   };
 
+  const handlePhotoChange = async (e) => {
+    const file = e.target.files[0];
+
+    if (file) {
+      const formData = new FormData();
+      formData.append("avatar", file);
+
+      try {
+        const response = await fetch(
+          "http://localhost:4000/api/users/updateAvatar",
+          {
+            method: "PATCH",
+            body: formData,
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          // console.log("Avatar updated successfully!", data);
+          alert("Avatar updated successfully!");
+          setSelectedImage(URL.createObjectURL(file));
+          await fetchProfile();
+        } else {
+          console.error("Failed to update avatar");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    }
+  };
+
+  const toggleMenu = () => {
+    setMenuOpen((prev) => !prev);
+  };
+
+  const handleDeleteAvatar = async () => {
+    if (window.confirm("Do you want to delete your avatar?")) {
+      try {
+        const response = await fetch(
+          "http://localhost:4000/api/users/deleteAvatar",
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          alert("Avatar deleted successfully!");
+          setSelectedImage(null);
+        } else {
+          console.error("Failed to delete avatar");
+        }
+      } catch (error) {
+        console.error("Error while deleting avatar:", error);
+      }
+    }
+  };
+
   if (loading) return null; // Swal handles loading
   if (error) return null; // Swal handles errors
   if (!patientData) return null; // Swal handles no data
@@ -262,19 +328,57 @@ export default function PatientProfile() {
           {/* Personal Data */}
           <div className="patient-profile-edit-icon">
             <div className="patient-profile-header">
-              {patientData.avatar ? (
+              <div className="patient-profile-image-container">
                 <img
-                  src={`http://localhost:4000/public/uploads/users/${patientData.avatar}`}
-                  alt="Profile"
-                  className="patient-profile-img"
+                  src={
+                    selectedImage || patientData.avatar
+                      ? `http://localhost:4000/public/uploads/users/${
+                          selectedImage || patientData.avatar
+                        }`
+                      : "http://localhost:4000/public/uploads/users/default.jpg"
+                  }
+                  alt=" Patient"
+                  className="patient-profile-image"
                 />
-              ) : (
-                <img
-                  src="https://via.placeholder.com/100"
-                  alt="Default Profile"
-                  className="patient-profile-img"
+                {!id && (
+                  <div className="patient-camera-menu">
+                    <button
+                      onClick={toggleMenu}
+                      className="patient-camera-icon"
+                    >
+                      <img
+                        src="https://img.icons8.com/ios-filled/50/000000/camera.png"
+                        alt="Edit"
+                      />
+                    </button>
+
+                    {menuOpen && (
+                      <>
+                        <div className="overlay" onClick={toggleMenu}></div>
+                        <div className="patient-camera-options">
+                          <button
+                            onClick={() =>
+                              document.getElementById("upload-photo").click()
+                            }
+                          >
+                            Upload
+                          </button>
+                          <button onClick={handleDeleteAvatar}>Delete</button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+
+                <input
+                  type="file"
+                  id="upload-photo"
+                  accept="image/*"
+                  capture="user"
+                  style={{ display: "none" }}
+                  onChange={(e) => handlePhotoChange(e)}
                 />
-              )}
+              </div>
               <div className="patient-profile-info">
                 <h1>{`${patientData.firstName} ${patientData.lastName}`}</h1>
                 <p className="email">
@@ -288,10 +392,6 @@ export default function PatientProfile() {
                   </p>
                   <p>
                     <User size={15} color="#505050" /> {patientData.gender}
-                  </p>
-                  <p>
-                    <Activity size={15} color="#505050" /> Status:{" "}
-                    {patientData.userType}
                   </p>
                 </div>
               </div>
@@ -317,14 +417,34 @@ export default function PatientProfile() {
             <div className="patient-profile-card">
               <Calendar size={16} color="green" />
               <h3>
-                {patientData.patientSince
-                  ? `${patientData.patientSince} Years`
+                {patientData.profile.createdAt
+                  ? (() => {
+                      const now = new Date();
+                      const createdDate = new Date(
+                        patientData.profile.createdAt
+                      );
+                      const years =
+                        now.getFullYear() - createdDate.getFullYear();
+                      const months = now.getMonth() - createdDate.getMonth();
+
+                      if (years > 0) {
+                        return years === 1
+                          ? "Joined 1 year ago"
+                          : `Joined ${years} years ago`;
+                      } else if (months > 0) {
+                        return months === 1
+                          ? "Joined 1 month ago"
+                          : `Joined ${months} months ago`;
+                      } else {
+                        return "Joined less than a month ago";
+                      }
+                    })()
                   : "N/A"}
               </h3>
               <p>Patient Since</p>
             </div>
             <div className="patient-profile-card">
-              <ClipboardList size={16} color="green" />
+              <ClipboardList size={16} color="#1f61a8" />
               <h3>{patientData.reports || 0}</h3>
               <p>Reports</p>
             </div>
@@ -334,7 +454,7 @@ export default function PatientProfile() {
           <div className="patient-profile-scan-section">
             <h2>
               <ScanBarcode size={15} color="#1f61a8" />
-              Past Scans
+              Scans
             </h2>
             <table className="patient-profile-data-table">
               <thead>
@@ -370,7 +490,7 @@ export default function PatientProfile() {
           <div className="patient-profile-scan-section">
             <h2>
               <Calendar size={15} color="#1f61a8" />
-              Past Appointments
+              Appointments
             </h2>
             <table className="patient-profile-data-table">
               <thead>
@@ -392,7 +512,7 @@ export default function PatientProfile() {
                           : "N/A"}
                       </td>
                       <td>{appointment?.doctor?.specialization || "N/A"}</td>
-                      <td>{appointment?.notes || "N/A"}</td>
+                      <td>{appointment?.reason || "N/A"}</td>
                     </tr>
                   ))
                 ) : (
