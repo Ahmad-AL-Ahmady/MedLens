@@ -10,14 +10,15 @@ export default function PharmacyDashboard() {
   const [allMedicines, setAllMedicines] = useState([]);
   const [pharmacy, setPharmacy] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
 
   const authToken =
     localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
 
   const fetchPharmacyProfile = async () => {
     if (!authToken) {
-      console.error("No token found");
       setError("No token found");
       setLoading(false);
       return;
@@ -37,7 +38,6 @@ export default function PharmacyDashboard() {
       }
 
       const data = await response.json();
-      console.log("PHARMACY ", data);
       if (data.status === "success" && data.data) {
         setPharmacy(data.data);
         setMedicines(data.data.profile?.inventory || []);
@@ -45,7 +45,6 @@ export default function PharmacyDashboard() {
         setError("Failed to fetch pharmacy data");
       }
     } catch (error) {
-      console.error("Error fetching pharmacy profile:", error);
       setError("Error fetching pharmacy profile");
     }
   };
@@ -66,8 +65,7 @@ export default function PharmacyDashboard() {
       const medicationsData = await medicationsResponse.json();
       setAllMedicines(medicationsData.data.medications || []);
     } catch (error) {
-      console.error("Error fetching medications:", error);
-      setError(error.message || "An error occurred while fetching medications");
+      setError("An error occurred while fetching medications");
     }
   };
 
@@ -81,162 +79,155 @@ export default function PharmacyDashboard() {
     fetchData();
   }, [authToken]);
 
-  const availableMedicines = allMedicines.filter(
-    (med) =>
-      !medicines.some((m) => m.medication._id.toString() === med._id.toString())
-  );
-
   const handleAddSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    setSuccess(null);
+    setSubmitting(true);
+
     const formData = new FormData(e.target);
-    const price = parseFloat(formData.get("price"));
-    const stock = parseInt(formData.get("stock"));
-    const expiryDate = formData.get("expiryDate");
 
     try {
-      let medication;
       if (addMode === "new") {
+        // Create new medication
         const name = formData.get("name");
         const strength = formData.get("strength");
         const description =
           formData.get("description") || `${name} ${strength}`;
-        medication = { name, description, strength };
-      } else {
-        const medicationId = formData.get("medicineId");
-        const selectedMedicine = allMedicines.find(
-          (med) => med._id === medicationId
+
+        // Client-side validation
+        if (!name.trim()) throw new Error("Name is required");
+        if (!strength.trim()) throw new Error("Strength is required");
+
+        const medicationResponse = await fetch(
+          "http://localhost:4000/api/medications",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${authToken}`,
+            },
+            body: JSON.stringify({ name, description, strength }),
+          }
         );
-        if (!selectedMedicine) {
-          throw new Error("Selected medicine not found");
+
+        if (!medicationResponse.ok) {
+          const errorData = await medicationResponse.json();
+          throw new Error(
+            errorData.message || "Failed to create new medication"
+          );
         }
-        medication = {
-          _id: selectedMedicine._id,
-          name: selectedMedicine.name,
-          description: selectedMedicine.description,
-          strength: selectedMedicine.strength,
-        };
-      }
 
-      // Prepare the new inventory item
-      const newInventoryItem = {
-        medication,
-        stock,
-        price,
-        expiryDate,
-      };
-
-      // Update the profile with the new inventory item
-      const updatedProfile = {
-        ...pharmacy,
-        profile: {
-          ...pharmacy.profile,
-          inventory: [...medicines, newInventoryItem],
-        },
-      };
-
-      const response = await fetch(
-        "http://localhost:4000/api/pharmacies/profile",
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`,
-          },
-          body: JSON.stringify(updatedProfile),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to add medicine to profile");
-      }
-
-      const data = await response.json();
-      if (data.status === "success") {
-        await fetchPharmacyProfile(); // Refresh data
-        setShowAddForm(false);
-        if (addMode === "new") {
-          // Optionally update allMedicines if a new medicine was added
-          setAllMedicines([...allMedicines, medication]);
-        }
+        const medicationData = await medicationResponse.json();
+        // Update allMedicines to include the new medication
+        setAllMedicines([...allMedicines, medicationData.data.medication]);
+        setSuccess("Medication created successfully!");
       } else {
-        throw new Error("Failed to update profile with new medicine");
+        // Add existing medication to inventory
+        const medicationId = formData.get("medicineId");
+        const price = parseFloat(formData.get("price"));
+        const stock = parseInt(formData.get("stock"));
+        const expiryDate = formData.get("expiryDate");
+
+        // Client-side validation
+        if (!medicationId) throw new Error("Please select a medicine");
+        if (price <= 0) throw new Error("Price must be positive");
+        if (stock < 0) throw new Error("Stock cannot be negative");
+
+        const inventoryResponse = await fetch(
+          "http://localhost:4000/api/pharmacies/inventory",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${authToken}`,
+            },
+            body: JSON.stringify({
+              medicationId,
+              stock,
+              price,
+              expiryDate,
+            }),
+          }
+        );
+
+        if (!inventoryResponse.ok) {
+          const errorData = await inventoryResponse.json();
+          throw new Error(errorData.message || "Failed to add to inventory");
+        }
+
+        // Refresh pharmacy profile
+        await fetchPharmacyProfile();
+        setSuccess("Medicine added to inventory successfully!");
       }
+
+      setShowAddForm(false);
     } catch (error) {
-      console.error("Error adding medicine:", error);
-      setError(error.message || "An error occurred while adding the medicine");
+      setError(
+        error.message || "An error occurred while processing the request"
+      );
+    } finally {
+      setSubmitting(false);
+      setTimeout(() => setSuccess(null), 3000); // Clear success message after 3 seconds
     }
   };
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    setSubmitting(true);
+
     const formData = new FormData(e.target);
-    const updatedMedicine = {
-      price: parseFloat(formData.get("price")),
-      stock:
-        formData.get("available") === "on"
-          ? 0
-          : parseInt(formData.get("stock")),
-    };
+    const price = parseFloat(formData.get("price"));
+    const isAvailable = formData.get("available") !== "on";
+    const stock = isAvailable ? parseInt(formData.get("stock")) : 0;
+    const expiryDate = formData.get("expiryDate");
 
     try {
-      // Update the specific medicine in the inventory
-      const updatedInventory = medicines.map((med) =>
-        med._id === editingMedicine._id
-          ? {
-              ...med,
-              price: updatedMedicine.price,
-              stock: updatedMedicine.stock,
-            }
-          : med
-      );
-
-      // Prepare the updated profile
-      const updatedProfile = {
-        ...pharmacy,
-        profile: {
-          ...pharmacy.profile,
-          inventory: updatedInventory,
-        },
+      const updateData = {
+        medicationId: editingMedicine.medication._id,
+        stock,
+        price,
+        expiryDate,
       };
 
       const response = await fetch(
-        "http://localhost:4000/api/pharmacies/profile",
+        "http://localhost:4000/api/pharmacies/inventory",
         {
-          method: "PATCH",
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${authToken}`,
           },
-          body: JSON.stringify(updatedProfile),
+          body: JSON.stringify(updateData),
         }
       );
 
       if (!response.ok) {
-        throw new Error("Failed to update medicine in profile");
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to update inventory");
       }
 
-      const data = await response.json();
-      if (data.status === "success") {
-        await fetchPharmacyProfile(); // Refresh data
-        setEditingMedicine(null);
-      } else {
-        throw new Error("Failed to update medicine in profile");
-      }
+      await fetchPharmacyProfile();
+      setEditingMedicine(null);
+      setSuccess("Inventory updated successfully!");
     } catch (error) {
-      console.error("Error updating medicine:", error);
       setError(
-        error.message || "An error occurred while updating the medicine"
+        error.message || "An error occurred while updating the inventory"
       );
+    } finally {
+      setSubmitting(false);
+      setTimeout(() => setSuccess(null), 3000);
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (medicationId) => {
     if (window.confirm("Are you sure you want to delete this medicine?")) {
+      setError(null);
+      setSubmitting(true);
       try {
         const response = await fetch(
-          `http://localhost:4000/api/inventory/${id}`,
+          `http://localhost:4000/api/pharmacies/inventory/${medicationId}`,
           {
             method: "DELETE",
             headers: {
@@ -244,15 +235,21 @@ export default function PharmacyDashboard() {
             },
           }
         );
+
         if (!response.ok) {
-          throw new Error("Failed to delete medicine");
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to delete medicine");
         }
+
         await fetchPharmacyProfile();
+        setSuccess("Medicine deleted successfully!");
       } catch (error) {
-        console.error("Error deleting medicine:", error);
         setError(
           error.message || "An error occurred while deleting the medicine"
         );
+      } finally {
+        setSubmitting(false);
+        setTimeout(() => setSuccess(null), 3000);
       }
     }
   };
@@ -260,7 +257,6 @@ export default function PharmacyDashboard() {
   if (loading) return <p>Loading...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
   if (!pharmacy) {
-    console.log("No profile found:", pharmacy);
     return <p>No pharmacy profile found.</p>;
   }
 
@@ -357,7 +353,7 @@ export default function PharmacyDashboard() {
                   ${medicine.price.toFixed(2)}
                 </td>
                 <td className="pharmacy-dashboard-table-data">
-                  {medicine.expiryDate}
+                  {medicine.expiryDate || "N/A"}
                 </td>
                 <td className="pharmacy-dashboard-table-data">
                   <button
@@ -368,7 +364,7 @@ export default function PharmacyDashboard() {
                   </button>
                   <button
                     className="pharmacy-dashboard-delete-button"
-                    onClick={() => handleDelete(medicine._id)}
+                    onClick={() => handleDelete(medicine.medication._id)}
                   >
                     <Trash2 size={18} />
                   </button>
@@ -396,6 +392,9 @@ export default function PharmacyDashboard() {
               onSubmit={handleEditSubmit}
             >
               {error && <div className="pharmacy-dashboard-error">{error}</div>}
+              {success && (
+                <div className="pharmacy-dashboard-success">{success}</div>
+              )}
               <div className="pharmacy-dashboard-form-column">
                 <div className="pharmacy-dashboard-form-group">
                   <label>Price ($)</label>
@@ -415,6 +414,18 @@ export default function PharmacyDashboard() {
                     defaultValue={editingMedicine.stock}
                     disabled={editingMedicine.stock === 0}
                     required
+                  />
+                </div>
+                <div className="pharmacy-dashboard-form-group">
+                  <label>Expiry Date</label>
+                  <input
+                    type="date"
+                    name="expiryDate"
+                    defaultValue={
+                      editingMedicine.expiryDate
+                        ? editingMedicine.expiryDate.split("T")[0]
+                        : ""
+                    }
                   />
                 </div>
               </div>
@@ -440,14 +451,16 @@ export default function PharmacyDashboard() {
                   type="button"
                   className="pharmacy-dashboard-form-cancel"
                   onClick={() => setEditingMedicine(null)}
+                  disabled={submitting}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   className="pharmacy-dashboard-form-submit"
+                  disabled={submitting}
                 >
-                  Save Changes
+                  {submitting ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </form>
@@ -472,6 +485,9 @@ export default function PharmacyDashboard() {
               onSubmit={handleAddSubmit}
             >
               {error && <div className="pharmacy-dashboard-error">{error}</div>}
+              {success && (
+                <div className="pharmacy-dashboard-success">{success}</div>
+              )}
               <div className="pharmacy-dashboard-form-group pharmacy-dashboard-form-group--radio">
                 <label>
                   <input
@@ -515,51 +531,58 @@ export default function PharmacyDashboard() {
               )}
 
               {addMode === "existing" && (
-                <div className="pharmacy-dashboard-form-group">
-                  <label>Medicine</label>
-                  <select
-                    name="medicineId"
-                    className="pharmacy-dashboard-select"
-                    required
-                  >
-                    <option value="">Select Medicine</option>
-                    {availableMedicines.map((med) => (
-                      <option key={med._id} value={med._id}>
-                        {med.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <>
+                  <div className="pharmacy-dashboard-form-group">
+                    <label>Medicine</label>
+                    <select
+                      name="medicineId"
+                      className="pharmacy-dashboard-select"
+                      required
+                    >
+                      <option value="">Select Medicine</option>
+                      {allMedicines.map((med) => (
+                        <option key={med._id} value={med._id}>
+                          {med.name} ({med.strength})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="pharmacy-dashboard-form-column">
+                    <div className="pharmacy-dashboard-form-group">
+                      <label>Price</label>
+                      <input type="number" step="0.01" name="price" required />
+                    </div>
+                    <div className="pharmacy-dashboard-form-group">
+                      <label>Stock</label>
+                      <input type="number" name="stock" required />
+                    </div>
+                    <div className="pharmacy-dashboard-form-group">
+                      <label>Expiry Date</label>
+                      <input type="date" name="expiryDate" required />
+                    </div>
+                  </div>
+                </>
               )}
-
-              <div className="pharmacy-dashboard-form-column">
-                <div className="pharmacy-dashboard-form-group">
-                  <label>Price</label>
-                  <input type="number" step="0.01" name="price" required />
-                </div>
-                <div className="pharmacy-dashboard-form-group">
-                  <label>Stock</label>
-                  <input type="number" name="stock" required />
-                </div>
-                <div className="pharmacy-dashboard-form-group">
-                  <label>Expiry Date</label>
-                  <input type="date" name="expiryDate" required />
-                </div>
-              </div>
 
               <div className="pharmacy-dashboard-form-actions">
                 <button
                   type="button"
                   className="pharmacy-dashboard-form-cancel"
                   onClick={() => setShowAddForm(false)}
+                  disabled={submitting}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   className="pharmacy-dashboard-form-submit"
+                  disabled={submitting}
                 >
-                  Add Medicine
+                  {submitting
+                    ? "Processing..."
+                    : addMode === "new"
+                    ? "Create Medicine"
+                    : "Add Medicine"}
                 </button>
               </div>
             </form>
