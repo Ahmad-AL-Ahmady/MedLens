@@ -378,7 +378,7 @@ const DoctorProfile = () => {
                 value={formData.experienceYears}
                 onChange={handleChange}
               />
-              </div>
+            </div>
             <div className="doctor-operating-hours-edit">
               <h3>Working Hours</h3>
               {Object.entries(formData.availability).map(([day, info]) => (
@@ -473,30 +473,32 @@ const DoctorProfile = () => {
                   alt="Doctor"
                   className="doctor-profile-image"
                 />
-                <div className="camera-menu">
-                  <button onClick={toggleMenu} className="camera-icon">
-                    <img
-                      src="https://img.icons8.com/ios-filled/50/000000/camera.png"
-                      alt="Edit"
-                    />
-                  </button>
+                {!id && (
+                  <div className="camera-menu">
+                    <button onClick={toggleMenu} className="camera-icon">
+                      <img
+                        src="https://img.icons8.com/ios-filled/50/000000/camera.png"
+                        alt="Edit"
+                      />
+                    </button>
 
-                  {menuOpen && (
-                    <>
-                      <div className="overlay" onClick={toggleMenu}></div>
-                      <div className="camera-options">
-                        <button
-                          onClick={() =>
-                            document.getElementById("upload-photo").click()
-                          }
-                        >
-                          Upload
-                        </button>
-                        <button onClick={handleDeleteAvatar}>Delete</button>
-                      </div>
-                    </>
-                  )}
-                </div>
+                    {menuOpen && (
+                      <>
+                        <div className="overlay" onClick={toggleMenu}></div>
+                        <div className="camera-options">
+                          <button
+                            onClick={() =>
+                              document.getElementById("upload-photo").click()
+                            }
+                          >
+                            Upload
+                          </button>
+                          <button onClick={handleDeleteAvatar}>Delete</button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
 
                 <input
                   type="file"
@@ -725,6 +727,7 @@ const DoctorProfile = () => {
   );
 };
 
-export default DoctorProfile; 
+export default DoctorProfile;
+
 
 
