@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { CiLocationOn } from "react-icons/ci";
@@ -37,6 +38,7 @@ export default function DoctorPage() {
   const [error, setError] = useState(null);
   const [startIndex, setStartIndex] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(6);
+  const [doctorCardsPerPage, setDoctorCardsPerPage] = useState(6);
   const [location, setLocation] = useState("");
   const [distance, setDistance] = useState("");
   const [showDistance, setShowDistance] = useState(false);
@@ -68,9 +70,29 @@ export default function DoctorPage() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    const handleDoctorResize = () => {
+      if (window.innerWidth < 576) {
+        setDoctorCardsPerPage(1);
+      } else if (window.innerWidth >= 576 && window.innerWidth < 768) {
+        setDoctorCardsPerPage(2);
+      } else if (window.innerWidth >= 768 && window.innerWidth < 992) {
+        setDoctorCardsPerPage(3);
+      } else if (window.innerWidth >= 992 && window.innerWidth < 1200) {
+        setDoctorCardsPerPage(4);
+      } else {
+        setDoctorCardsPerPage(6);
+      }
+    };
+
+    handleDoctorResize();
+    window.addEventListener("resize", handleDoctorResize);
+
+    return () => window.removeEventListener("resize", handleDoctorResize);
+  }, []);
+
   const handleSpecializationClick = (specialty) => {
     setSelectedSpecialization(specialty);
-  
   };
 
   // ✅ Fetch doctors list
@@ -193,78 +215,78 @@ export default function DoctorPage() {
           &gt;
         </button>
       </div>
-     
-        {/* ✅ Specialization bar */}
-        <div className="specialty-container">
-          {specializations
-            .slice(startIndex, startIndex + itemsPerPage)
-            .map((specialty) => {
-              const isActive = selectedSpecialization === specialty.name;
-              const icon = specialtyIcons[specialty.name]
-                ? React.cloneElement(specialtyIcons[specialty.name], {
-                    color: isActive
-                      ? "white"
-                      : specialtyIcons[specialty.name].props.color,
-                  })
-                : null;
 
-              return (
-                <button
-                  key={specialty.name}
-                  className={`specialty-btn ${isActive ? "active" : ""}`}
-                  onClick={() => setSelectedSpecialization(specialty.name)}
-                >
-                  {icon}
-                  {specialty.name}
-                </button>
-              );
-            })}
-        </div>
+      {/* ✅ Specialization bar */}
+      <div className="specialty-container">
+        {specializations
+          .slice(startIndex, startIndex + itemsPerPage)
+          .map((specialty) => {
+            const isActive = selectedSpecialization === specialty.name;
+            const icon = specialtyIcons[specialty.name]
+              ? React.cloneElement(specialtyIcons[specialty.name], {
+                  color: isActive
+                    ? "white"
+                    : specialtyIcons[specialty.name].props.color,
+                })
+              : null;
 
-        {/* ✅ Search bar */}
-        <div className="search-wrapper">
-          <input
-            type="text"
-            placeholder="Search name"
-            className="search-input search-box "
-            value={searchName}
-            onChange={(e) => setSearchName(e.target.value)}
-          />
+            return (
+              <button
+                key={specialty.name}
+                className={`specialty-btn ${isActive ? "active" : ""}`}
+                onClick={() => setSelectedSpecialization(specialty.name)}
+              >
+                {icon}
+                {specialty.name}
+              </button>
+            );
+          })}
+      </div>
 
-          <select
-            className="distance-select"
-            value={distance}
-            onChange={(e) => setDistance(e.target.value)}
+      {/* ✅ Search bar */}
+      <div className="search-wrapper">
+        <input
+          type="text"
+          placeholder="Search name"
+          className="search-input search-box "
+          value={searchName}
+          onChange={(e) => setSearchName(e.target.value)}
+        />
+
+        <select
+          className="distance-select"
+          value={distance}
+          onChange={(e) => setDistance(e.target.value)}
+        >
+          <option value="">Select Distance</option>
+          <option value="5">5 km</option>
+          <option value="10">10 km</option>
+          <option value="20">20 km</option>
+          <option value="50">50 km</option>
+        </select>
+
+        <div className="signup-location-container">
+          <button
+            type="button"
+            className="signup-location-button"
+            onClick={() => setShowMap(!showMap)}
           >
-            <option value="">Select Distance</option>
-            <option value="5">5 km</option>
-            <option value="10">10 km</option>
-            <option value="20">20 km</option>
-            <option value="50">50 km</option>
-          </select>
-
-          <div className="signup-location-container">
-            <button
-              type="button"
-              className="signup-location-button"
-              onClick={() => setShowMap(!showMap)}
-            >
-              <CiLocationOn className="signup-location-icon" />
-              {location ? "Location Selected" : "Select Location"}
-            </button>
-          </div>
-          {showMap && (
-            <LocationPicker
-              onSelect={setLocation}
-              onClose={() => setShowMap(false)}
-            />
-          )}
-
-          <button className="search-button" onClick={handleSearch}>
-            <Search size={16} />
+            <CiLocationOn className="signup-location-icon" />
+            {location ? "Location Selected" : "Select Location"}
           </button>
         </div>
-      
+        {showMap && (
+          <LocationPicker
+            onSelect={setLocation}
+            onClose={() => setShowMap(false)}
+          />
+        )}
+
+        <button className="search-button" onClick={handleSearch}>
+          <Search size={16} />
+        </button>
+      </div>
+
       {/* ✅ Doctors List */}
       <div className="doctors-section">
         <div className="header">
@@ -276,43 +298,45 @@ export default function DoctorPage() {
         </div>
 
         <div className="doctors-container">
-        {error ? (
-  <p className="error-message">{error}</p>
-) : doctors.length > 0 ? (
-  doctors.map((doctor) => (
-    <div key={doctor.id} className="doctor-card">
-      <div className="doctor-info">
-        <img
-          src={
-            doctor.avatar
-              ? `http://localhost:4000/public/uploads/users/${doctor.avatar}`
-              : "http://localhost:4000/public/uploads/users/default.jpg"
-          }
-          alt={doctor.name}
-          className="doctor-img"
-        />
-        <div className="doctor-details">
-          <h3 className="doctor-name">
-            {doctor.firstName} {doctor.lastName}
-          </h3>
-          <p className="specialty">{doctor.specialization}</p>
-          <p className="rating">
-            <StarIcon size={16} /> {doctor.averageRating} (
-            {doctor.totalReviews} reviews)
-          </p>
-        </div>
-      </div>
-      <button
-        className="profile-btn"
-        onClick={() => navigate(`/doctors/${doctor.id}`)}
-      >
-        Profile
-      </button>
-    </div>
-  ))
-) : (
-  <p className="no-doctors">No doctors available</p>
-)}
+          {error ? (
+            <p className="error-message">{error}</p>
+          ) : doctors.length > 0 ? (
+            (showAll ? doctors : doctors.slice(0, doctorCardsPerPage)).map(
+              (doctor) => (
+                <div key={doctor.id} className="doctor-card">
+                  <div className="doctor-info">
+                    <img
+                      src={
+                        doctor.avatar
+                          ? `http://localhost:4000/public/uploads/users/${doctor.avatar}`
+                          : "http://localhost:4000/public/uploads/users/default.jpg"
+                      }
+                      alt={doctor.name}
+                      className="doctor-img"
+                    />
+                    <div className="doctor-details">
+                      <h3 className="doctor-name">
+                        {doctor.firstName} {doctor.lastName}
+                      </h3>
+                      <p className="specialty">{doctor.specialization}</p>
+                      <p className="rating">
+                        <StarIcon size={16} /> {doctor.averageRating} (
+                        {doctor.totalReviews} reviews)
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    className="profile-btn"
+                    onClick={() => navigate(`/doctors/${doctor.id}`)}
+                  >
+                    Profile
+                  </button>
+                </div>
+              )
+            )
+          ) : (
+            <p className="no-doctors">No doctors available</p>
+          )}
         </div>
       </div>
     </div>
