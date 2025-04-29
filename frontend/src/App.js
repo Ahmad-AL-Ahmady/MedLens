@@ -92,6 +92,14 @@ function App() {
               </AuthenticatedRoute>
             }
           />
+          <Route
+            path="/medicines/:id"
+            element={
+              <AuthenticatedRoute>
+                <MedicineDetails />
+              </AuthenticatedRoute>
+            }
+          />
         </Route>
       </Routes>
     </Router>
