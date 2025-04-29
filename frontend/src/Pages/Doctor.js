@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { CiLocationOn } from "react-icons/ci";
@@ -99,7 +98,7 @@ export default function DoctorPage() {
   useEffect(() => {
     fetch("http://localhost:4000/api/doctors/all")
       .then((res) => {
-        console.log("Response Status:", res.status);
+        // console.log("Response Status:", res.status);
         return res.json();
       })
       .then((data) => {
@@ -131,7 +130,7 @@ export default function DoctorPage() {
     )
       .then((res) => res.json())
       .then((data) => {
-        console.log("Doctors Fetched: ", data);
+        //console.log("Doctors Fetched: ", data);
         setDoctors(data.data.doctors || []);
         setLoading(false);
       })
@@ -176,7 +175,7 @@ export default function DoctorPage() {
           );
         });
 
-        console.log("Filtered Doctors:", filteredDoctors);
+        //console.log("Filtered Doctors:", filteredDoctors);
         setDoctors(filteredDoctors);
       } else if (location?.latitude && location?.longitude) {
         setDoctors(doctorsList.sort((a, b) => a.distance - b.distance));
