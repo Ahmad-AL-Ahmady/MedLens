@@ -47,6 +47,9 @@ exports.getMyProfile = catchAsync(async (req, res, next) => {
     age: user.age,
     avatar: user.avatar,
     profile: patientProfile,
+    totalAppointments: patientProfile.appointments
+      ? patientProfile.appointments.length
+      : 0,
   };
 
   res.status(200).json({
