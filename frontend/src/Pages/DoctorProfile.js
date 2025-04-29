@@ -27,6 +27,9 @@ const DoctorProfile = () => {
   const [showEditForm, setShowEditForm] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [comment, setComment] = useState("");
+  const [rating, setRating] = useState(5);
   const [formData, setFormData] = useState({
     city: "",
     state: "",
@@ -318,6 +321,44 @@ const DoctorProfile = () => {
     } catch (error) {
       console.error("Error updating profile:", error);
       alert("Something went wrong");
+    }
+  };
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const res = await fetch("http://localhost:4000/api/reviews", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          reviewedEntityId: id,
+          entityType: "Doctor",
+          rating,
+          comment,
+        }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Something went wrong");
+      }
+
+      const data = await res.json();
+      console.log("Review added:", data);
+
+      setShowReviewForm(false);
+      setComment("");
+      setRating(5);
+      setProfile((prev) => ({
+        ...prev,
+        reviews: [data.data.review, ...prev.reviews],
+      }));
+    } catch (error) {
+      console.error("Error adding review:", error.message);
     }
   };
 
@@ -704,17 +745,80 @@ const DoctorProfile = () => {
 
           {/* Reviews Section */}
           <div className="doctor-profile-reviews">
-            <h2>Patient Reviews</h2>
+            <div className="doctor-profile-review-header">
+              <h2>Patient Reviews</h2>
+              {id && (
+                <button
+                  className="add-review-button"
+                  onClick={() => setShowReviewForm(true)}
+                >
+                  Add Review
+                </button>
+              )}
+            </div>
+            {showReviewForm && (
+              <div className="review-modal-overlay">
+                <div className="review-modal">
+                  <h2 className="review-modal-title">Add Your Review</h2>
+                  <form onSubmit={handleReviewSubmit}>
+                    <textarea
+                      placeholder="Write your review..."
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                      required
+                    />
+                    <div className="rating-input">
+                      <input
+                        type="number"
+                        value={rating}
+                        onChange={(e) => setRating(parseFloat(e.target.value))}
+                        step="0.1"
+                        min="1"
+                        max="5"
+                        required
+                      />
+                      <span> ⭐️</span>
+                      <div className="review-rating-buttons">
+                        <button type="submit" className="submit-review-button">
+                          Submit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShowReviewForm(false)}
+                          className="close-modal-button"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+
             {profile?.reviews?.length > 0 ? (
               profile.reviews.map((review) => (
                 <div key={review._id} className="doctor-profile-review">
-                  <p>
-                    <strong>{review.user?.name || "Anonymous"}</strong> -{" "}
-                    {review.comment}
-                  </p>
-                  <span className="doctor-profile-rating">
-                    ⭐️ {review.rating}
-                  </span>
+                  <div className="review-header">
+                    <img
+                      src={`http://localhost:4000/public/uploads/users/${review.reviewer?.avatar}`}
+                      alt="Reviewer Avatar"
+                      className="review-avatar"
+                    />
+                    <div className="reviewer-section">
+                      <div className="reviewer-info">
+                        <strong>
+                          {review.reviewer
+                            ? `${review.reviewer.firstName} ${review.reviewer.lastName}`
+                            : "Anonymous"}
+                        </strong>
+                        <span className="doctor-profile-rating">
+                          (⭐️ {review.rating})
+                        </span>
+                      </div>
+                      <p className="review-comment">{review.comment}</p>
+                    </div>
+                  </div>
                 </div>
               ))
             ) : (
@@ -728,6 +832,7 @@ const DoctorProfile = () => {
 };
 
 export default DoctorProfile;
+
 
 
 

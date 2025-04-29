@@ -70,9 +70,7 @@ export default function DoctorPage() {
 
   const handleSpecializationClick = (specialty) => {
     setSelectedSpecialization(specialty);
-    setFilteredDoctors(
-      doctors.filter((doc) => doc.specialization === specialty)
-    );
+  
   };
 
   // ✅ Fetch doctors list
@@ -111,6 +109,7 @@ export default function DoctorPage() {
     )
       .then((res) => res.json())
       .then((data) => {
+        console.log("Doctors Fetched: ", data);
         setDoctors(data.data.doctors || []);
         setLoading(false);
       })
@@ -277,43 +276,43 @@ export default function DoctorPage() {
         </div>
 
         <div className="doctors-container">
-          {error ? (
-            <p className="error-message">{error}</p>
-          ) : doctors.length > 0 ? (
-            displayedDoctors.map((doctor) => (
-              <div key={doctor.id} className="doctor-card">
-                <div className="doctor-info">
-                  <img
-                    src={
-                      doctor.avatar
-                        ? `http://localhost:4000/public/uploads/users/${doctor.avatar}`
-                        : "http://localhost:4000/public/uploads/users/default.jpg"
-                    }
-                    alt={doctor.name}
-                    className="doctor-img"
-                  />
-                  <div className="doctor-details">
-                    <h3 className="doctor-name">
-                      {doctor.firstName} {doctor.lastName}
-                    </h3>
-                    <p className="specialty">{doctor.specialization}</p>
-                    <p className="rating">
-                      <StarIcon size={16} /> {doctor.averageRating} (
-                      {doctor.totalReviews} reviews)
-                    </p>
-                  </div>
-                </div>
-                <button
-                  className="profile-btn"
-                  onClick={() => navigate(`/doctors/${doctor.id}`)}
-                >
-                  Profile
-                </button>
-              </div>
-            ))
-          ) : (
-            <p className="no-doctors">No doctors available</p>
-          )}
+        {error ? (
+  <p className="error-message">{error}</p>
+) : doctors.length > 0 ? (
+  doctors.map((doctor) => (
+    <div key={doctor.id} className="doctor-card">
+      <div className="doctor-info">
+        <img
+          src={
+            doctor.avatar
+              ? `http://localhost:4000/public/uploads/users/${doctor.avatar}`
+              : "http://localhost:4000/public/uploads/users/default.jpg"
+          }
+          alt={doctor.name}
+          className="doctor-img"
+        />
+        <div className="doctor-details">
+          <h3 className="doctor-name">
+            {doctor.firstName} {doctor.lastName}
+          </h3>
+          <p className="specialty">{doctor.specialization}</p>
+          <p className="rating">
+            <StarIcon size={16} /> {doctor.averageRating} (
+            {doctor.totalReviews} reviews)
+          </p>
+        </div>
+      </div>
+      <button
+        className="profile-btn"
+        onClick={() => navigate(`/doctors/${doctor.id}`)}
+      >
+        Profile
+      </button>
+    </div>
+  ))
+) : (
+  <p className="no-doctors">No doctors available</p>
+)}
         </div>
       </div>
     </div>
