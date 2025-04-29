@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Activity, Plus, Edit2, X, Mail, Trash2 } from "lucide-react";
+import Swal from "sweetalert2";
 import "../Styles/PharmacyDashboard.css";
 
 export default function PharmacyDashboard() {
@@ -11,15 +12,17 @@ export default function PharmacyDashboard() {
   const [pharmacy, setPharmacy] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
 
   const authToken =
     localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
 
   const fetchPharmacyProfile = async () => {
     if (!authToken) {
-      setError("No token found");
+      Swal.fire({
+        icon: "error",
+        title: "Authentication Error",
+        text: "Please log in to access your profile.",
+      });
       setLoading(false);
       return;
     }
@@ -34,7 +37,14 @@ export default function PharmacyDashboard() {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch pharmacy profile");
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          throw new Error("Server response is not valid JSON");
+        }
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || "Failed to fetch pharmacy profile"
+        );
       }
 
       const data = await response.json();
@@ -42,10 +52,15 @@ export default function PharmacyDashboard() {
         setPharmacy(data.data);
         setMedicines(data.data.profile?.inventory || []);
       } else {
-        setError("Failed to fetch pharmacy data");
+        throw new Error("Failed to fetch pharmacy data");
       }
     } catch (error) {
-      setError("Error fetching pharmacy profile");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Unable to load your pharmacy profile. Please try again later.",
+      });
+      setLoading(false);
     }
   };
 
@@ -60,20 +75,45 @@ export default function PharmacyDashboard() {
         }
       );
       if (!medicationsResponse.ok) {
-        throw new Error("Failed to fetch medications");
+        const contentType = medicationsResponse.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          throw new Error("Server response is not valid JSON");
+        }
+        const errorData = await medicationsResponse.json();
+        throw new Error(errorData.message || "Failed to fetch medications");
       }
       const medicationsData = await medicationsResponse.json();
       setAllMedicines(medicationsData.data.medications || []);
     } catch (error) {
-      setError("An error occurred while fetching medications");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Unable to load medications. Please try again later.",
+      });
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
-      await Promise.all([fetchPharmacyProfile(), fetchMedications()]);
-      setLoading(false);
+      // Show SweetAlert2 loading modal
+      Swal.fire({
+        title: "Loading...",
+        text: "Fetching your pharmacy data, please wait.",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      try {
+        setLoading(true);
+        await Promise.all([fetchPharmacyProfile(), fetchMedications()]);
+      } finally {
+        setLoading(false);
+        Swal.close(); // Close the loading modal
+      }
     };
 
     fetchData();
@@ -81,9 +121,18 @@ export default function PharmacyDashboard() {
 
   const handleAddSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
-    setSuccess(null);
     setSubmitting(true);
+
+    // Show loading modal
+    Swal.fire({
+      title: "Processing...",
+      text: "Please wait while we process your request.",
+      allowOutsideClick: false,
+      showConfirmButton: false,
+      willOpen: () => {
+        Swal.showLoading();
+      },
+    });
 
     const formData = new FormData(e.target);
 
@@ -96,8 +145,9 @@ export default function PharmacyDashboard() {
           formData.get("description") || `${name} ${strength}`;
 
         // Client-side validation
-        if (!name.trim()) throw new Error("Name is required");
-        if (!strength.trim()) throw new Error("Strength is required");
+        if (!name.trim()) throw new Error("Please enter a medicine name.");
+        if (!strength.trim())
+          throw new Error("Please enter the medicine strength.");
 
         const medicationResponse = await fetch(
           "http://localhost:4000/api/medications",
@@ -112,16 +162,33 @@ export default function PharmacyDashboard() {
         );
 
         if (!medicationResponse.ok) {
+          const contentType = medicationResponse.headers.get("content-type");
+          if (!contentType || !contentType.includes("application/json")) {
+            throw new Error("Server response is not valid JSON");
+          }
           const errorData = await medicationResponse.json();
+          // Check for duplicate medication error
+          if (
+            errorData.message ===
+            "A medication with this name and strength already exists"
+          ) {
+            throw new Error("This medicine is already in the database.");
+          }
           throw new Error(
-            errorData.message || "Failed to create new medication"
+            errorData.message || "Failed to create the new medicine."
           );
         }
 
         const medicationData = await medicationResponse.json();
         // Update allMedicines to include the new medication
         setAllMedicines([...allMedicines, medicationData.data.medication]);
-        setSuccess("Medication created successfully!");
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "The new medicine has been created successfully.",
+          timer: 2000,
+          showConfirmButton: false,
+        });
       } else {
         // Add existing medication to inventory
         const medicationId = formData.get("medicineId");
@@ -130,9 +197,9 @@ export default function PharmacyDashboard() {
         const expiryDate = formData.get("expiryDate");
 
         // Client-side validation
-        if (!medicationId) throw new Error("Please select a medicine");
-        if (price <= 0) throw new Error("Price must be positive");
-        if (stock < 0) throw new Error("Stock cannot be negative");
+        if (!medicationId) throw new Error("Please select a medicine.");
+        if (price <= 0) throw new Error("Price must be a positive number.");
+        if (stock < 0) throw new Error("Stock cannot be negative.");
 
         const inventoryResponse = await fetch(
           "http://localhost:4000/api/pharmacies/inventory",
@@ -152,30 +219,55 @@ export default function PharmacyDashboard() {
         );
 
         if (!inventoryResponse.ok) {
+          const contentType = inventoryResponse.headers.get("content-type");
+          if (!contentType || !contentType.includes("application/json")) {
+            throw new Error("Server response is not valid JSON");
+          }
           const errorData = await inventoryResponse.json();
-          throw new Error(errorData.message || "Failed to add to inventory");
+          throw new Error(errorData.message || "Failed to add to inventory.");
         }
 
         // Refresh pharmacy profile
         await fetchPharmacyProfile();
-        setSuccess("Medicine added to inventory successfully!");
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "The medicine has been added to your inventory.",
+          timer: 2000,
+          showConfirmButton: false,
+        });
       }
 
       setShowAddForm(false);
     } catch (error) {
-      setError(
-        error.message || "An error occurred while processing the request"
-      );
+      Swal.fire({
+        icon: "error",
+        title: "Oops!",
+        text:
+          error.message === "Server response is not valid JSON"
+            ? "The medicine already exists in the database ."
+            : error.message ||
+              "Something went wrong while processing your request. Please try again.",
+      });
     } finally {
       setSubmitting(false);
-      setTimeout(() => setSuccess(null), 3000); // Clear success message after 3 seconds
     }
   };
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
     setSubmitting(true);
+
+    // Show loading modal
+    Swal.fire({
+      title: "Processing...",
+      text: "Please wait while we update the inventory.",
+      allowOutsideClick: false,
+      showConfirmButton: false,
+      willOpen: () => {
+        Swal.showLoading();
+      },
+    });
 
     const formData = new FormData(e.target);
     const price = parseFloat(formData.get("price"));
@@ -204,27 +296,62 @@ export default function PharmacyDashboard() {
       );
 
       if (!response.ok) {
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          throw new Error("Server response is not valid JSON");
+        }
         const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to update inventory");
+        throw new Error(errorData.message || "Failed to update inventory.");
       }
 
       await fetchPharmacyProfile();
       setEditingMedicine(null);
-      setSuccess("Inventory updated successfully!");
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: "The inventory has been updated successfully.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
     } catch (error) {
-      setError(
-        error.message || "An error occurred while updating the inventory"
-      );
+      Swal.fire({
+        icon: "error",
+        title: "Oops!",
+        text:
+          error.message === "Server response is not valid JSON"
+            ? "Unable to connect to the server. Please try again later."
+            : error.message ||
+              "Something went wrong while updating the inventory. Please try again.",
+      });
     } finally {
       setSubmitting(false);
-      setTimeout(() => setSuccess(null), 3000);
     }
   };
 
   const handleDelete = async (medicationId) => {
-    if (window.confirm("Are you sure you want to delete this medicine?")) {
-      setError(null);
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to remove this medicine from your inventory?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, keep it",
+    });
+
+    if (result.isConfirmed) {
       setSubmitting(true);
+
+      // Show loading modal
+      Swal.fire({
+        title: "Processing...",
+        text: "Please wait while we remove the medicine.",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
       try {
         const response = await fetch(
           `http://localhost:4000/api/pharmacies/inventory/${medicationId}`,
@@ -237,25 +364,40 @@ export default function PharmacyDashboard() {
         );
 
         if (!response.ok) {
+          const contentType = response.headers.get("content-type");
+          if (!contentType || !contentType.includes("application/json")) {
+            throw new Error("Server response is not valid JSON");
+          }
           const errorData = await response.json();
-          throw new Error(errorData.message || "Failed to delete medicine");
+          throw new Error(errorData.message || "Failed to delete medicine.");
         }
 
         await fetchPharmacyProfile();
-        setSuccess("Medicine deleted successfully!");
+        Swal.fire({
+          icon: "success",
+          title: "Deleted!",
+          text: "The medicine has been removed from your inventory.",
+          timer: 2000,
+          showConfirmButton: false,
+        });
       } catch (error) {
-        setError(
-          error.message || "An error occurred while deleting the medicine"
-        );
+        Swal.fire({
+          icon: "error",
+          title: "Oops!",
+          text:
+            error.message === "Server response is not valid JSON"
+              ? "Unable to connect to the server. Please try again later."
+              : error.message ||
+                "Something went wrong while deleting the medicine. Please try again.",
+        });
       } finally {
         setSubmitting(false);
-        setTimeout(() => setSuccess(null), 3000);
       }
     }
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  // Remove the loading placeholder since we're using SweetAlert2
+  if (loading) return null; // SweetAlert2 loading modal will handle this
   if (!pharmacy) {
     return <p>No pharmacy profile found.</p>;
   }
@@ -391,10 +533,6 @@ export default function PharmacyDashboard() {
               className="pharmacy-dashboard-form-content"
               onSubmit={handleEditSubmit}
             >
-              {error && <div className="pharmacy-dashboard-error">{error}</div>}
-              {success && (
-                <div className="pharmacy-dashboard-success">{success}</div>
-              )}
               <div className="pharmacy-dashboard-form-column">
                 <div className="pharmacy-dashboard-form-group">
                   <label>Price ($)</label>
@@ -484,10 +622,6 @@ export default function PharmacyDashboard() {
               className="pharmacy-dashboard-form-content"
               onSubmit={handleAddSubmit}
             >
-              {error && <div className="pharmacy-dashboard-error">{error}</div>}
-              {success && (
-                <div className="pharmacy-dashboard-success">{success}</div>
-              )}
               <div className="pharmacy-dashboard-form-group pharmacy-dashboard-form-group--radio">
                 <label>
                   <input
