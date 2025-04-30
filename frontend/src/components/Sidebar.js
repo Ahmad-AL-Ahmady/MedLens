@@ -43,6 +43,18 @@ export default function Sidebar() {
     };
   }, []);
 
+  useEffect(() => {
+    // Update main content class based on sidebar state
+    const mainContent = document.querySelector(".main-content");
+    if (mainContent) {
+      if (isExpanded) {
+        mainContent.classList.add("expanded");
+      } else {
+        mainContent.classList.remove("expanded");
+      }
+    }
+  }, [isExpanded]);
+
   const getDashboardPath = () => {
     if (userRole === "Patient") return "/patient-dashboard";
     if (userRole === "Doctor") return "/doctor-dashboard";
@@ -61,11 +73,8 @@ export default function Sidebar() {
       confirmButtonText: "Yes, logout!",
     }).then((result) => {
       if (result.isConfirmed) {
-        // Clear user info
         localStorage.removeItem("userRole");
         sessionStorage.removeItem("userRole");
-
-        // Redirect to login page directly
         navigate("/login");
       }
     });
@@ -90,7 +99,6 @@ export default function Sidebar() {
       path: "/pharmacy",
       roles: ["Patient", "Doctor", "Pharmacy"],
     },
-
     {
       icon: Stethoscope,
       label: "Doctor",
@@ -116,6 +124,7 @@ export default function Sidebar() {
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="toggle-button"
+          aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
         >
           {isExpanded ? (
             <ChevronLeft className="icon" />

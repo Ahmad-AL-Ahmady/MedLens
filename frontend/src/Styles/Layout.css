@@ -6,11 +6,19 @@
 }
 
 .main-content {
-  flex: 1 1 0%;
-  display: flex;
-  flex-direction: column;
+  flex: 1;
+  margin-left: 5rem;
+  /* Default width of collapsed sidebar */
+  transition: margin-left 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.main-content.expanded {
+  margin-left: 16rem;
+  /* Width of expanded sidebar */
 }
 
 .main-wrapper {
   padding: 1.5rem;
+  max-width: 1440px;
+  margin: 0 auto;
 }
