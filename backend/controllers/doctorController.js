@@ -87,6 +87,10 @@ exports.getMyProfile = catchAsync(async (req, res, next) => {
       country: doctorProfile.country,
     },
     profile: doctorProfile,
+    totalAppointments: doctorProfile.appointments
+      ? doctorProfile.appointments.length
+      : 0,
+    totalReviews: doctorProfile.reviews ? doctorProfile.reviews.length : 0,
   };
 
   res.status(200).json({
@@ -407,8 +411,6 @@ exports.getSpecializations = catchAsync(async (req, res, next) => {
     },
   });
 });
-
-// Add to doctorController.js
 
 // Get all doctors with filtering and pagination
 exports.getAllDoctors = catchAsync(async (req, res, next) => {

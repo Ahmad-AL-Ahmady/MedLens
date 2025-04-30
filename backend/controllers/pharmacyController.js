@@ -87,6 +87,10 @@ exports.getMyProfile = catchAsync(async (req, res, next) => {
     profile: pharmacyProfile,
     avatar: user.avatar,
     createdAt: user.createdAt,
+    totalMedications: pharmacyProfile.inventory
+      ? pharmacyProfile.inventory.length
+      : 0,
+    totalReviews: pharmacyProfile.reviews ? pharmacyProfile.reviews.length : 0,
   };
 
   res.status(200).json({
