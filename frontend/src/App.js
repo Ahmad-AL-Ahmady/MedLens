@@ -10,11 +10,11 @@ import ScanPage from "./Pages/Scan";
 import Layout from "./components/Layout";
 import DoctorPage from "./Pages/Doctor";
 import PharmacyPage from "./Pages/Pharmacy";
-import PatientDashboard from "./Pages/PatientDashbord"; // Fixed typo
-import GoogleSignUpForm from "./Pages/Signupgoogel"; // Fixed typo
-import DoctorDashboard from "./Pages/DoctorDashbord"; // Fixed typo
+import PatientDashboard from "./Pages/PatientDashbord";
+import GoogleSignUpForm from "./Pages/Signupgoogel";
+import DoctorDashboard from "./Pages/DoctorDashbord";
 import PharmacyDashboard from "./Pages/PharmacyDashboard";
-import MedicineDetails from "./components/MedecienDetails"; // Fixed typo
+import MedicineDetails from "./components/MedecienDetails";
 import PatientProfile from "./Pages/PatientProfile";
 import DoctorProfile from "./Pages/DoctorProfile";
 import PharmacyProfile from "./Pages/PharmacyProfile";
@@ -36,11 +36,8 @@ function App() {
           path="/verify-email-instructions"
           element={<VerifyEmailInstructions />}
         />
-        <Route path="/profile/patient" element={<PatientProfile />} />
-        <Route path="/profile/doctor" element={<DoctorProfile />} />
-        <Route path="/profile/pharmacy" element={<PharmacyProfile />} />
-        <Route path="/doctors/:id" element={<DoctorProfile />} />
         <Route path="/signup-google" element={<GoogleSignUpForm />} />
+        
         {/* Protected Routes Wrapped in Layout */}
         <Route element={<Layout />}>
           <Route
@@ -83,7 +80,6 @@ function App() {
               </AuthenticatedRoute>
             }
           />
-
           <Route
             path="/pharmacy"
             element={
@@ -97,6 +93,38 @@ function App() {
             element={
               <AuthenticatedRoute>
                 <MedicineDetails />
+              </AuthenticatedRoute>
+            }
+          />
+          <Route
+            path="/profile/patient"
+            element={
+              <AuthenticatedRoute>
+                <PatientProfile />
+              </AuthenticatedRoute>
+            }
+          />
+          <Route
+            path="/profile/doctor"
+            element={
+              <AuthenticatedRoute>
+                <DoctorProfile />
+              </AuthenticatedRoute>
+            }
+          />
+          <Route
+            path="/profile/pharmacy"
+            element={
+              <AuthenticatedRoute>
+                <PharmacyProfile />
+              </AuthenticatedRoute>
+            }
+          />
+          <Route
+            path="/doctors/:id"
+            element={
+              <AuthenticatedRoute>
+                <DoctorProfile />
               </AuthenticatedRoute>
             }
           />

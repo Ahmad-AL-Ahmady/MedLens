@@ -56,6 +56,12 @@ export default function Navbar() {
         return "Patient Management";
       case "/doctor":
         return "Doctor Portal";
+      case "/profile/patient":
+        return "Patient Profile";
+      case "/profile/doctor":
+        return "Doctor Profile";
+      case "/profile/pharmacy":
+        return "Pharmacy Profile";
       default:
         return "Dashboard";
     }
@@ -68,33 +74,31 @@ export default function Navbar() {
         <h1 className="navbar-title">{getPageTitle(location.pathname)}</h1>
         <div className="navbar-actions">
           <div className="navbar-avatar">
-            <div className="navbar-avatar">
-              <img
-                src={`http://localhost:4000/public/uploads/users/${user?.user?.avatar}`}
-                alt="Profile"
-                className="profile-avatar"
-                onClick={() => {
-                  if (!user || !user.user) {
-                    alert("Please log in to view your profile.");
-                    return;
-                  }
-                  switch (user.user.userType) {
-                    case "Patient":
-                      navigate("/profile/patient");
-                      break;
-                    case "Doctor":
-                      navigate("/profile/doctor");
-                      break;
-                    case "Pharmacy":
-                      navigate("/profile/pharmacy");
-                      break;
-                    default:
-                      navigate("/login");
-                  }
-                }}
-                title="View Profile"
-              />
-            </div>
+            <img
+              src={`http://localhost:4000/public/uploads/users/${user?.user?.avatar}`}
+              alt="Profile"
+              className="profile-avatar"
+              onClick={() => {
+                if (!user || !user.user) {
+                  alert("Please log in to view your profile.");
+                  return;
+                }
+                switch (user.user.userType) {
+                  case "Patient":
+                    navigate("/profile/patient");
+                    break;
+                  case "Doctor":
+                    navigate("/profile/doctor");
+                    break;
+                  case "Pharmacy":
+                    navigate("/profile/pharmacy");
+                    break;
+                  default:
+                    navigate("/login");
+                }
+              }}
+              title="View Profile"
+            />
           </div>
         </div>
       </div>
