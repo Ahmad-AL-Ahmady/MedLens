@@ -69,12 +69,10 @@ export default function ScanPage() {
           <option value="Eye">Eye</option>
           <option value="Brain">Brain</option>
           <option value="Bones">Bones</option>
-          <option value="Breast">Breast</option>
           <option value="Lung">Lung</option>
           <option value="Kidney">Kidney</option>
           <option value="Nail">Nail</option>
           <option value="Skin">Skin</option>
-          <option value="Alzheimer">Alzheimer</option>
         </select>
 
         <div className="upload-area">
