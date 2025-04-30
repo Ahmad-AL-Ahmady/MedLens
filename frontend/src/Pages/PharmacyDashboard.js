@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Activity, Plus, Edit2, X, Mail, Trash2 } from "lucide-react";
+import { Activity, Plus, Edit2, X, Mail, Trash2, Package } from "lucide-react";
 import Swal from "sweetalert2";
 import "../Styles/PharmacyDashboard.css";
 
@@ -15,6 +15,22 @@ export default function PharmacyDashboard() {
 
   const authToken =
     localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
+
+  // Helper function to format date to "DD MMMM YYYY"
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return "N/A";
+      return date.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      });
+    } catch {
+      return "N/A";
+    }
+  };
 
   const fetchPharmacyProfile = async () => {
     if (!authToken) {
@@ -96,7 +112,6 @@ export default function PharmacyDashboard() {
 
   useEffect(() => {
     const fetchData = async () => {
-      // Show SweetAlert2 loading modal
       Swal.fire({
         title: "Loading...",
         text: "Fetching your pharmacy data, please wait.",
@@ -112,7 +127,7 @@ export default function PharmacyDashboard() {
         await Promise.all([fetchPharmacyProfile(), fetchMedications()]);
       } finally {
         setLoading(false);
-        Swal.close(); // Close the loading modal
+        Swal.close();
       }
     };
 
@@ -123,7 +138,6 @@ export default function PharmacyDashboard() {
     e.preventDefault();
     setSubmitting(true);
 
-    // Show loading modal
     Swal.fire({
       title: "Processing...",
       text: "Please wait while we process your request.",
@@ -138,16 +152,22 @@ export default function PharmacyDashboard() {
 
     try {
       if (addMode === "new") {
-        // Create new medication
         const name = formData.get("name");
-        const strength = formData.get("strength");
+        const strengthInput = formData.get("strength");
         const description =
-          formData.get("description") || `${name} ${strength}`;
+          formData.get("description") || `${name} ${strengthInput} mg`;
+
+        // Validate strength as a positive number
+        const strengthNumber = parseFloat(strengthInput);
+        if (isNaN(strengthNumber) || strengthNumber <= 0) {
+          throw new Error("Strength must be a positive number.");
+        }
+
+        // Append "mg" to strength
+        const strength = `${strengthNumber} mg`;
 
         // Client-side validation
         if (!name.trim()) throw new Error("Please enter a medicine name.");
-        if (!strength.trim())
-          throw new Error("Please enter the medicine strength.");
 
         const medicationResponse = await fetch(
           "http://localhost:4000/api/medications",
@@ -167,7 +187,6 @@ export default function PharmacyDashboard() {
             throw new Error("Server response is not valid JSON");
           }
           const errorData = await medicationResponse.json();
-          // Check for duplicate medication error
           if (
             errorData.message ===
             "A medication with this name and strength already exists"
@@ -180,7 +199,6 @@ export default function PharmacyDashboard() {
         }
 
         const medicationData = await medicationResponse.json();
-        // Update allMedicines to include the new medication
         setAllMedicines([...allMedicines, medicationData.data.medication]);
         Swal.fire({
           icon: "success",
@@ -190,13 +208,11 @@ export default function PharmacyDashboard() {
           showConfirmButton: false,
         });
       } else {
-        // Add existing medication to inventory
         const medicationId = formData.get("medicineId");
         const price = parseFloat(formData.get("price"));
         const stock = parseInt(formData.get("stock"));
         const expiryDate = formData.get("expiryDate");
 
-        // Client-side validation
         if (!medicationId) throw new Error("Please select a medicine.");
         if (price <= 0) throw new Error("Price must be a positive number.");
         if (stock < 0) throw new Error("Stock cannot be negative.");
@@ -227,7 +243,6 @@ export default function PharmacyDashboard() {
           throw new Error(errorData.message || "Failed to add to inventory.");
         }
 
-        // Refresh pharmacy profile
         await fetchPharmacyProfile();
         Swal.fire({
           icon: "success",
@@ -245,7 +260,7 @@ export default function PharmacyDashboard() {
         title: "Oops!",
         text:
           error.message === "Server response is not valid JSON"
-            ? "The medicine already exists in the database ."
+            ? "The medicine already exists in the database."
             : error.message ||
               "Something went wrong while processing your request. Please try again.",
       });
@@ -258,7 +273,6 @@ export default function PharmacyDashboard() {
     e.preventDefault();
     setSubmitting(true);
 
-    // Show loading modal
     Swal.fire({
       title: "Processing...",
       text: "Please wait while we update the inventory.",
@@ -341,7 +355,6 @@ export default function PharmacyDashboard() {
     if (result.isConfirmed) {
       setSubmitting(true);
 
-      // Show loading modal
       Swal.fire({
         title: "Processing...",
         text: "Please wait while we remove the medicine.",
@@ -396,8 +409,7 @@ export default function PharmacyDashboard() {
     }
   };
 
-  // Remove the loading placeholder since we're using SweetAlert2
-  if (loading) return null; // SweetAlert2 loading modal will handle this
+  if (loading) return null;
   if (!pharmacy) {
     return <p>No pharmacy profile found.</p>;
   }
@@ -430,7 +442,7 @@ export default function PharmacyDashboard() {
         <div className="pharmacy-dashboard-card">
           <div className="pharmacy-dashboard-card__header">
             <h3 className="pharmacy-dashboard-card__title">Inventory Status</h3>
-            <div className="pharmacy-dashboard-card__icon pharmacy-dashboard-card__icon--blue" />
+            <Package className="pharmacy-dashboard-card__icon pharmacy-dashboard-card__icon--blue" />
           </div>
           <div className="pharmacy-dashboard-card__content">
             <p className="pharmacy-dashboard-card__value">{medicines.length}</p>
@@ -495,7 +507,7 @@ export default function PharmacyDashboard() {
                   ${medicine.price.toFixed(2)}
                 </td>
                 <td className="pharmacy-dashboard-table-data">
-                  {medicine.expiryDate || "N/A"}
+                  {formatDate(medicine.expiryDate)}
                 </td>
                 <td className="pharmacy-dashboard-table-data">
                   <button
@@ -561,7 +573,9 @@ export default function PharmacyDashboard() {
                     name="expiryDate"
                     defaultValue={
                       editingMedicine.expiryDate
-                        ? editingMedicine.expiryDate.split("T")[0]
+                        ? new Date(editingMedicine.expiryDate)
+                            .toISOString()
+                            .split("T")[0]
                         : ""
                     }
                   />
@@ -653,8 +667,14 @@ export default function PharmacyDashboard() {
                       <input type="text" name="name" required />
                     </div>
                     <div className="pharmacy-dashboard-form-group">
-                      <label>Strength</label>
-                      <input type="text" name="strength" required />
+                      <label>Strength (mg)</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        name="strength"
+                        placeholder="e.g., 500"
+                        required
+                      />
                     </div>
                   </div>
                   <div className="pharmacy-dashboard-form-group pharmacy-dashboard-form-fullwidth">
