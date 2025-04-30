@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Activity, Plus, Edit2, X } from "lucide-react";
+import { Activity, Plus, Edit2, X, Mail, Trash2 } from "lucide-react";
+import Swal from "sweetalert2";
 import "../Styles/PharmacyDashboard.css";
 
 export default function PharmacyDashboard() {
@@ -8,168 +9,423 @@ export default function PharmacyDashboard() {
   const [addMode, setAddMode] = useState("new");
   const [medicines, setMedicines] = useState([]);
   const [allMedicines, setAllMedicines] = useState([]);
-  const [categories] = useState([
-    "Antibiotics",
-    "Pain Relief",
-    "Cardiology",
-    "Dermatology",
-    "Pediatrics",
-  ]);
-  const [error, setError] = useState(null);
+  const [pharmacy, setPharmacy] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
-  // Retrieve auth token from localStorage (assumes it's stored after login)
-  const authToken = localStorage.getItem("authToken");
+  const authToken =
+    localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
 
-  // Fetch inventory and all medications on component mount
+  const fetchPharmacyProfile = async () => {
+    if (!authToken) {
+      Swal.fire({
+        icon: "error",
+        title: "Authentication Error",
+        text: "Please log in to access your profile.",
+      });
+      setLoading(false);
+      return;
+    }
+    try {
+      const response = await fetch(
+        "http://localhost:4000/api/pharmacies/profile",
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          throw new Error("Server response is not valid JSON");
+        }
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || "Failed to fetch pharmacy profile"
+        );
+      }
+
+      const data = await response.json();
+      if (data.status === "success" && data.data) {
+        setPharmacy(data.data);
+        setMedicines(data.data.profile?.inventory || []);
+      } else {
+        throw new Error("Failed to fetch pharmacy data");
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Unable to load your pharmacy profile. Please try again later.",
+      });
+      setLoading(false);
+    }
+  };
+
+  const fetchMedications = async () => {
+    try {
+      const medicationsResponse = await fetch(
+        "http://localhost:4000/api/medications",
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+      if (!medicationsResponse.ok) {
+        const contentType = medicationsResponse.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          throw new Error("Server response is not valid JSON");
+        }
+        const errorData = await medicationsResponse.json();
+        throw new Error(errorData.message || "Failed to fetch medications");
+      }
+      const medicationsData = await medicationsResponse.json();
+      setAllMedicines(medicationsData.data.medications || []);
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Unable to load medications. Please try again later.",
+      });
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        // Fetch pharmacy inventory
-        const inventoryResponse = await fetch(
-          "http://localhost:3000/api/pharmacies/inventory",
-          {
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-            },
-          }
-        );
-        if (!inventoryResponse.ok) throw new Error("Failed to fetch inventory");
-        const inventoryData = await inventoryResponse.json();
-        setMedicines(inventoryData.data.inventory);
+      // Show SweetAlert2 loading modal
+      Swal.fire({
+        title: "Loading...",
+        text: "Fetching your pharmacy data, please wait.",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+          Swal.showLoading();
+        },
+      });
 
-        // Fetch all medications
-        const medicationsResponse = await fetch(
-          "http://localhost:3000/api/medications"
-        );
-        if (!medicationsResponse.ok)
-          throw new Error("Failed to fetch medications");
-        const medicationsData = await medicationsResponse.json();
-        setAllMedicines(medicationsData.data.medications);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setError(error.message || "An error occurred while fetching data");
+      try {
+        setLoading(true);
+        await Promise.all([fetchPharmacyProfile(), fetchMedications()]);
+      } finally {
+        setLoading(false);
+        Swal.close(); // Close the loading modal
       }
     };
+
     fetchData();
   }, [authToken]);
 
-  // Filter medicines not already in inventory for the "existing" mode dropdown
-  const availableMedicines = allMedicines.filter(
-    (med) =>
-      !medicines.some((m) => m.medication._id.toString() === med._id.toString())
-  );
-
-  // Handle submission for adding a new or existing medicine
   const handleAddSubmit = async (e) => {
     e.preventDefault();
-    setError(null); // Clear previous errors
+    setSubmitting(true);
+
+    // Show loading modal
+    Swal.fire({
+      title: "Processing...",
+      text: "Please wait while we process your request.",
+      allowOutsideClick: false,
+      showConfirmButton: false,
+      willOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
     const formData = new FormData(e.target);
-    const price = parseFloat(formData.get("price"));
-    const stock = parseInt(formData.get("stock"));
-    let medicationId;
 
     try {
       if (addMode === "new") {
-        // Create a new medication
+        // Create new medication
         const name = formData.get("name");
-        const category = formData.get("category");
         const strength = formData.get("strength");
         const description =
           formData.get("description") || `${name} ${strength}`;
 
+        // Client-side validation
+        if (!name.trim()) throw new Error("Please enter a medicine name.");
+        if (!strength.trim())
+          throw new Error("Please enter the medicine strength.");
+
         const medicationResponse = await fetch(
-          "http://localhost:3000/api/medications",
+          "http://localhost:4000/api/medications",
           {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${authToken}`,
             },
-            body: JSON.stringify({ name, description, strength, category }),
+            body: JSON.stringify({ name, description, strength }),
           }
         );
-        if (!medicationResponse.ok)
-          throw new Error("Failed to create medication");
+
+        if (!medicationResponse.ok) {
+          const contentType = medicationResponse.headers.get("content-type");
+          if (!contentType || !contentType.includes("application/json")) {
+            throw new Error("Server response is not valid JSON");
+          }
+          const errorData = await medicationResponse.json();
+          // Check for duplicate medication error
+          if (
+            errorData.message ===
+            "A medication with this name and strength already exists"
+          ) {
+            throw new Error("This medicine is already in the database.");
+          }
+          throw new Error(
+            errorData.message || "Failed to create the new medicine."
+          );
+        }
+
         const medicationData = await medicationResponse.json();
-        medicationId = medicationData.data.medication._id;
+        // Update allMedicines to include the new medication
+        setAllMedicines([...allMedicines, medicationData.data.medication]);
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "The new medicine has been created successfully.",
+          timer: 2000,
+          showConfirmButton: false,
+        });
       } else {
-        // Use existing medication ID
-        medicationId = formData.get("medicineId");
+        // Add existing medication to inventory
+        const medicationId = formData.get("medicineId");
+        const price = parseFloat(formData.get("price"));
+        const stock = parseInt(formData.get("stock"));
+        const expiryDate = formData.get("expiryDate");
+
+        // Client-side validation
+        if (!medicationId) throw new Error("Please select a medicine.");
+        if (price <= 0) throw new Error("Price must be a positive number.");
+        if (stock < 0) throw new Error("Stock cannot be negative.");
+
+        const inventoryResponse = await fetch(
+          "http://localhost:4000/api/pharmacies/inventory",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${authToken}`,
+            },
+            body: JSON.stringify({
+              medicationId,
+              stock,
+              price,
+              expiryDate,
+            }),
+          }
+        );
+
+        if (!inventoryResponse.ok) {
+          const contentType = inventoryResponse.headers.get("content-type");
+          if (!contentType || !contentType.includes("application/json")) {
+            throw new Error("Server response is not valid JSON");
+          }
+          const errorData = await inventoryResponse.json();
+          throw new Error(errorData.message || "Failed to add to inventory.");
+        }
+
+        // Refresh pharmacy profile
+        await fetchPharmacyProfile();
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "The medicine has been added to your inventory.",
+          timer: 2000,
+          showConfirmButton: false,
+        });
       }
 
-      // Add the medication to inventory
-      const inventoryResponse = await fetch(
-        "http://localhost:3000/api/pharmacies/inventory",
+      setShowAddForm(false);
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops!",
+        text:
+          error.message === "Server response is not valid JSON"
+            ? "The medicine already exists in the database ."
+            : error.message ||
+              "Something went wrong while processing your request. Please try again.",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+
+    // Show loading modal
+    Swal.fire({
+      title: "Processing...",
+      text: "Please wait while we update the inventory.",
+      allowOutsideClick: false,
+      showConfirmButton: false,
+      willOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    const formData = new FormData(e.target);
+    const price = parseFloat(formData.get("price"));
+    const isAvailable = formData.get("available") !== "on";
+    const stock = isAvailable ? parseInt(formData.get("stock")) : 0;
+    const expiryDate = formData.get("expiryDate");
+
+    try {
+      const updateData = {
+        medicationId: editingMedicine.medication._id,
+        stock,
+        price,
+        expiryDate,
+      };
+
+      const response = await fetch(
+        "http://localhost:4000/api/pharmacies/inventory",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${authToken}`,
           },
-          body: JSON.stringify({
-            medicationId,
-            stock,
-            price,
-            expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days expiry
-          }),
+          body: JSON.stringify(updateData),
         }
       );
-      if (!inventoryResponse.ok) throw new Error("Failed to add to inventory");
-      const inventoryData = await inventoryResponse.json();
-      setMedicines([...medicines, inventoryData.data.inventoryItem]);
-      setShowAddForm(false);
-    } catch (error) {
-      console.error("Error adding medicine:", error);
-      setError(error.message || "An error occurred while adding the medicine");
-    }
-  };
 
-  // Handle submission for editing an existing medicine
-  const handleEditSubmit = async (e) => {
-    e.preventDefault();
-    setError(null); // Clear previous errors
-    const formData = new FormData(e.target);
-    const updatedMedicine = {
-      price: parseFloat(formData.get("price")),
-      stock:
-        formData.get("available") === "on"
-          ? 0
-          : parseInt(formData.get("stock")),
-    };
-
-    try {
-      const response = await fetch(
-        `http://localhost:3000/api/pharmacies/inventory/${editingMedicine.medication._id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`,
-          },
-          body: JSON.stringify(updatedMedicine),
+      if (!response.ok) {
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          throw new Error("Server response is not valid JSON");
         }
-      );
-      if (!response.ok) throw new Error("Failed to update medicine");
-      const updatedData = await response.json();
-      setMedicines(
-        medicines.map((m) =>
-          m.medication._id === updatedData.data.inventoryItem.medication._id
-            ? updatedData.data.inventoryItem
-            : m
-        )
-      );
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to update inventory.");
+      }
+
+      await fetchPharmacyProfile();
       setEditingMedicine(null);
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: "The inventory has been updated successfully.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
     } catch (error) {
-      console.error("Error updating medicine:", error);
-      setError(
-        error.message || "An error occurred while updating the medicine"
-      );
+      Swal.fire({
+        icon: "error",
+        title: "Oops!",
+        text:
+          error.message === "Server response is not valid JSON"
+            ? "Unable to connect to the server. Please try again later."
+            : error.message ||
+              "Something went wrong while updating the inventory. Please try again.",
+      });
+    } finally {
+      setSubmitting(false);
     }
   };
+
+  const handleDelete = async (medicationId) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to remove this medicine from your inventory?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, keep it",
+    });
+
+    if (result.isConfirmed) {
+      setSubmitting(true);
+
+      // Show loading modal
+      Swal.fire({
+        title: "Processing...",
+        text: "Please wait while we remove the medicine.",
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      try {
+        const response = await fetch(
+          `http://localhost:4000/api/pharmacies/inventory/${medicationId}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          const contentType = response.headers.get("content-type");
+          if (!contentType || !contentType.includes("application/json")) {
+            throw new Error("Server response is not valid JSON");
+          }
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to delete medicine.");
+        }
+
+        await fetchPharmacyProfile();
+        Swal.fire({
+          icon: "success",
+          title: "Deleted!",
+          text: "The medicine has been removed from your inventory.",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Oops!",
+          text:
+            error.message === "Server response is not valid JSON"
+              ? "Unable to connect to the server. Please try again later."
+              : error.message ||
+                "Something went wrong while deleting the medicine. Please try again.",
+        });
+      } finally {
+        setSubmitting(false);
+      }
+    }
+  };
+
+  // Remove the loading placeholder since we're using SweetAlert2
+  if (loading) return null; // SweetAlert2 loading modal will handle this
+  if (!pharmacy) {
+    return <p>No pharmacy profile found.</p>;
+  }
 
   return (
     <div className="pharmacy-dashboard-container">
-      {/* Stats Section */}
+      <div className="pharmacy-dashboard-profile-header">
+        <img
+          src={
+            pharmacy.avatar
+              ? `http://localhost:4000/public/uploads/users/${pharmacy.avatar}`
+              : "https://via.placeholder.com/80"
+          }
+          alt="Pharmacy Avatar"
+          className="pharmacy-dashboard-profile-image"
+          onError={(e) => (e.target.src = "https://via.placeholder.com/80")}
+        />
+        <div className="pharmacy-dashboard-profile-info">
+          <h1 className="pharmacy-dashboard-profile-name">
+            {pharmacy.firstName} {pharmacy.lastName}
+          </h1>
+          <p className="pharmacy-dashboard-profile-email">
+            <Mail size={16} color="#1e56cf" />
+            {pharmacy.email}
+          </p>
+        </div>
+      </div>
+
       <div className="pharmacy-dashboard-stats-grid">
         <div className="pharmacy-dashboard-card">
           <div className="pharmacy-dashboard-card__header">
@@ -197,7 +453,6 @@ export default function PharmacyDashboard() {
         </div>
       </div>
 
-      {/* Medicines Table */}
       <div className="pharmacy-dashboard-section">
         <div className="pharmacy-dashboard-header">
           <h2 className="pharmacy-dashboard-title">Manage Medicines</h2>
@@ -213,10 +468,11 @@ export default function PharmacyDashboard() {
           <thead>
             <tr className="pharmacy-dashboard-table-header">
               <th className="pharmacy-dashboard-table-heading">NAME</th>
-              <th className="pharmacy-dashboard-table-heading">CATEGORY</th>
+              <th className="pharmacy-dashboard-table-heading">DESCRIPTION</th>
               <th className="pharmacy-dashboard-table-heading">STRENGTH</th>
               <th className="pharmacy-dashboard-table-heading">STOCK</th>
               <th className="pharmacy-dashboard-table-heading">PRICE</th>
+              <th className="pharmacy-dashboard-table-heading">EXPIRY DATE</th>
               <th className="pharmacy-dashboard-table-heading">ACTIONS</th>
             </tr>
           </thead>
@@ -224,13 +480,13 @@ export default function PharmacyDashboard() {
             {medicines.map((medicine) => (
               <tr key={medicine._id} className="pharmacy-dashboard-table-row">
                 <td className="pharmacy-dashboard-table-data">
-                  {medicine.medication.name}
+                  {medicine.medication?.name || "N/A"}
                 </td>
                 <td className="pharmacy-dashboard-table-data">
-                  {medicine.medication.category || "N/A"}
+                  {medicine.medication?.description || "N/A"}
                 </td>
                 <td className="pharmacy-dashboard-table-data">
-                  {medicine.medication.strength}
+                  {medicine.medication?.strength || "N/A"}
                 </td>
                 <td className="pharmacy-dashboard-table-data">
                   {medicine.stock}
@@ -239,11 +495,20 @@ export default function PharmacyDashboard() {
                   ${medicine.price.toFixed(2)}
                 </td>
                 <td className="pharmacy-dashboard-table-data">
+                  {medicine.expiryDate || "N/A"}
+                </td>
+                <td className="pharmacy-dashboard-table-data">
                   <button
                     className="pharmacy-dashboard-edit-button"
                     onClick={() => setEditingMedicine(medicine)}
                   >
                     <Edit2 className="pharmacy-dashboard-edit-icon" size={18} />
+                  </button>
+                  <button
+                    className="pharmacy-dashboard-delete-button"
+                    onClick={() => handleDelete(medicine.medication._id)}
+                  >
+                    <Trash2 size={18} />
                   </button>
                 </td>
               </tr>
@@ -252,12 +517,11 @@ export default function PharmacyDashboard() {
         </table>
       </div>
 
-      {/* Edit Medicine Form */}
       {editingMedicine && (
         <div className="pharmacy-dashboard-form-overlay">
           <div className="pharmacy-dashboard-form-container">
             <div className="pharmacy-dashboard-form-header">
-              <h2>Edit {editingMedicine.medication.name}</h2>
+              <h2>Edit {editingMedicine.medication?.name || "Medicine"}</h2>
               <button
                 className="pharmacy-dashboard-form-close"
                 onClick={() => setEditingMedicine(null)}
@@ -269,7 +533,6 @@ export default function PharmacyDashboard() {
               className="pharmacy-dashboard-form-content"
               onSubmit={handleEditSubmit}
             >
-              {error && <div className="pharmacy-dashboard-error">{error}</div>}
               <div className="pharmacy-dashboard-form-column">
                 <div className="pharmacy-dashboard-form-group">
                   <label>Price ($)</label>
@@ -289,6 +552,18 @@ export default function PharmacyDashboard() {
                     defaultValue={editingMedicine.stock}
                     disabled={editingMedicine.stock === 0}
                     required
+                  />
+                </div>
+                <div className="pharmacy-dashboard-form-group">
+                  <label>Expiry Date</label>
+                  <input
+                    type="date"
+                    name="expiryDate"
+                    defaultValue={
+                      editingMedicine.expiryDate
+                        ? editingMedicine.expiryDate.split("T")[0]
+                        : ""
+                    }
                   />
                 </div>
               </div>
@@ -314,14 +589,16 @@ export default function PharmacyDashboard() {
                   type="button"
                   className="pharmacy-dashboard-form-cancel"
                   onClick={() => setEditingMedicine(null)}
+                  disabled={submitting}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   className="pharmacy-dashboard-form-submit"
+                  disabled={submitting}
                 >
-                  Save Changes
+                  {submitting ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </form>
@@ -329,7 +606,6 @@ export default function PharmacyDashboard() {
         </div>
       )}
 
-      {/* Add Medicine Form */}
       {showAddForm && (
         <div className="pharmacy-dashboard-form-overlay">
           <div className="pharmacy-dashboard-form-container">
@@ -346,7 +622,6 @@ export default function PharmacyDashboard() {
               className="pharmacy-dashboard-form-content"
               onSubmit={handleAddSubmit}
             >
-              {error && <div className="pharmacy-dashboard-error">{error}</div>}
               <div className="pharmacy-dashboard-form-group pharmacy-dashboard-form-group--radio">
                 <label>
                   <input
@@ -371,79 +646,77 @@ export default function PharmacyDashboard() {
               </div>
 
               {addMode === "new" && (
-                <div className="pharmacy-dashboard-form-column">
-                  <div className="pharmacy-dashboard-form-group">
-                    <label>Name</label>
-                    <input type="text" name="name" required />
+                <>
+                  <div className="pharmacy-dashboard-form-column">
+                    <div className="pharmacy-dashboard-form-group">
+                      <label>Name</label>
+                      <input type="text" name="name" required />
+                    </div>
+                    <div className="pharmacy-dashboard-form-group">
+                      <label>Strength</label>
+                      <input type="text" name="strength" required />
+                    </div>
                   </div>
+                  <div className="pharmacy-dashboard-form-group pharmacy-dashboard-form-fullwidth">
+                    <label>Description</label>
+                    <input type="text" name="description" />
+                  </div>
+                </>
+              )}
+
+              {addMode === "existing" && (
+                <>
                   <div className="pharmacy-dashboard-form-group">
-                    <label>Category</label>
+                    <label>Medicine</label>
                     <select
-                      name="category"
+                      name="medicineId"
                       className="pharmacy-dashboard-select"
                       required
                     >
-                      <option value="">Select Category</option>
-                      {categories.map((cat) => (
-                        <option key={cat} value={cat}>
-                          {cat}
+                      <option value="">Select Medicine</option>
+                      {allMedicines.map((med) => (
+                        <option key={med._id} value={med._id}>
+                          {med.name} ({med.strength})
                         </option>
                       ))}
                     </select>
                   </div>
-                  <div className="pharmacy-dashboard-form-group">
-                    <label>Strength</label>
-                    <input type="text" name="strength" required />
+                  <div className="pharmacy-dashboard-form-column">
+                    <div className="pharmacy-dashboard-form-group">
+                      <label>Price</label>
+                      <input type="number" step="0.01" name="price" required />
+                    </div>
+                    <div className="pharmacy-dashboard-form-group">
+                      <label>Stock</label>
+                      <input type="number" name="stock" required />
+                    </div>
+                    <div className="pharmacy-dashboard-form-group">
+                      <label>Expiry Date</label>
+                      <input type="date" name="expiryDate" required />
+                    </div>
                   </div>
-                  <div className="pharmacy-dashboard-form-group">
-                    <label>Description</label>
-                    <input type="text" name="description" />
-                  </div>
-                </div>
+                </>
               )}
-
-              {addMode === "existing" && (
-                <div className="pharmacy-dashboard-form-group">
-                  <label>Medicine</label>
-                  <select
-                    name="medicineId"
-                    className="pharmacy-dashboard-select"
-                    required
-                  >
-                    <option value="">Select Medicine</option>
-                    {availableMedicines.map((med) => (
-                      <option key={med._id} value={med._id}>
-                        {med.name} - {med.strength} ({med.category || "N/A"})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-              <div className="pharmacy-dashboard-form-column">
-                <div className="pharmacy-dashboard-form-group">
-                  <label>Price</label>
-                  <input type="number" step="0.01" name="price" required />
-                </div>
-                <div className="pharmacy-dashboard-form-group">
-                  <label>Stock</label>
-                  <input type="number" name="stock" required />
-                </div>
-              </div>
 
               <div className="pharmacy-dashboard-form-actions">
                 <button
                   type="button"
                   className="pharmacy-dashboard-form-cancel"
                   onClick={() => setShowAddForm(false)}
+                  disabled={submitting}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   className="pharmacy-dashboard-form-submit"
+                  disabled={submitting}
                 >
-                  Add Medicine
+                  {submitting
+                    ? "Processing..."
+                    : addMode === "new"
+                    ? "Create Medicine"
+                    : "Add Medicine"}
                 </button>
               </div>
             </form>

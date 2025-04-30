@@ -9,7 +9,6 @@ const medicationSchema = new mongoose.Schema(
     },
     // genericName: String,
     // manufacturer: String,
-    category: String,
     description: String,
     strength: String, // e.g., "500mg"
   },

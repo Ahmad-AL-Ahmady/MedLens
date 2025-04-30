@@ -27,12 +27,104 @@
   justify-content: flex-start;
 }
 
+.profile-image-container {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin-right: 30px;
+  margin-bottom: 32px;
+}
+.profile-image-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
 .doctor-profile-image {
   width: 100px;
   height: 100px;
-  border-radius: 50px;
+  border-radius: 50%;
+  object-fit: cover;
   margin-right: 30px;
   margin-bottom: 32px;
+}
+
+.camera-icon {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: #edecec;
+  border-radius: 50%;
+  padding: 5px;
+  border: 1px solid #edecec;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.camera-icon img {
+  width: 20px;
+  height: 20px;
+}
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 999;
+}
+.camera-options {
+  position: absolute;
+  top: 80px;
+  right: 0;
+  background-color: #666;
+  border: 1px solid #666;
+  border-radius: 4px;
+  width: 103px;
+  height: 20px;
+  display: flex;
+  z-index: 1000;
+  gap: 5px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.3s ease-in-out;
+}
+.camera-options button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: -4px;
+  margin-bottom: -1px;
+  padding: 8px 12px;
+  background-color: #f3f3f3;
+  color: #666;
+  border: none;
+  border-radius: 3px 0px 0px 3px;
+  font-size: 9px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 50px;
+  height: 18px;
+  transition: background-color 0.3s;
+}
+
+.camera-options button:last-child {
+  margin-bottom: 10px;
+  background-color: #f3f3f3;
+  border-radius: 0px 3px 3px 0px;
+  width: 50px;
+  height: 18px;
+}
+
+.camera-options button:hover {
+  background-color: #d9d9d9;
+}
+
+.camera-options button:last-child:hover {
+  background-color: #d9d9d9;
 }
 
 .doctor-profile-info {
@@ -40,6 +132,7 @@
   flex-direction: column;
   justify-content: center;
   text-align: left;
+  margin-bottom: 20px;
 }
 
 .doctor-profile-name {
@@ -78,7 +171,7 @@
   font-weight: bold;
   color: #666;
   display: flex;
-  align-items: center; 
+  align-items: center;
   transition: color 0.3s ease;
   margin-bottom: 10px;
 }
@@ -88,86 +181,130 @@
 }
 
 .edit-doctor-profile-button {
-  background: linear-gradient(135deg, #5795f9 0%, #1e56cf 100%);
+  background: linear-gradient(135deg, #639efd 0%, #425f9f 100%);
   color: white;
   border: none;
   padding: 8px 20px;
-  border-radius: 8px;
+  border-radius: 4px;
   cursor: pointer;
   display: flex;
   gap: 7px;
-  margin-left: auto;
-  margin-bottom: 40px;
+  margin-left: 380px;
+  margin-bottom: 100px;
 }
 
-.edit-docror-profile-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+.edit-doctor-profile-button:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2) !important;
 }
 
 /* edit profile form */
 .edit-doctor-profile-form-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: white;
-  padding: 40px;
-  overflow-y: auto;
-  z-index: 1000;
+  width: 100%;
+  margin: 0 auto;
+  padding: 30px 15px;
+  border-radius: 10px;
 }
 
 .edit-doctor-profile-form {
   max-width: 600px;
-  margin: auto;
+  padding: 40px;
+  margin: 25px auto;
+  background-color: #fff;
+  border-radius: 12px;
+  border: 1px solid #1f61a8;
+  box-shadow: 0 0 0 2.5px rgba(165, 207, 255, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
-
 .edit-doctor-profile-form h2 {
   text-align: center;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   color: #1f61a8;
+  font-size: 24px;
+}
+.doctor-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
 .edit-doctor-profile-form label {
-  display: block;
-  margin-bottom: 10px;
+  font-weight: normal;
+  color: #1f61a8;
+  font-size: 13px;
 }
 
-.edit-doctor-profile-form input {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-  border-radius: 5px;
+.edit-doctor-profile-form input[type="text"],
+.edit-doctor-profile-form input[type="number"],
+.edit-doctor-profile-form input[type="time"] {
+  padding: 8px 10px;
   border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
-.edit-doctor-profile-form button {
-  padding: 10px 20px;
-  margin-right: 10px;
-  border-radius: 5px;
-  background-color: #4CAF50;
-  color: white;
+.edit-doctor-profile-form input[type="text"]:focus,
+.edit-doctor-profile-form input[type="number"]:focus,
+.edit-doctor-profile-form input[type="time"]:focus {
+  border-color: #1f61a8;
+  outline: none;
+}
+
+.edit-doctor-profile-form input[type="checkbox"] {
+  margin-top: 8px;
+}
+
+.doctor-operating-hours-edit {
+  margin-top: 20px;
+}
+
+.doctor-operating-hours-edit h3 {
+  color: #1f61a8;
+  text-align: flex-start;
+  margin-bottom: 10px;
+}
+
+.doctor-operating-hours-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.doctor-operating-hours-label {
+  width: 100px;
+  font-weight: 500;
+}
+
+.edit-doctor-profile-form button[type="submit"],
+.edit-doctor-profile-form button[type="button"] {
+  flex: 1;
+  padding: 10px 10px;
+  font-size: 14px;
+  font-weight: bold;
   border: none;
+  border-radius: 8px;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.edit-doctor-profile-form  button[type="submit"] {
+.edit-doctor-profile-form button[type="submit"] {
   background-color: #1f61a8;
   color: white;
 }
-
-.edit-doctor-profile-form  button[type="submit"]:hover {
+.edit-doctor-profile-form button[type="submit"]:hover {
   background-color: #1c5c9f;
 }
 
-.edit-doctor-profile-form  button[type="button"] {
-  background-color: #ccc;
+.edit-doctor-profile-form button[type="button"] {
+  background-color: #f1f1f1;
   color: #333;
 }
 
-.edit-doctor-profile-form  button[type="button"]:hover {
-  background-color: #aaa;
+.edit-doctor-profile-form button[type="button"]:hover {
+  background-color: #e0e0e0;
 }
 
 /* Working Hours */
@@ -184,7 +321,7 @@
   width: 400px;
 }
 
-.modal-content  h2 {
+.modal-content h2 {
   font-size: 26px;
   font-weight: bold;
   text-align: center;
@@ -199,7 +336,6 @@
   padding: 12px;
 }
 
-
 .operating-hours-item {
   background: rgb(255, 255, 255);
   border: 1px solid #c0c1c3 !important;
@@ -212,7 +348,6 @@
   flex-direction: column;
   align-items: center;
 }
- 
 
 .operating-hours-item:hover {
   transform: translateY(-5px);
@@ -221,7 +356,7 @@
   border-color: #808080;
 }
 
-.operating-hours-item .day  {
+.operating-hours-item .day {
   font-size: 10px;
   font-weight: 700;
   color: #666;
@@ -247,7 +382,7 @@
 
 .status.closed {
   background-color: #e9e6e6 !important;
-  color:#666 !important;
+  color: #666 !important;
   border: 1px solid #acacac !important;
   font-size: 10px !important;
   font-weight: bold !important;
@@ -270,7 +405,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #639efd 0%, #425f9f 100%);
+  background: linear-gradient(135deg, #377be8 0%, #1c5c9f 100%);
   color: white;
   font-size: 12px;
   font-weight: bold;
@@ -299,7 +434,7 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(20, 20, 21, 0.5); 
+  background-color: rgba(20, 20, 21, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -341,7 +476,6 @@
   color: #666;
   margin-bottom: 1px;
   margin-left: 2px;
-
 }
 
 /* inputs */
@@ -369,7 +503,6 @@
   cursor: pointer;
   transition: background-color 0.3s;
   margin-top: 7px;
-
 }
 
 .appointment-form-button:hover {
@@ -434,10 +567,135 @@
   border-radius: 10px;
   border: 0.8px solid #ebebeb;
 }
-
 .doctor-profile-reviews h2 {
-  font-size: 15px;
-  color: black;
+  font-size: 16px;
+  color: #1c5c9f;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.doctor-profile-review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.add-review-button {
+  background: linear-gradient(135deg, #377be8 0%, #1c5c9f 100%);
+  color: white;
+  padding: 10px 20px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.add-review-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+.review-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.review-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.review-modal {
+  background: white;
+  padding: 20px;
+  border-radius: 6px;
+  width: 350px;
+  max-width: 90%;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+.review-modal-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #175392;
+  margin-bottom: 15px;
+  text-align: center;
+}
+.review-modal textarea {
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  margin-bottom: 10px;
+  resize: none;
+  border: 1px solid rgb(207, 207, 207);
+  border-radius: 5px;
+}
+.review-modal textarea:focus,
+.rating-input input:focus {
+  border-color: #066edc;
+  outline: none;
+}
+
+.rating-input {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.rating-input input {
+  width: 80px;
+  padding: 5px;
+  border: 1px solid rgb(207, 207, 207);
+  border-radius: 5px;
+}
+.review-rating-buttons {
+  display: flex;
+  color: white;
+  border: none;
+  font-size: 10px;
+  cursor: pointer;
+  margin-left: 47px;
+  transition: background-color 0.3s ease;
+}
+
+.submit-review-button,
+.close-modal-button {
+  padding: 8px 16px;
+  margin-right: 7px;
+  border-radius: 5px;
+  border: none;
+  font-size: 12px;
+}
+
+.submit-review-button {
+  background-color: #1c5c9f;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.close-modal-button {
+  background-color: #666;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.submit-review-button:hover,
+.close-modal-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .doctor-profile-reviews p {
@@ -447,27 +705,38 @@
 
 .doctor-profile-review {
   padding: 10px;
-  border-bottom: 1px solid #ddd;
+  border: 1px solid #dedede;
+  border-radius: 8px;
 }
-
-.doctor-profile-review:last-child {
-  border-bottom: none;
+.doctor-profile-review:hover {
+  border-color: #b6b5b5;
+  transform: translateY(-1px);
 }
-
+.review-header {
+  display: flex;
+  gap: 10px;
+}
+.reviewer-section {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
 .doctor-profile-review strong {
-  font-size: 11px;
-  color: #1f61a8;
+  font-size: 12px;
+  color: #444;
 }
 
-.doctor-profile-review p {
-  font-size: 11px;
+.review-comment {
+  font-size: 10px;
+  font-weight: normal;
   color: #444;
-  margin: 5px 0;
 }
 
 .doctor-profile-rating {
-  font-size: 14px;
-  color: #fad955;
+  font-size: 12px;
+  font-weight: bold;
+  color: #1c5c9f;
+  margin-left: 5px;
 }
 
 @media (max-width: 599px) {
@@ -543,7 +812,7 @@
   }
 
   .operating-hours-grid {
-    grid-template-columns: 1fr; 
+    grid-template-columns: 1fr;
   }
 
   .add-appointment-btn {
@@ -586,5 +855,4 @@
     width: 100%;
     font-size: 12px;
   }
-
 }

@@ -20,6 +20,7 @@
   font-family: "Inter", system-ui, sans-serif;
   background: var(--dd-surface);
   min-height: 100vh;
+  line-height: 1.6;
 }
 
 /* Stats Grid */
@@ -93,6 +94,12 @@
   transform: scale(1.1);
 }
 
+.doctor-dashboard-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 .doctor-dashboard-card__value {
   font-size: 2.25rem;
   font-weight: 700;
@@ -100,6 +107,13 @@
   margin: 0.5rem 0;
   line-height: 1;
   font-feature-settings: "tnum";
+  font-family: "Space Grotesk", system-ui, sans-serif;
+}
+
+.doctor-dashboard-card__subtext {
+  font-size: 0.875rem;
+  color: var(--dd-text-secondary);
+  margin: 0;
 }
 
 /* Schedule Section */
@@ -127,6 +141,12 @@
   height: 1.5rem;
   background: var(--dd-primary);
   border-radius: 2px;
+}
+
+.doctor-dashboard-schedule__icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--dd-primary);
 }
 
 .doctor-dashboard-schedule__list {
@@ -175,20 +195,48 @@
   padding-right: 1rem;
 }
 
+.doctor-dashboard-appointment__patient {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.doctor-dashboard-patient-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--dd-border);
+  box-shadow: var(--dd-shadow-sm);
+}
+
+.doctor-dashboard-appointment__patient-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
 .doctor-dashboard-appointment__name {
   font-weight: 600;
   color: var(--dd-text-primary);
-  margin: 0 0 0.25rem;
+  margin: 0;
   font-size: 1rem;
   letter-spacing: -0.01em;
 }
 
-.doctor-dashboard-appointment__type {
+.doctor-dashboard-appointment__reason {
   font-size: 0.8125rem;
   color: var(--dd-text-secondary);
   margin: 0;
   opacity: 0.9;
   font-weight: 500;
+}
+
+.doctor-dashboard-appointment__meta {
+  font-size: 0.75rem;
+  color: var(--dd-text-secondary);
+  margin: 0;
+  font-weight: 400;
 }
 
 .doctor-dashboard-appointment__time {
@@ -227,9 +275,25 @@
     padding: 1.25rem;
   }
 
+  .doctor-dashboard-appointment__patient {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .doctor-dashboard-patient-avatar {
+    width: 36px;
+    height: 36px;
+  }
+
   .doctor-dashboard-appointment__time {
     width: 100%;
     text-align: center;
+  }
+
+  .doctor-dashboard-appointment__meta,
+  .doctor-dashboard-appointment__reason {
+    font-size: 0.6875rem;
   }
 }
 
@@ -245,12 +309,4 @@
   .doctor-dashboard-container {
     font-family: "Inter var", system-ui, sans-serif;
   }
-}
-
-.doctor-dashboard-container {
-  line-height: 1.6;
-}
-
-.doctor-dashboard-card__value {
-  font-family: "Space Grotesk", system-ui, sans-serif;
 }

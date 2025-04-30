@@ -39,17 +39,27 @@ router.use(authController.protect);
 
 // Routes accessible to all authenticated users
 router.post("/logout", authController.logout);
+router.delete("/delete-account", authController.deleteUserAndContents);
 router.patch("/completeProfile", authController.completeProfile);
 router.patch("/updatePassword", authController.updatePassword);
+
+// Route to update avatar only
 router.patch(
   "/updateAvatar",
   avatarUpload,
   uploadConfig.avatar.compressMiddleware,
   userController.uploadAvatar
 );
+
+router.patch(
+  "/updateMe",
+  avatarUpload, // Add the avatar upload middleware here
+  uploadConfig.avatar.compressMiddleware, // Add image compression
+  userController.updateMe
+);
+
 router.delete("/deleteAvatar", userController.deleteAvatar);
 router.get("/me", userController.getMe);
-router.patch("/updateMe", userController.updateMe);
 
 // Admin only routes
 router.use(authController.restrictTo("Admin"));

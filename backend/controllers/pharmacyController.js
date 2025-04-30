@@ -87,6 +87,10 @@ exports.getMyProfile = catchAsync(async (req, res, next) => {
     profile: pharmacyProfile,
     avatar: user.avatar,
     createdAt: user.createdAt,
+    totalMedications: pharmacyProfile.inventory
+      ? pharmacyProfile.inventory.length
+      : 0,
+    totalReviews: pharmacyProfile.reviews ? pharmacyProfile.reviews.length : 0,
   };
 
   res.status(200).json({
@@ -281,7 +285,7 @@ exports.getPharmacyById = catchAsync(async (req, res, next) => {
 
 // Get nearby pharmacies
 exports.getNearbyPharmacies = catchAsync(async (req, res, next) => {
-  const { longitude, latitude, distance = 10 } = req.query;
+  const { longitude, latitude, distance = 10, medicationId } = req.query;
 
   // Validate required parameters
   if (!longitude || !latitude) {
@@ -290,6 +294,19 @@ exports.getNearbyPharmacies = catchAsync(async (req, res, next) => {
 
   // Convert distance to meters (default 10km)
   const radius = distance * 1000;
+
+  // Find pharmacies with the medication in stock (if medicationId is provided)
+  let inventoryQuery = {};
+  if (medicationId) {
+    inventoryQuery = { medication: medicationId, stock: { $gt: 0 } };
+  }
+
+  const inventoryItems = await PharmacyInventory.find(inventoryQuery).select(
+    "pharmacy"
+  );
+  const pharmacyIdsWithMedication = inventoryItems.map((item) =>
+    item.pharmacy.toString()
+  );
 
   // Build query to find pharmacies near the provided coordinates
   let query = {
@@ -304,6 +321,11 @@ exports.getNearbyPharmacies = catchAsync(async (req, res, next) => {
       },
     },
   };
+
+  // If medicationId is provided, filter by pharmacies with the medication
+  if (medicationId) {
+    query._id = { $in: pharmacyIdsWithMedication };
+  }
 
   // Find pharmacies matching the criteria
   const pharmacies = await User.find(query);
@@ -320,13 +342,32 @@ exports.getNearbyPharmacies = catchAsync(async (req, res, next) => {
     profileMap[profile.user.toString()] = profile;
   });
 
-  // Combine pharmacy info with profile info
+  // Fetch inventory details for the medication (if medicationId is provided)
+  const inventoryDetails = medicationId
+    ? await PharmacyInventory.find({
+        pharmacy: { $in: pharmacyIds },
+        medication: medicationId,
+      }).populate("medication")
+    : [];
+
+  const inventoryMap = {};
+  inventoryDetails.forEach((item) => {
+    inventoryMap[item.pharmacy.toString()] = {
+      stock: item.stock,
+      price: item.price,
+      expiryDate: item.expiryDate,
+    };
+  });
+
+  // Combine pharmacy info with profile and inventory info
   const pharmaciesWithProfiles = pharmacies.map((pharmacy) => {
     const profile = profileMap[pharmacy._id.toString()] || {};
+    const inventory = inventoryMap[pharmacy._id.toString()] || {};
     return {
       id: pharmacy._id,
       firstName: pharmacy.firstName,
       lastName: pharmacy.lastName,
+      name: `${pharmacy.firstName} ${pharmacy.lastName}`, // Added for UI compatibility
       location: pharmacy.location,
       locationDetails: {
         locationName: profile.locationName,
@@ -337,6 +378,8 @@ exports.getNearbyPharmacies = catchAsync(async (req, res, next) => {
       },
       averageRating: profile.averageRating || 0,
       totalReviews: profile.totalReviews || 0,
+      stock: inventory.stock || 0,
+      price: inventory.price || null,
     };
   });
 
@@ -844,5 +887,85 @@ exports.searchMedications = catchAsync(async (req, res, next) => {
       medications,
       pharmacies: result,
     },
+  });
+});
+
+// Get pharmacy profiles by IDs (public access)
+exports.getPharmacyProfiles = catchAsync(async (req, res, next) => {
+  const { ids } = req.query;
+
+  if (!ids) {
+    return next(new AppError("Please provide pharmacy IDs", 400));
+  }
+
+  const pharmacyIds = ids.split(",");
+
+  // Get pharmacy users
+  const pharmacies = await User.find({
+    _id: { $in: pharmacyIds },
+    userType: "Pharmacy",
+  }).select("firstName lastName email location avatar");
+
+  if (!pharmacies.length) {
+    return next(new AppError("No pharmacies found", 404));
+  }
+
+  // Get pharmacy profiles
+  const pharmacyProfiles = await PharmacyProfile.find({
+    user: { $in: pharmacyIds },
+  })
+    .populate({
+      path: "inventory",
+      populate: {
+        path: "medication",
+        select: "name description strength",
+      },
+    })
+    .populate({
+      path: "reviews",
+      options: { sort: { createdAt: -1 }, limit: 5 },
+      populate: {
+        path: "reviewer",
+        select: "firstName lastName avatar",
+      },
+    });
+
+  // Combine user and profile data
+  const responseData = pharmacies.map((pharmacy) => {
+    const profile = pharmacyProfiles.find(
+      (p) => p.user.toString() === pharmacy._id.toString()
+    );
+    return {
+      id: pharmacy._id,
+      firstName: pharmacy.firstName,
+      lastName: pharmacy.lastName,
+      email: pharmacy.email,
+      location: pharmacy.location,
+      locationDetails: profile
+        ? {
+            locationName: profile.locationName,
+            formattedAddress: profile.formattedAddress,
+            city: profile.city,
+            state: profile.state,
+            country: profile.country,
+          }
+        : null,
+      profile: profile
+        ? {
+            phoneNumber: profile.phoneNumber,
+            operatingHours: profile.operatingHours,
+            inventory: profile.inventory,
+            reviews: profile.reviews,
+          }
+        : null,
+      avatar: pharmacy.avatar,
+      totalMedications: profile?.inventory?.length || 0,
+      totalReviews: profile?.reviews?.length || 0,
+    };
+  });
+
+  res.status(200).json({
+    status: "success",
+    data: responseData,
   });
 });

@@ -165,6 +165,8 @@ const userSchema = new mongoose.Schema(
 
 // Index for location-based queries
 userSchema.index({ location: "2dsphere" });
+userSchema.index({ userType: 1 }); // For filtering doctors/patients
+userSchema.index({ firstName: 1, lastName: 1 }); // For name searches
 
 // Virtual for user's full name
 userSchema.virtual("fullName").get(function () {

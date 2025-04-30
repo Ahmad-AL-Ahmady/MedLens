@@ -261,14 +261,9 @@ exports.deleteReview = catchAsync(async (req, res, next) => {
     return next(new AppError("Review not found", 404));
   }
 
-  // Check if the user is authorized to delete this review
-  if (
-    review.reviewer.toString() !== req.user.id &&
-    req.user.userType !== "Admin"
-  ) {
-    return next(
-      new AppError("You are not authorized to delete this review", 403)
-    );
+  // Check if the user is the one who created the review
+  if (review.reviewer.toString() !== req.user.id) {
+    return next(new AppError("You can only delete your own reviews", 403));
   }
 
   // Delete the review

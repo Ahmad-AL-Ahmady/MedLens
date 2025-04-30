@@ -6,6 +6,15 @@ const AppError = require("../utils/appError");
 const sendEmail = require("../utils/email");
 const crypto = require("crypto");
 const { promisify } = require("util");
+const path = require("path");
+const fs = require("fs");
+const PatientProfile = require("../models/patientProfileModel");
+const MedicalScan = require("../models/medicalScanModel");
+const DoctorProfile = require("../models/doctorProfileModel");
+const Review = require("../models/reviewModel");
+const PharmacyProfile = require("../models/pharmacyProfileModel");
+const PharmacyInventory = require("../models/pharmacyInventoryModel");
+const Appointment = require("../models/appointmentModel");
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -639,3 +648,71 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
+
+exports.deleteUserAndContents = catchAsync(async (req, res, next) => {
+  const userId = req.user.id;
+
+  // Get user details first
+  const user = await User.findById(userId);
+  if (!user) {
+    return next(new AppError("User not found", 404));
+  }
+
+  // Delete user's profile based on their type
+  if (user.userType === "Patient") {
+    await PatientProfile.findOneAndDelete({ user: userId });
+    // Delete medical scans
+    await MedicalScan.deleteMany({ patient: userId });
+  } else if (user.userType === "Doctor") {
+    await DoctorProfile.findOneAndDelete({ user: userId });
+    // Delete reviews
+    await Review.deleteMany({ reviewedEntity: userId });
+  } else if (user.userType === "Pharmacy") {
+    await PharmacyProfile.findOneAndDelete({ user: userId });
+    // Delete inventory and reviews
+    await PharmacyInventory.deleteMany({ pharmacy: userId });
+    await Review.deleteMany({ reviewedEntity: userId });
+  }
+
+  // Delete appointments where user is either doctor or patient
+  await Appointment.deleteMany({
+    $or: [{ doctor: userId }, { patient: userId }],
+  });
+
+  // Delete reviews where user is the reviewer
+  await Review.deleteMany({ reviewer: userId });
+
+  // Delete user's avatar file if it's not the default
+  if (user.avatar && user.avatar !== "default.jpg") {
+    const avatarPath = path.join(
+      __dirname,
+      "..",
+      "public",
+      "uploads",
+      "users",
+      user.avatar
+    );
+    try {
+      await fs.unlink(avatarPath);
+    } catch (err) {
+      console.error("Error deleting avatar file:", err);
+    }
+  }
+
+  // Finally, delete the user
+  await User.findByIdAndDelete(userId);
+
+  // Clear the JWT cookie
+  res.cookie("jwt", "", {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+    path: "/",
+  });
+
+  res.status(200).json({
+    status: "success",
+    message: "User and all associated data deleted successfully",
+  });
+});

@@ -70,19 +70,54 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     "lastName",
     "email",
     "gender",
-    "age"
+    "age",
+    "avatar" // Added avatar to allowed fields
   );
 
-  // 3) Update user document
+  // 3) If there's an uploaded file from multer middleware, use it
+  if (req.file) {
+    // If there's a new avatar uploaded, use its filename
+    filteredBody.avatar = req.file.filename;
+
+    // Delete old avatar if it exists and isn't the default
+    if (req.user.avatar && req.user.avatar !== "default.jpg") {
+      const oldAvatarPath = path.join(
+        __dirname,
+        "..",
+        "public",
+        "uploads",
+        "users",
+        req.user.avatar
+      );
+      try {
+        await fs.access(oldAvatarPath);
+        await fs.unlink(oldAvatarPath);
+        console.log(`Deleted old avatar: ${oldAvatarPath}`);
+      } catch (err) {
+        console.log(`Note: Could not delete old avatar: ${err.message}`);
+        // Continue even if deletion fails
+      }
+    }
+  }
+
+  // 4) Update user document
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
     new: true,
     runValidators: true,
   });
 
+  // 5) Add timestamp for cache busting if avatar was updated
+  let avatarUrl = null;
+  if (req.file) {
+    const timestamp = Date.now();
+    avatarUrl = `/public/uploads/users/${req.file.filename}?t=${timestamp}`;
+  }
+
   res.status(200).json({
     status: "success",
     data: {
       user: updatedUser,
+      ...(avatarUrl && { avatarUrl }), // Include avatarUrl only if it exists
     },
   });
 });
@@ -229,7 +264,8 @@ exports.updateUser = catchAsync(async (req, res, next) => {
     "userType",
     "gender",
     "age",
-    "active"
+    "active",
+    "avatar" // Added avatar to allowed fields
   );
 
   const updatedUser = await User.findByIdAndUpdate(
