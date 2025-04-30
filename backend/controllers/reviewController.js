@@ -260,20 +260,15 @@ exports.updateReview = catchAsync(async (req, res, next) => {
 exports.deleteReview = catchAsync(async (req, res, next) => {
   const { id } = req.params;
 
-  // Find the review
-  const review = await Review.findById(id);
+  // Find and delete the review in one operation
+  const review = await Review.findOneAndDelete({
+    _id: id,
+    reviewer: req.user.id, // Ensure the user can only delete their own reviews
+  });
 
   if (!review) {
-    return next(new AppError("Review not found", 404));
+    return next(new AppError("Review not found or unauthorized", 404));
   }
-
-  // Check if the user is the one who created the review
-  if (review.reviewer.toString() !== req.user.id) {
-    return next(new AppError("You can only delete your own reviews", 403));
-  }
-
-  // Delete the review
-  await Review.findByIdAndDelete(id);
 
   res.status(204).json({
     status: "success",

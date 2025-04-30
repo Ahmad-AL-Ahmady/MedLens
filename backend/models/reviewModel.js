@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const DoctorProfile = require("./doctorProfileModel");
+const PharmacyProfile = require("./pharmacyProfileModel");
 
 const reviewSchema = new mongoose.Schema(
   {
@@ -48,56 +49,66 @@ reviewSchema.index({ reviewer: 1, reviewedEntity: 1 }, { unique: true });
 
 // Create static method to calculate average rating
 reviewSchema.statics.calcAverageRating = async function (entityId) {
-  const stats = await this.aggregate([
-    {
-      $match: { reviewedEntity: entityId },
-    },
-    {
-      $group: {
-        _id: "$reviewedEntity",
-        avgRating: { $avg: "$rating" },
-        nRating: { $sum: 1 },
+  try {
+    const stats = await this.aggregate([
+      {
+        $match: { reviewedEntity: new mongoose.Types.ObjectId(entityId) },
       },
-    },
-  ]);
+      {
+        $group: {
+          _id: "$reviewedEntity",
+          avgRating: { $avg: "$rating" },
+          nRating: { $sum: 1 },
+        },
+      },
+    ]);
 
-  // Update the doctor or pharmacy profile
-  if (stats.length > 0) {
+    const updateData =
+      stats.length > 0
+        ? {
+            averageRating: Math.round(stats[0].avgRating * 10) / 10, // Round to 1 decimal place
+            totalReviews: stats[0].nRating,
+          }
+        : {
+            averageRating: 0,
+            totalReviews: 0,
+          };
+
     // First try to update doctor profile
     const doctorUpdated = await DoctorProfile.findOneAndUpdate(
       { user: entityId },
-      {
-        averageRating: stats[0].avgRating,
-        totalReviews: stats[0].nRating,
-      }
+      updateData,
+      { new: true } // Return the updated document
     );
 
     // If no doctor was updated, try pharmacy
     if (!doctorUpdated) {
-      await PharmacyProfile.findOneAndUpdate(
-        { user: entityId },
-        {
-          averageRating: stats[0].avgRating,
-          totalReviews: stats[0].nRating,
-        }
-      );
+      await PharmacyProfile.findOneAndUpdate({ user: entityId }, updateData, {
+        new: true,
+      });
     }
+
+    console.log(`Updated stats for entity ${entityId}:`, updateData);
+  } catch (error) {
+    console.error("Error calculating average rating:", error);
   }
 };
 
 // Call calcAverageRating after save
-reviewSchema.post("save", function () {
-  this.constructor.calcAverageRating(this.reviewedEntity);
+reviewSchema.post("save", async function () {
+  await this.constructor.calcAverageRating(this.reviewedEntity);
 });
 
-// Call calcAverageRating before remove
-reviewSchema.pre(/^findOneAnd/, async function (next) {
-  this.r = await this.findOne();
-  next();
+// For deletion, store the document before deleting
+reviewSchema.pre("findOneAndDelete", async function () {
+  this.r = await this.clone().findOne();
 });
 
-reviewSchema.post(/^findOneAnd/, async function () {
-  await this.r.constructor.calcAverageRating(this.r.reviewedEntity);
+// After deletion, calculate new average
+reviewSchema.post("findOneAndDelete", async function () {
+  if (this.r) {
+    await this.r.constructor.calcAverageRating(this.r.reviewedEntity);
+  }
 });
 
 const Review = mongoose.model("Review", reviewSchema);

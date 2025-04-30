@@ -30,6 +30,7 @@ const DoctorProfile = () => {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(5);
+  const [currentUserId, setCurrentUserId] = useState(null);
   const [formData, setFormData] = useState({
     city: "",
     state: "",
@@ -129,6 +130,10 @@ const DoctorProfile = () => {
       setLoading(false);
       return;
     }
+
+    // Get current user ID from token
+    const tokenPayload = JSON.parse(atob(token.split(".")[1]));
+    setCurrentUserId(tokenPayload.id);
 
     fetchDoctorProfile();
   }, [id]);
@@ -353,12 +358,45 @@ const DoctorProfile = () => {
       setShowReviewForm(false);
       setComment("");
       setRating(5);
-      setProfile((prev) => ({
-        ...prev,
-        reviews: [data.data.review, ...prev.reviews],
-      }));
+
+      // Fetch updated doctor profile to get new stats and reviews
+      await fetchDoctorProfile();
     } catch (error) {
       console.error("Error adding review:", error.message);
+      alert(error.message);
+    }
+  };
+
+  const handleDeleteReview = async (reviewId) => {
+    if (window.confirm("Are you sure you want to delete this review?")) {
+      try {
+        const res = await fetch(
+          `http://localhost:4000/api/reviews/${reviewId}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.message || "Something went wrong");
+        }
+
+        // Update the profile state to remove the deleted review
+        setProfile((prev) => ({
+          ...prev,
+          reviews: prev.reviews.filter((review) => review._id !== reviewId),
+        }));
+
+        // Fetch updated doctor profile to get new stats
+        await fetchDoctorProfile();
+      } catch (error) {
+        console.error("Error deleting review:", error.message);
+        alert("Failed to delete review. Please try again.");
+      }
     }
   };
 
@@ -815,6 +853,14 @@ const DoctorProfile = () => {
                         <span className="doctor-profile-rating">
                           (⭐️ {review.rating})
                         </span>
+                        {review.reviewer?._id === currentUserId && (
+                          <button
+                            className="delete-review-button"
+                            onClick={() => handleDeleteReview(review._id)}
+                          >
+                            Delete
+                          </button>
+                        )}
                       </div>
                       <p className="review-comment">{review.comment}</p>
                     </div>
@@ -832,7 +878,3 @@ const DoctorProfile = () => {
 };
 
 export default DoctorProfile;
-
-
-
-

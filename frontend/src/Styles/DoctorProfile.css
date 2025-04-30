@@ -34,6 +34,7 @@
   margin-right: 30px;
   margin-bottom: 32px;
 }
+
 .profile-image-wrapper {
   position: relative;
   display: inline-block;
@@ -68,6 +69,7 @@
   width: 20px;
   height: 20px;
 }
+
 .overlay {
   position: fixed;
   top: 0;
@@ -77,6 +79,7 @@
   background: rgba(0, 0, 0, 0.3);
   z-index: 999;
 }
+
 .camera-options {
   position: absolute;
   top: 80px;
@@ -92,6 +95,7 @@
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
   animation: fadeIn 0.3s ease-in-out;
 }
+
 .camera-options button {
   display: flex;
   align-items: center;
@@ -218,12 +222,14 @@
   flex-direction: column;
   gap: 12px;
 }
+
 .edit-doctor-profile-form h2 {
   text-align: center;
   margin-bottom: 20px;
   color: #1f61a8;
   font-size: 24px;
 }
+
 .doctor-form-group {
   display: flex;
   flex-direction: column;
@@ -294,6 +300,7 @@
   background-color: #1f61a8;
   color: white;
 }
+
 .edit-doctor-profile-form button[type="submit"]:hover {
   background-color: #1c5c9f;
 }
@@ -456,6 +463,7 @@
   font-size: 23px;
   margin-top: -10px;
 }
+
 .close-bt:hover {
   color: #1f61a8;
 }
@@ -567,6 +575,7 @@
   border-radius: 10px;
   border: 0.8px solid #ebebeb;
 }
+
 .doctor-profile-reviews h2 {
   font-size: 16px;
   color: #1c5c9f;
@@ -598,6 +607,7 @@
   transform: translateY(-1px);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
+
 .review-avatar {
   width: 40px;
   height: 40px;
@@ -626,6 +636,7 @@
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   position: relative;
 }
+
 .review-modal-title {
   font-size: 16px;
   font-weight: bold;
@@ -633,6 +644,7 @@
   margin-bottom: 15px;
   text-align: center;
 }
+
 .review-modal textarea {
   width: 100%;
   height: 100px;
@@ -642,6 +654,7 @@
   border: 1px solid rgb(207, 207, 207);
   border-radius: 5px;
 }
+
 .review-modal textarea:focus,
 .rating-input input:focus {
   border-color: #066edc;
@@ -653,12 +666,14 @@
   align-items: center;
   gap: 7px;
 }
+
 .rating-input input {
   width: 80px;
   padding: 5px;
   border: 1px solid rgb(207, 207, 207);
   border-radius: 5px;
 }
+
 .review-rating-buttons {
   display: flex;
   color: white;
@@ -708,19 +723,23 @@
   border: 1px solid #dedede;
   border-radius: 8px;
 }
+
 .doctor-profile-review:hover {
   border-color: #b6b5b5;
   transform: translateY(-1px);
 }
+
 .review-header {
   display: flex;
   gap: 10px;
 }
+
 .reviewer-section {
   display: flex;
   flex-direction: column;
   gap: 5px;
 }
+
 .doctor-profile-review strong {
   font-size: 12px;
   color: #444;
@@ -737,6 +756,22 @@
   font-weight: bold;
   color: #1c5c9f;
   margin-left: 5px;
+}
+
+.delete-review-button {
+  background-color: #ff4444;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-left: 10px;
+  transition: background-color 0.3s;
+}
+
+.delete-review-button:hover {
+  background-color: #cc0000;
 }
 
 @media (max-width: 599px) {
