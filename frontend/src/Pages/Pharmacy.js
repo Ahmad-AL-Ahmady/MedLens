@@ -88,7 +88,7 @@ export default function PharmacyPage() {
     }
   };
 
-  const handleSearch = async () => {
+  const handleSearch = () => {
     if (!location || !distance) {
       Swal.fire({
         icon: "warning",
@@ -97,38 +97,6 @@ export default function PharmacyPage() {
       });
       return;
     }
-
-    // Optional: Fetch nearby pharmacies directly for display (not currently needed)
-    try {
-      const queryParams = new URLSearchParams({
-        longitude: location.coordinates[0],
-        latitude: location.coordinates[1],
-        distance,
-      }).toString();
-
-      const response = await fetch(
-        `http://localhost:4000/api/pharmacies/nearby?${queryParams}`
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch nearby pharmacies");
-      }
-      const data = await response.json();
-      if (data.results === 0) {
-        Swal.fire({
-          icon: "info",
-          title: "No Pharmacies Found",
-          text: `No pharmacies found within ${distance} km.`,
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching nearby pharmacies:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Oops!",
-        text: "Could not fetch nearby pharmacies. Please try again.",
-      });
-    }
-
     setPagination((prev) => ({ ...prev, page: 1 }));
   };
 

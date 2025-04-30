@@ -53,6 +53,26 @@
   font-weight: 600;
   display: inline-block;
   box-shadow: 0 2px 4px rgba(30, 64, 175, 0.1);
+  margin-bottom: 1rem; /* Added spacing below category */
+}
+
+.medecien-details__description {
+  color: #475569;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 800px;
+  opacity: 0;
+  animation: fadeIn 0.5s ease forwards;
+  animation-delay: 0.2s;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .medecien-details__subtitle {
@@ -183,11 +203,19 @@
     border-top: 1px solid #f1f5f9;
     padding-top: 1.5rem;
   }
+
+  .medecien-details__description {
+    font-size: 0.95rem;
+  }
 }
 
 @media (max-width: 480px) {
   .medecien-details__title {
     font-size: 1.75rem;
+  }
+
+  .medecien-details__description {
+    font-size: 0.9rem;
   }
 
   .medecien-details__view-map-button {

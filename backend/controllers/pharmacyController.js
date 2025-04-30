@@ -285,7 +285,7 @@ exports.getPharmacyById = catchAsync(async (req, res, next) => {
 
 // Get nearby pharmacies
 exports.getNearbyPharmacies = catchAsync(async (req, res, next) => {
-  const { longitude, latitude, distance = 10 } = req.query;
+  const { longitude, latitude, distance = 10, medicationId } = req.query;
 
   // Validate required parameters
   if (!longitude || !latitude) {
@@ -294,6 +294,19 @@ exports.getNearbyPharmacies = catchAsync(async (req, res, next) => {
 
   // Convert distance to meters (default 10km)
   const radius = distance * 1000;
+
+  // Find pharmacies with the medication in stock (if medicationId is provided)
+  let inventoryQuery = {};
+  if (medicationId) {
+    inventoryQuery = { medication: medicationId, stock: { $gt: 0 } };
+  }
+
+  const inventoryItems = await PharmacyInventory.find(inventoryQuery).select(
+    "pharmacy"
+  );
+  const pharmacyIdsWithMedication = inventoryItems.map((item) =>
+    item.pharmacy.toString()
+  );
 
   // Build query to find pharmacies near the provided coordinates
   let query = {
@@ -308,6 +321,11 @@ exports.getNearbyPharmacies = catchAsync(async (req, res, next) => {
       },
     },
   };
+
+  // If medicationId is provided, filter by pharmacies with the medication
+  if (medicationId) {
+    query._id = { $in: pharmacyIdsWithMedication };
+  }
 
   // Find pharmacies matching the criteria
   const pharmacies = await User.find(query);
@@ -324,13 +342,32 @@ exports.getNearbyPharmacies = catchAsync(async (req, res, next) => {
     profileMap[profile.user.toString()] = profile;
   });
 
-  // Combine pharmacy info with profile info
+  // Fetch inventory details for the medication (if medicationId is provided)
+  const inventoryDetails = medicationId
+    ? await PharmacyInventory.find({
+        pharmacy: { $in: pharmacyIds },
+        medication: medicationId,
+      }).populate("medication")
+    : [];
+
+  const inventoryMap = {};
+  inventoryDetails.forEach((item) => {
+    inventoryMap[item.pharmacy.toString()] = {
+      stock: item.stock,
+      price: item.price,
+      expiryDate: item.expiryDate,
+    };
+  });
+
+  // Combine pharmacy info with profile and inventory info
   const pharmaciesWithProfiles = pharmacies.map((pharmacy) => {
     const profile = profileMap[pharmacy._id.toString()] || {};
+    const inventory = inventoryMap[pharmacy._id.toString()] || {};
     return {
       id: pharmacy._id,
       firstName: pharmacy.firstName,
       lastName: pharmacy.lastName,
+      name: `${pharmacy.firstName} ${pharmacy.lastName}`, // Added for UI compatibility
       location: pharmacy.location,
       locationDetails: {
         locationName: profile.locationName,
@@ -341,6 +378,8 @@ exports.getNearbyPharmacies = catchAsync(async (req, res, next) => {
       },
       averageRating: profile.averageRating || 0,
       totalReviews: profile.totalReviews || 0,
+      stock: inventory.stock || 0,
+      price: inventory.price || null,
     };
   });
 
