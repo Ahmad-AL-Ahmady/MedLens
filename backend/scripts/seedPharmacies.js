@@ -14,132 +14,144 @@ console.log(
   }`
 );
 
-// Cairo neighborhoods and Delta cities with coordinates - same as in seedDoctors.js
+// Menofia Governorate locations with coordinates - focused around 30.5077622, 31.1251893
 const locations = [
-  // Cairo Neighborhoods
+  // Shibin El Kom (Capital of Menofia)
   {
-    city: "Cairo",
+    city: "Shibin El Kom",
     area: "Downtown",
-    coordinates: [31.2357, 30.0444],
-    description: "Central Cairo",
+    coordinates: [30.552, 31.012],
+    description: "Capital of Menofia Governorate",
   },
   {
-    city: "Cairo",
-    area: "Maadi",
-    coordinates: [31.2573, 29.9742],
-    description: "Upscale residential area",
+    city: "Shibin El Kom",
+    area: "El Mahatta",
+    coordinates: [30.558, 31.014],
+    description: "Train station area",
   },
   {
-    city: "Cairo",
-    area: "Zamalek",
-    coordinates: [31.2229, 30.07],
-    description: "Island neighborhood",
-  },
-  {
-    city: "Cairo",
-    area: "Heliopolis",
-    coordinates: [31.332, 30.0914],
-    description: "Eastern district",
-  },
-  {
-    city: "Cairo",
-    area: "Nasr City",
-    coordinates: [31.3675, 30.0566],
-    description: "Modern district",
-  },
-  {
-    city: "Cairo",
-    area: "New Cairo",
-    coordinates: [31.4216, 30.0075],
-    description: "New development",
-  },
-  {
-    city: "Cairo",
-    area: "5th Settlement",
-    coordinates: [31.4429, 29.9916],
-    description: "New Cairo district",
-  },
-  {
-    city: "Cairo",
-    area: "Garden City",
-    coordinates: [31.2297, 30.0433],
-    description: "Historic district",
-  },
-  {
-    city: "Cairo",
-    area: "Dokki",
-    coordinates: [31.2126, 30.038],
-    description: "Central area in Giza",
-  },
-  {
-    city: "Cairo",
-    area: "Mohandessin",
-    coordinates: [31.2039, 30.0541],
-    description: "Popular residential area",
+    city: "Shibin El Kom",
+    area: "El Gamaa",
+    coordinates: [30.545, 31.018],
+    description: "University district",
   },
 
-  // Giza
+  // Menouf
   {
-    city: "Giza",
-    area: "Haram",
-    coordinates: [31.1386, 29.9914],
-    description: "Near the pyramids",
+    city: "Menouf",
+    area: "Downtown",
+    coordinates: [30.4658, 30.9335],
+    description: "Historic town center",
   },
   {
-    city: "Giza",
-    area: "6th of October",
-    coordinates: [30.9748, 29.9491],
-    description: "Western suburb",
-  },
-  {
-    city: "Giza",
-    area: "Sheikh Zayed",
-    coordinates: [30.9385, 30.0149],
-    description: "New city",
+    city: "Menouf",
+    area: "El Midan",
+    coordinates: [30.468, 30.935],
+    description: "Central square area",
   },
 
-  // Delta Cities
+  // Quesna
   {
-    city: "Alexandria",
+    city: "Quesna",
     area: "Downtown",
-    coordinates: [29.9187, 31.2001],
-    description: "Coastal city center",
+    coordinates: [30.5077, 31.1251], // The requested coordinates
+    description: "Main district",
   },
   {
-    city: "Alexandria",
-    area: "Montazah",
-    coordinates: [29.9995, 31.2783],
-    description: "Eastern district",
+    city: "Quesna",
+    area: "El Mahatta",
+    coordinates: [30.509, 31.128],
+    description: "Transportation hub",
   },
   {
-    city: "Alexandria",
-    area: "Gleem",
-    coordinates: [29.9657, 31.2406],
-    description: "Coastal area",
+    city: "Quesna",
+    area: "Al Azhar Street",
+    coordinates: [30.505, 31.124],
+    description: "Commercial district",
   },
+
+  // Tala
   {
-    city: "Alexandria",
-    area: "Smouha",
-    coordinates: [29.9367, 31.2099],
-    description: "Southern district",
-  },
-  {
-    city: "Tanta",
+    city: "Tala",
     area: "Downtown",
-    coordinates: [31.0, 30.7865],
-    description: "Central Delta",
+    coordinates: [30.6803, 30.9401],
+    description: "Town center",
   },
   {
-    city: "Mansoura",
+    city: "Tala",
+    area: "El Souq",
+    coordinates: [30.682, 30.942],
+    description: "Market area",
+  },
+
+  // Ashmoun
+  {
+    city: "Ashmoun",
     area: "Downtown",
-    coordinates: [31.3667, 31.0333],
-    description: "Northeastern Delta",
+    coordinates: [30.2975, 30.9753],
+    description: "Main district",
   },
   {
-    city: "Zagazig",
+    city: "Ashmoun",
+    area: "El Tahrir",
+    coordinates: [30.3, 30.978],
+    description: "Central square",
+  },
+
+  // Berket El Sab
+  {
+    city: "Berket El Sab",
     area: "Downtown",
-    coordinates: [31.5021, 30.5833],
-    description: "Eastern Delta",
+    coordinates: [30.6267, 31.075],
+    description: "Town center",
+  },
+  {
+    city: "Berket El Sab",
+    area: "El Kornish",
+    coordinates: [30.628, 31.077],
+    description: "Waterfront area",
+  },
+
+  // El Bagour
+  {
+    city: "El Bagour",
+    area: "Downtown",
+    coordinates: [30.4319, 31.0319],
+    description: "Town center",
+  },
+  {
+    city: "El Bagour",
+    area: "El Mahatta",
+    coordinates: [30.433, 31.034],
+    description: "Station area",
+  },
+
+  // El Shohada
+  {
+    city: "El Shohada",
+    area: "Downtown",
+    coordinates: [30.5964, 30.8967],
+    description: "Town center",
+  },
+  {
+    city: "El Shohada",
+    area: "El Souq",
+    coordinates: [30.598, 30.898],
+    description: "Market district",
+  },
+
+  // El Sadat City (Related to Menofia)
+  {
+    city: "El Sadat City",
+    area: "Downtown",
+    coordinates: [30.3619, 30.5336],
+    description: "Modern planned city",
+  },
+  {
+    city: "El Sadat City",
+    area: "Industrial Zone",
+    coordinates: [30.37, 30.54],
+    description: "Industrial area",
   },
 ];
 
@@ -290,7 +302,7 @@ const medicationsData = [
   { name: "Clotrimazole", description: "Antifungal cream", strength: "1%" },
 ];
 
-// Egyptian pharmacy names
+// Egyptian pharmacy names in Menofia region
 const pharmacyPrefixes = [
   "Al",
   "El",
@@ -301,12 +313,13 @@ const pharmacyPrefixes = [
   "Care",
   "Health",
   "Family",
-  "Cairo",
+  "Menofia",
   "Nile",
   "Delta",
+  "Quesna",
+  "Shibin",
   "Egyptian",
   "Community",
-  "City",
 ];
 
 const pharmacySuffixes = [
@@ -322,8 +335,40 @@ const pharmacySuffixes = [
   "Remedies",
 ];
 
-// Generate a random pharmacy name
+// Local pharmacy names in Arabic transliteration
+const localPharmacyNames = [
+  "Al Shorouk",
+  "Al Amana",
+  "Al Baraka",
+  "Al Rahma",
+  "Al Salam",
+  "Al Noor",
+  "Al Shefa",
+  "Al Ezaby",
+  "Al Hayah",
+  "Al Dawaa",
+  "Al Mohsen",
+  "Al Watany",
+  "Al Zahraa",
+  "Al Hekma",
+  "Ibn Sina",
+  "Al Tawhid",
+  "Al Mostakbal",
+  "Al Doktor",
+  "Al Zaytoun",
+  "Al Taqwa",
+];
+
+// Generate a random pharmacy name with more local flavor
 function generatePharmacyName() {
+  // 40% chance to use a local Arabic-style name
+  if (Math.random() < 0.4) {
+    return localPharmacyNames[
+      Math.floor(Math.random() * localPharmacyNames.length)
+    ];
+  }
+
+  // 60% chance to use prefix-suffix combination
   const prefix =
     pharmacyPrefixes[Math.floor(Math.random() * pharmacyPrefixes.length)];
   const suffix =
@@ -337,9 +382,46 @@ function generatePharmaciesList(count) {
   const usedEmails = new Set();
   const usedNames = new Set();
 
+  // Distribute pharmacies with higher concentration around Quesna (the specified coordinates)
+  // and fewer as we move away from that area
+  const locationWeights = locations.map((loc) => {
+    // Calculate distance from Quesna center (30.5077, 31.1251)
+    const latDiff = loc.coordinates[0] - 30.5077;
+    const lngDiff = loc.coordinates[1] - 31.1251;
+    const distance = Math.sqrt(latDiff * latDiff + lngDiff * lngDiff);
+
+    // Weight inversely proportional to distance (closer = higher weight)
+    return {
+      location: loc,
+      weight: 1 / (distance + 0.05), // Adding small constant to avoid division by zero
+    };
+  });
+
+  // Normalize weights to create a probability distribution
+  const totalWeight = locationWeights.reduce((sum, loc) => sum + loc.weight, 0);
+  const normalizedWeights = locationWeights.map((loc) => ({
+    location: loc.location,
+    probability: loc.weight / totalWeight,
+  }));
+
   for (let i = 0; i < count; i++) {
-    // Pick a random location
-    const location = locations[Math.floor(Math.random() * locations.length)];
+    // Select location based on weighted probability
+    const rand = Math.random();
+    let cumulativeProbability = 0;
+    let selectedLocation;
+
+    for (const loc of normalizedWeights) {
+      cumulativeProbability += loc.probability;
+      if (rand <= cumulativeProbability) {
+        selectedLocation = loc.location;
+        break;
+      }
+    }
+
+    // If somehow we didn't select (shouldn't happen), take the first one
+    if (!selectedLocation) {
+      selectedLocation = locations[0];
+    }
 
     // Generate a unique pharmacy name
     let pharmacyName;
@@ -351,20 +433,28 @@ function generatePharmaciesList(count) {
     // Generate email (ensure it's unique)
     let email;
     do {
+      // Use more Egyptian-style email domains sometimes
+      const emailDomain =
+        Math.random() > 0.5
+          ? "example.com"
+          : Math.random() > 0.5
+          ? "gmail.com"
+          : "yahoo.com";
+
       email = `${pharmacyName.toLowerCase().replace(/\s/g, "")}${Math.floor(
         Math.random() * 1000
-      )}@example.com`;
+      )}@${emailDomain}`;
     } while (usedEmails.has(email));
     usedEmails.add(email);
 
     // Use pharmacy name for first name, and location for last name
     const firstName = pharmacyName;
-    const lastName = `${location.area} Branch`;
+    const lastName = `${selectedLocation.area} Branch`;
 
-    // Generate random phone number
-    const phoneNumber = `+20${Math.floor(Math.random() * 10)}${Math.floor(
-      Math.random() * 10000000
-    )
+    // Generate random phone number (Egyptian format)
+    const phoneNumber = `+20${
+      Math.random() > 0.5 ? "10" : Math.random() > 0.5 ? "11" : "12"
+    }${Math.floor(Math.random() * 10000000)
       .toString()
       .padStart(7, "0")}`;
 
@@ -374,31 +464,67 @@ function generatePharmaciesList(count) {
       email,
       phoneNumber,
       location: {
-        coordinates: location.coordinates,
+        coordinates: selectedLocation.coordinates,
       },
-      city: location.city,
-      area: location.area,
-      areaDescription: location.description,
+      city: selectedLocation.city,
+      area: selectedLocation.area,
+      areaDescription: selectedLocation.description,
     });
   }
 
   return pharmacies;
 }
 
-// Generate default operating hours for pharmacies
+// Generate operating hours for pharmacies
 const generateOperatingHours = () => {
+  // Some pharmacies will have different hours
+  const openingVariations = ["08:00", "09:00", "10:00"];
+  const closingVariations = ["22:00", "23:00", "00:00"];
+  const weekendOpeningVariations = ["09:00", "10:00", "11:00"];
+
+  // Some pharmacies will be 24 hours
+  const is24Hours = Math.random() < 0.2;
+
+  if (is24Hours) {
+    return {
+      monday: { open: "00:00", close: "23:59", isOpen: true },
+      tuesday: { open: "00:00", close: "23:59", isOpen: true },
+      wednesday: { open: "00:00", close: "23:59", isOpen: true },
+      thursday: { open: "00:00", close: "23:59", isOpen: true },
+      friday: { open: "00:00", close: "23:59", isOpen: true },
+      saturday: { open: "00:00", close: "23:59", isOpen: true },
+      sunday: { open: "00:00", close: "23:59", isOpen: true },
+    };
+  }
+
+  const opening =
+    openingVariations[Math.floor(Math.random() * openingVariations.length)];
+  const closing =
+    closingVariations[Math.floor(Math.random() * closingVariations.length)];
+  const weekendOpening =
+    weekendOpeningVariations[
+      Math.floor(Math.random() * weekendOpeningVariations.length)
+    ];
+
+  // Friday is a religious day in Egypt, some pharmacies may have different hours
+  const fridayOpen = Math.random() < 0.8; // 80% chance pharmacy is open on Friday
+
   return {
-    monday: { open: "08:00", close: "22:00", isOpen: true },
-    tuesday: { open: "08:00", close: "22:00", isOpen: true },
-    wednesday: { open: "08:00", close: "22:00", isOpen: true },
-    thursday: { open: "08:00", close: "22:00", isOpen: true },
-    friday: { open: "08:00", close: "22:00", isOpen: true },
-    saturday: { open: "09:00", close: "22:00", isOpen: true },
-    sunday: { open: "09:00", close: "22:00", isOpen: true },
+    monday: { open: opening, close: closing, isOpen: true },
+    tuesday: { open: opening, close: closing, isOpen: true },
+    wednesday: { open: opening, close: closing, isOpen: true },
+    thursday: { open: opening, close: closing, isOpen: true },
+    friday: {
+      open: fridayOpen ? weekendOpening : "00:00",
+      close: fridayOpen ? closing : "00:00",
+      isOpen: fridayOpen,
+    },
+    saturday: { open: weekendOpening, close: closing, isOpen: true },
+    sunday: { open: weekendOpening, close: closing, isOpen: true },
   };
 };
 
-async function seedPharmacies(pharmacyCount = 20) {
+async function seedPharmacies(pharmacyCount = 30) {
   try {
     // Connect to database
     await mongoose.connect(DB);
@@ -416,11 +542,16 @@ async function seedPharmacies(pharmacyCount = 20) {
 
     // Generate pharmacy data
     const pharmaciesList = generatePharmaciesList(pharmacyCount);
-    console.log(`Generated data for ${pharmaciesList.length} pharmacies`);
+    console.log(
+      `Generated data for ${pharmaciesList.length} pharmacies in Menofia region`
+    );
 
     // Clear existing test pharmacies if needed
     console.log("Clearing existing test pharmacies...");
-    await User.deleteMany({ email: /.*example.com/, userType: "Pharmacy" });
+    await User.deleteMany({
+      email: /.*example.com|.*gmail.com|.*yahoo.com/,
+      userType: "Pharmacy",
+    });
 
     // Hash the password once for all pharmacies
     const password = await bcrypt.hash(
@@ -465,7 +596,9 @@ async function seedPharmacies(pharmacyCount = 20) {
       }
     }
 
-    console.log(`Successfully created ${createdUsers.length} pharmacy users.`);
+    console.log(
+      `Successfully created ${createdUsers.length} pharmacy users in Menofia region.`
+    );
 
     // Update pharmacy profiles with additional data
     console.log("Updating pharmacy profiles with additional data...");
@@ -486,7 +619,7 @@ async function seedPharmacies(pharmacyCount = 20) {
               operatingHours: generateOperatingHours(),
               city: details.city,
               locationName: `${details.area}, ${details.city}`,
-              formattedAddress: `${details.area}, ${details.city}, Egypt`,
+              formattedAddress: `${details.area}, ${details.city}, Menofia Governorate, Egypt`,
             },
             { new: true }
           );
@@ -603,7 +736,7 @@ async function seedPharmacies(pharmacyCount = 20) {
     }
 
     console.log("Seeding completed successfully!");
-    console.log("Distribution by city:");
+    console.log("Distribution of pharmacies by city in Menofia region:");
 
     // Count pharmacies by city
     const cityCounts = {};
@@ -632,6 +765,6 @@ async function seedPharmacies(pharmacyCount = 20) {
   }
 }
 
-// You can change the number of pharmacies to seed
-const numberOfPharmacies = 20;
+// Seed 30 pharmacies in the Menofia region
+const numberOfPharmacies = 30;
 seedPharmacies(numberOfPharmacies);
