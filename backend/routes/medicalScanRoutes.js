@@ -76,4 +76,10 @@ router.post(
   medicalScanController.uploadScanImage
 );
 
+/**
+ * POST /api/medical-scans/:id/chat
+ * Chat with AI about a specific scan
+ */
+router.post("/:id/chat", medicalScanController.chatWithAI);
+
 module.exports = router;

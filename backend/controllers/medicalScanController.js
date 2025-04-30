@@ -4,6 +4,10 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const fs = require("fs").promises;
 const path = require("path");
+const axios = require("axios");
+const FormData = require("form-data");
+
+const AI_SERVICE_URL = "http://127.0.0.1:8000";
 
 /**
  * Get all scans created by the current user
@@ -114,7 +118,7 @@ exports.uploadScan = catchAsync(async (req, res, next) => {
 });
 
 /**
- * Upload an image for a medical scan
+ * Upload an image for a medical scan and process with AI
  */
 exports.uploadScanImage = catchAsync(async (req, res, next) => {
   const { id } = req.params;
@@ -137,30 +141,89 @@ exports.uploadScanImage = catchAsync(async (req, res, next) => {
     return next(new AppError("No image file provided", 400));
   }
 
-  // Save file info to scan record
-  const imageUrl = `/public/uploads/scans/${req.file.filename}`;
+  try {
+    // Prepare form data for AI service
+    const formData = new FormData();
+    formData.append("file", fs.createReadStream(req.file.path));
+    formData.append("bodyPart", scan.bodyPart);
 
-  // Update scan with image URL
-  scan.images = scan.images || [];
-  scan.images.push(imageUrl);
+    // Send request to AI service
+    const response = await axios.post(`${AI_SERVICE_URL}/predict/`, formData, {
+      headers: {
+        ...formData.getHeaders(),
+      },
+    });
 
-  // For our example, we'll simulate the AI analysis response
-  // In a real implementation, this would call your Python service
-  scan.aiAnalysis = {
-    diagnosisConfidence: Math.random() * 0.3 + 0.7, // Random between 0.7 and 1.0
-    findings: getSampleDiagnosis(),
-    infectionDetected: Math.random() > 0.5, // Random true/false
-    processingDate: new Date(),
-  };
+    const aiResult = response.data;
 
-  await scan.save();
+    // Save file info to scan record
+    const imageUrl = `/public/uploads/scans/${req.file.filename}`;
 
-  res.status(200).json({
-    status: "success",
-    data: {
-      scan,
-    },
-  });
+    // Update scan with image URL and AI analysis
+    scan.images = scan.images || [];
+    scan.images.push(imageUrl);
+    scan.aiAnalysis = {
+      classification_result: aiResult.classification_result,
+      confidence_score: aiResult.confidence_score,
+      body_part: aiResult.body_part,
+      processingDate: new Date(),
+    };
+
+    await scan.save();
+
+    // Clean up the temporary file
+    await fs.unlink(req.file.path);
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        scan,
+      },
+    });
+  } catch (error) {
+    // Clean up the temporary file in case of error
+    await fs.unlink(req.file.path);
+    return next(new AppError("Failed to process image with AI service", 500));
+  }
+});
+
+/**
+ * Chat with AI about a specific scan
+ */
+exports.chatWithAI = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const { message } = req.body;
+
+  if (!message) {
+    return next(new AppError("Message is required", 400));
+  }
+
+  const scan = await MedicalScan.findById(id);
+  if (!scan) {
+    return next(new AppError("Medical scan not found", 404));
+  }
+
+  if (scan.uploadedBy.toString() !== req.user.id) {
+    return next(
+      new AppError("You are not authorized to access this scan", 403)
+    );
+  }
+
+  try {
+    const response = await axios.post(`${AI_SERVICE_URL}/chat`, {
+      message: message,
+    });
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        response: response.data.response,
+        scan,
+      },
+    });
+  } catch (error) {
+    return next(new AppError("Failed to get response from AI service", 500));
+  }
 });
 
 /**
@@ -224,15 +287,14 @@ exports.deleteScan = catchAsync(async (req, res, next) => {
 exports.getBodyParts = catchAsync(async (req, res, next) => {
   const bodyParts = [
     "Chest",
-    "Abdomen",
-    "Head",
-    "Neck",
-    "Spine",
-    "Arm",
-    "Leg",
-    "Pelvis",
-    "Hand",
-    "Foot",
+    "Eye",
+    "Brain",
+    "Bones",
+    "Breast",
+    "Lung",
+    "Kidney",
+    "Nail",
+    "Skin",
   ];
 
   res.status(200).json({

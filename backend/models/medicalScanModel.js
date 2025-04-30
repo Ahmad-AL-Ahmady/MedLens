@@ -15,13 +15,27 @@ const medicalScanSchema = new mongoose.Schema(
     bodyPart: {
       type: String,
       required: true,
+      enum: [
+        "Chest",
+        "Eye",
+        "Brain",
+        "Bones",
+        "Breast",
+        "Lung",
+        "Kidney",
+        "Nail",
+        "Skin",
+      ],
     },
     description: String,
     aiAnalysis: {
-      diagnosisConfidence: Number,
-      findings: String,
-      infectionDetected: Boolean,
-      processingDate: Date,
+      classification_result: String,
+      confidence_score: Number,
+      body_part: String,
+      processingDate: {
+        type: Date,
+        default: Date.now,
+      },
     },
   },
   {
