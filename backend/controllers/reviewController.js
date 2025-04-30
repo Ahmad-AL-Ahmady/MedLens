@@ -67,10 +67,16 @@ exports.createReview = catchAsync(async (req, res, next) => {
     helpful: { count: 0, users: [] },
   });
 
+  // Populate the review with reviewer information
+  const populatedReview = await Review.findById(review._id).populate({
+    path: "reviewer",
+    select: "firstName lastName avatar",
+  });
+
   res.status(201).json({
     status: "success",
     data: {
-      review,
+      review: populatedReview,
     },
   });
 });

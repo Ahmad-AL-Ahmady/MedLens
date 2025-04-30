@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const DoctorProfile = require("./doctorProfileModel");
 
 const reviewSchema = new mongoose.Schema(
   {
