@@ -8,7 +8,17 @@ export default function ChatBot({ classificationResult }) {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [currentDisease, setCurrentDisease] = useState(null);
+  const [showAttention, setShowAttention] = useState(false);
   const messagesEndRef = useRef(null);
+
+  // Format time to 12-hour format
+  const formatTime = (date) => {
+    return date.toLocaleString("en-US", {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    });
+  };
 
   // Auto-scroll to the latest message
   const scrollToBottom = () => {
@@ -24,11 +34,22 @@ export default function ChatBot({ classificationResult }) {
     if (classificationResult && classificationResult !== currentDisease) {
       setCurrentDisease(classificationResult);
       setMessages([]);
+      setShowAttention(true);
       if (isOpen) {
         fetchDiagnosisDetails(classificationResult);
       }
     }
   }, [classificationResult, isOpen, currentDisease]);
+
+  // Remove attention animation after 5 seconds
+  useEffect(() => {
+    if (showAttention) {
+      const timer = setTimeout(() => {
+        setShowAttention(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showAttention]);
 
   // Fetch details when chat opens if there's a classification result
   useEffect(() => {
@@ -69,39 +90,52 @@ export default function ChatBot({ classificationResult }) {
     setLoading(true);
     try {
       // First check if we have a current diagnosis from the server
-      const diagnosisResponse = await fetch("http://127.0.0.1:8000/current-diagnosis");
+      const diagnosisResponse = await fetch(
+        "http://127.0.0.1:8000/current-diagnosis"
+      );
       const diagnosisData = await diagnosisResponse.json();
-      
+
       // Now get information about the diagnosis
       const response = await fetch("http://127.0.0.1:8000/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          message: `Provide information for ${diagnosisData.classification_result || disease}`,
+          message: `Provide information for ${
+            diagnosisData.classification_result || disease
+          }`,
         }),
       });
-      
+
       const data = await response.json();
-      
+
       if (data.response) {
-        setMessages([{ text: data.response, isBot: true }]);
+        setMessages([
+          { text: data.response, isBot: true, timestamp: new Date() },
+        ]);
       } else if (data.error) {
-        setMessages([{ 
-          text: `Sorry, I couldn't get information about this condition: ${data.error}. Please try again later.`, 
-          isBot: true 
-        }]);
+        setMessages([
+          {
+            text: `Sorry, I couldn't get information about this condition: ${data.error}. Please try again later.`,
+            isBot: true,
+            timestamp: new Date(),
+          },
+        ]);
       } else {
-        setMessages([{ 
-          text: "I'm having trouble getting information about this condition. Please try asking a specific question.", 
-          isBot: true 
-        }]);
+        setMessages([
+          {
+            text: "I'm having trouble getting information about this condition. Please try asking a specific question.",
+            isBot: true,
+            timestamp: new Date(),
+          },
+        ]);
       }
     } catch (error) {
       console.error("Error fetching diagnosis details:", error);
       setMessages([
-        { 
-          text: "⚠️ Failed to connect to the medical database. Please check your internet connection and try again.", 
-          isBot: true 
+        {
+          text: "⚠️ Failed to connect to the medical database. Please check your internet connection and try again.",
+          isBot: true,
+          timestamp: new Date(),
         },
       ]);
     } finally {
@@ -112,7 +146,7 @@ export default function ChatBot({ classificationResult }) {
   // Handle sending a user message
   const handleSend = async () => {
     if (!input.trim() || loading) return;
-    const userMessage = { text: input, isBot: false };
+    const userMessage = { text: input, isBot: false, timestamp: new Date() };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setLoading(true);
@@ -123,32 +157,41 @@ export default function ChatBot({ classificationResult }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: input }),
       });
-      
+
       const data = await response.json();
-      
+
       if (data.response) {
         setMessages((prev) => [
           ...prev,
-          { text: data.response, isBot: true },
+          { text: data.response, isBot: true, timestamp: new Date() },
         ]);
       } else if (data.error) {
         setMessages((prev) => [
           ...prev,
-          { text: `Sorry, I couldn't process your question: ${data.error}`, isBot: true },
+          {
+            text: `Sorry, I couldn't process your question: ${data.error}`,
+            isBot: true,
+            timestamp: new Date(),
+          },
         ]);
       } else {
         setMessages((prev) => [
           ...prev,
-          { text: "I didn't understand that. Could you rephrase your question?", isBot: true },
+          {
+            text: "I didn't understand that. Could you rephrase your question?",
+            isBot: true,
+            timestamp: new Date(),
+          },
         ]);
       }
     } catch (error) {
       console.error("Error sending query:", error);
       setMessages((prev) => [
         ...prev,
-        { 
-          text: "⚠️ Connection error. Please check your internet connection and try again.", 
-          isBot: true 
+        {
+          text: "⚠️ Connection error. Please check your internet connection and try again.",
+          isBot: true,
+          timestamp: new Date(),
         },
       ]);
     } finally {
@@ -158,7 +201,7 @@ export default function ChatBot({ classificationResult }) {
 
   // Function to handle keypress events
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
@@ -168,8 +211,11 @@ export default function ChatBot({ classificationResult }) {
     <>
       {!isOpen && (
         <button
-          className="chat-toggle"
-          onClick={() => setIsOpen(true)}
+          className={`chat-toggle ${showAttention ? "attention" : ""}`}
+          onClick={() => {
+            setIsOpen(true);
+            setShowAttention(false);
+          }}
           aria-label="Open Chat"
         >
           <MessageCircle size={24} />
@@ -210,14 +256,19 @@ export default function ChatBot({ classificationResult }) {
                   message.isBot ? "message-bot" : "message-user"
                 }`}
               >
-                <div
-                  className={`message-content ${
-                    message.isBot ? "bot" : "user"
-                  }`}
-                >
-                  {message.isBot
-                    ? formatMessageText(message.text)
-                    : message.text}
+                <div className="message-wrapper">
+                  <div
+                    className={`message-content ${
+                      message.isBot ? "bot" : "user"
+                    }`}
+                  >
+                    {message.isBot
+                      ? formatMessageText(message.text)
+                      : message.text}
+                  </div>
+                  <div className="message-timestamp">
+                    {formatTime(message.timestamp)}
+                  </div>
                 </div>
               </div>
             ))}
