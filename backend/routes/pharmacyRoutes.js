@@ -23,6 +23,15 @@ router.get("/all", pharmacyController.getAllPharmacies);
 router.get("/nearby", pharmacyController.getNearbyPharmacies);
 
 /**
+ * GET /api/pharmacies/profiles
+ * Frontend: Used to get detailed information about specific pharmacies
+ * Parameters: ids (comma-separated list of pharmacy IDs)
+ * Returns detailed information about the requested pharmacies
+ * Used when viewing pharmacy details or comparing multiple pharmacies
+ */
+router.get("/profiles", pharmacyController.getPharmacyProfiles);
+
+/**
  * GET /api/pharmacies/search-medications
  * Frontend: Used in medication search feature to find pharmacies with specific medications
  * Parameters: query (medication name/description), longitude, latitude, distance (optional)

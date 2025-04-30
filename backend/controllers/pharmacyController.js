@@ -889,3 +889,83 @@ exports.searchMedications = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+// Get pharmacy profiles by IDs (public access)
+exports.getPharmacyProfiles = catchAsync(async (req, res, next) => {
+  const { ids } = req.query;
+
+  if (!ids) {
+    return next(new AppError("Please provide pharmacy IDs", 400));
+  }
+
+  const pharmacyIds = ids.split(",");
+
+  // Get pharmacy users
+  const pharmacies = await User.find({
+    _id: { $in: pharmacyIds },
+    userType: "Pharmacy",
+  }).select("firstName lastName email location avatar");
+
+  if (!pharmacies.length) {
+    return next(new AppError("No pharmacies found", 404));
+  }
+
+  // Get pharmacy profiles
+  const pharmacyProfiles = await PharmacyProfile.find({
+    user: { $in: pharmacyIds },
+  })
+    .populate({
+      path: "inventory",
+      populate: {
+        path: "medication",
+        select: "name description strength",
+      },
+    })
+    .populate({
+      path: "reviews",
+      options: { sort: { createdAt: -1 }, limit: 5 },
+      populate: {
+        path: "reviewer",
+        select: "firstName lastName avatar",
+      },
+    });
+
+  // Combine user and profile data
+  const responseData = pharmacies.map((pharmacy) => {
+    const profile = pharmacyProfiles.find(
+      (p) => p.user.toString() === pharmacy._id.toString()
+    );
+    return {
+      id: pharmacy._id,
+      firstName: pharmacy.firstName,
+      lastName: pharmacy.lastName,
+      email: pharmacy.email,
+      location: pharmacy.location,
+      locationDetails: profile
+        ? {
+            locationName: profile.locationName,
+            formattedAddress: profile.formattedAddress,
+            city: profile.city,
+            state: profile.state,
+            country: profile.country,
+          }
+        : null,
+      profile: profile
+        ? {
+            phoneNumber: profile.phoneNumber,
+            operatingHours: profile.operatingHours,
+            inventory: profile.inventory,
+            reviews: profile.reviews,
+          }
+        : null,
+      avatar: pharmacy.avatar,
+      totalMedications: profile?.inventory?.length || 0,
+      totalReviews: profile?.reviews?.length || 0,
+    };
+  });
+
+  res.status(200).json({
+    status: "success",
+    data: responseData,
+  });
+});

@@ -203,15 +203,17 @@ exports.getPharmaciesWithMedication = catchAsync(async (req, res, next) => {
     select: "firstName lastName location",
   });
 
-  // Format response
-  const pharmaciesWithMedication = inventoryItems.map((item) => ({
-    id: item.pharmacy._id,
-    name: `${item.pharmacy.firstName} ${item.pharmacy.lastName}`,
-    location: item.pharmacy.location,
-    stock: item.stock,
-    price: item.price,
-    expiryDate: item.expiryDate,
-  }));
+  // Filter out items with null pharmacy and format response
+  const pharmaciesWithMedication = inventoryItems
+    .filter((item) => item.pharmacy) // Filter out items with null pharmacy
+    .map((item) => ({
+      id: item.pharmacy._id,
+      name: `${item.pharmacy.firstName} ${item.pharmacy.lastName}`,
+      location: item.pharmacy.location,
+      stock: item.stock,
+      price: item.price,
+      expiryDate: item.expiryDate,
+    }));
 
   res.status(200).json({
     status: "success",

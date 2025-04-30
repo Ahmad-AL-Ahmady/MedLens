@@ -97,15 +97,15 @@ export default function MedicineDetails() {
             ","
           )}`
         );
-        let profileData = { data: { profiles: [] } };
+        let profileData = { data: [] };
         if (profileResponse.ok) {
           profileData = await profileResponse.json();
         }
 
         // Create a map of profiles for quick lookup
         const profileMap = {};
-        profileData.data.profiles.forEach((profile) => {
-          profileMap[profile.user] = profile;
+        profileData.data.forEach((profile) => {
+          profileMap[profile.id] = profile;
         });
 
         // Step 5: Enhance pharmacies with calculated distance and locationDetails
@@ -113,12 +113,12 @@ export default function MedicineDetails() {
           const profile = profileMap[pharmacy.id] || {};
           return {
             ...pharmacy,
-            locationDetails: {
-              locationName: profile.locationName || "",
-              formattedAddress: profile.formattedAddress || "",
-              city: profile.city || "",
-              state: profile.state || "",
-              country: profile.country || "",
+            locationDetails: profile.locationDetails || {
+              locationName: "",
+              formattedAddress: "",
+              city: "",
+              state: "",
+              country: "",
             },
             calculatedDistance:
               state?.location && pharmacy.location?.coordinates
@@ -161,7 +161,19 @@ export default function MedicineDetails() {
 
   // Handle loading and error states
   if (loading) {
-    return null; // Loading is handled by Swal
+    return (
+      <div className="medecien-details">
+        <button
+          className="medecien-details__back-button"
+          onClick={() => navigate(-1)}
+        >
+          ← Back to medicines
+        </button>
+        <div className="medecien-details__loading">
+          <p>Loading medication details...</p>
+        </div>
+      </div>
+    );
   }
 
   if (error || !medicine) {
@@ -173,7 +185,15 @@ export default function MedicineDetails() {
         >
           ← Back to medicines
         </button>
-        <p>No medication found or an error occurred.</p>
+        <div className="medecien-details__error">
+          <p>{error || "No medication found or an error occurred."}</p>
+          <button
+            className="medecien-details__retry-button"
+            onClick={() => window.location.reload()}
+          >
+            Try Again
+          </button>
+        </div>
       </div>
     );
   }
@@ -239,7 +259,14 @@ export default function MedicineDetails() {
             </div>
           ))
         ) : (
-          <p>No pharmacies currently stock this medication.</p>
+          <div className="medecien-details__no-pharmacies">
+            <p>No pharmacies currently stock this medication in your area.</p>
+            {state?.location && (
+              <p className="medecien-details__suggestion">
+                Try increasing your search distance or check back later.
+              </p>
+            )}
+          </div>
         )}
       </div>
     </div>
