@@ -37,7 +37,7 @@ function App() {
           element={<VerifyEmailInstructions />}
         />
         <Route path="/signup-google" element={<GoogleSignUpForm />} />
-        
+
         {/* Protected Routes Wrapped in Layout */}
         <Route element={<Layout />}>
           <Route

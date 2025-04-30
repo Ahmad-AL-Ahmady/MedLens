@@ -8,12 +8,24 @@ export default function PatientDashboard() {
   const [appointments, setAppointments] = useState([]);
   const [scans, setScans] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const token =
     localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
 
   useEffect(() => {
     const fetchDashboardData = async () => {
+      if (isInitialLoad) {
+        Swal.fire({
+          title: "Loading Dashboard...",
+          text: "Please wait while we fetch your data!",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+      }
+
       try {
         const profileResponse = await fetch(
           "http://localhost:4000/api/patients/profile",
@@ -62,13 +74,17 @@ export default function PatientDashboard() {
         });
       } finally {
         setLoading(false);
+        if (isInitialLoad) {
+          Swal.close();
+          setIsInitialLoad(false);
+        }
       }
     };
 
     fetchDashboardData();
-  }, [token]);
+  }, [token, isInitialLoad]);
 
-  if (loading) return null; // you can also add a loading spinner if you want
+  if (loading && !isInitialLoad) return null;
 
   const nextAppointment = appointments.length > 0 ? appointments[0] : null;
   const scanCount = scans.length;

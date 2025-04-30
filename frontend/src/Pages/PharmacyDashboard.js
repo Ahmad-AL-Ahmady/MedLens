@@ -113,11 +113,10 @@ export default function PharmacyDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       Swal.fire({
-        title: "Loading...",
-        text: "Fetching your pharmacy data, please wait.",
+        title: "Loading Dashboard...",
+        text: "Please wait while we fetch your pharmacy data!",
         allowOutsideClick: false,
-        showConfirmButton: false,
-        willOpen: () => {
+        didOpen: () => {
           Swal.showLoading();
         },
       });

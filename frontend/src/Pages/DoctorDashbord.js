@@ -7,21 +7,23 @@ import "../Styles/DoctorDashboard.css";
 const DoctorDashboard = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const token =
     localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
 
   const fetchAppointments = async () => {
     try {
-      Swal.fire({
-        title: "Hang on...",
-        text: "We're getting your schedule...",
-        allowOutsideClick: false,
-        showConfirmButton: false,
-        willOpen: () => {
-          Swal.showLoading();
-        },
-      });
+      if (isInitialLoad) {
+        Swal.fire({
+          title: "Loading Dashboard...",
+          text: "Please wait while we fetch your appointments!",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+      }
 
       const response = await fetch(
         "http://localhost:4000/api/doctors/profile",
@@ -54,13 +56,18 @@ const DoctorDashboard = () => {
       });
     } finally {
       setLoading(false);
-      Swal.close();
+      if (isInitialLoad) {
+        Swal.close();
+        setIsInitialLoad(false);
+      }
     }
   };
 
   useEffect(() => {
     fetchAppointments();
   }, []);
+
+  if (loading && !isInitialLoad) return null;
 
   return (
     <div className="doctor-dashboard-container">
