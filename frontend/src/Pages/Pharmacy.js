@@ -1,25 +1,29 @@
 import React, { useState, useEffect } from "react";
+import { CiLocationOn } from "react-icons/ci";
+import { Search } from "lucide-react";
 import "../Styles/Pharmacy.css";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import LocationPicker from "./LocationPicker";
 
 export default function PharmacyPage() {
-  const [searchQuery, setSearchQuery] = useState(""); // Search query for name
-  const [medicines, setMedicines] = useState([]); // Store medicines
-  const [loading, setLoading] = useState(true); // Loading state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [medicines, setMedicines] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({
     page: 1,
-    limit: 12, // Changed from 10 to 12
+    limit: 12,
     totalPages: 1,
     totalMedications: 0,
-  }); // Pagination state
-  const [isInitialLoad, setIsInitialLoad] = useState(true); // Track initial load
+  });
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [location, setLocation] = useState(null); // { type: "Point", coordinates: [longitude, latitude] }
+  const [distance, setDistance] = useState("");
+  const [showMap, setShowMap] = useState(false);
   const navigate = useNavigate();
 
-  // Fetch medicines from the API
   useEffect(() => {
     const fetchMedicines = async () => {
-      // Show loading alert only on initial load
       if (isInitialLoad) {
         Swal.fire({
           title: "Loading Medicines...",
@@ -32,7 +36,6 @@ export default function PharmacyPage() {
       }
 
       try {
-        // Construct query string for backend filtering and pagination
         const queryParams = new URLSearchParams({
           name: searchQuery,
           page: pagination.page,
@@ -48,24 +51,23 @@ export default function PharmacyPage() {
         }
 
         const data = await response.json();
-        setMedicines(data.data.medications); // Store medicines
+        setMedicines(data.data.medications);
         setPagination({
           page: data.pagination.page,
           limit: data.pagination.limit,
           totalPages: data.pagination.totalPages,
           totalMedications: data.pagination.totalMedications,
-        }); // Update pagination
+        });
         setLoading(false);
         if (isInitialLoad) {
-          Swal.close(); // Close loading alert only on initial load
-          setIsInitialLoad(false); // Mark initial load as complete
+          Swal.close();
+          setIsInitialLoad(false);
         }
-        console.log("Medications data:", data);
       } catch (error) {
         console.error("Error fetching medications:", error);
         setLoading(false);
         if (isInitialLoad) {
-          Swal.close(); // Close loading alert on error during initial load
+          Swal.close();
           setIsInitialLoad(false);
         }
         Swal.fire({
@@ -80,31 +82,76 @@ export default function PharmacyPage() {
     fetchMedicines();
   }, [searchQuery, pagination.page, pagination.limit, isInitialLoad]);
 
-  // Handle page change
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= pagination.totalPages) {
       setPagination((prev) => ({ ...prev, page: newPage }));
     }
   };
 
+  const handleSearch = () => {
+    if (!location || !distance) {
+      Swal.fire({
+        icon: "warning",
+        title: "Location Required",
+        text: "Please select a location and distance to search for nearby pharmacies.",
+      });
+      return;
+    }
+    setPagination((prev) => ({ ...prev, page: 1 }));
+  };
+
   return (
     <div className="pharmacy-page">
-      <h1 className="pharmacy-page__title">Search for medicines</h1>
+      <h1 className="pharmacy-page__title">Search for Medicines</h1>
 
-      <div className="pharmacy-page__search-container">
+      <div className="pharmacy-page__search-wrapper">
         <input
           type="text"
           placeholder="Search by medicine name..."
           value={searchQuery}
           onChange={(e) => {
             setSearchQuery(e.target.value);
-            setPagination((prev) => ({ ...prev, page: 1 })); // Reset to page 1 on search
+            setPagination((prev) => ({ ...prev, page: 1 }));
           }}
           className="pharmacy-page__search-input"
         />
+
+        <select
+          className="pharmacy-page__distance-select"
+          value={distance}
+          onChange={(e) => setDistance(e.target.value)}
+          aria-label="Select search distance"
+        >
+          <option value="">Select Distance</option>
+          <option value="5">5 km</option>
+          <option value="10">10 km</option>
+          <option value="20">20 km</option>
+          <option value="50">50 km</option>
+        </select>
+
+        <div className="pharmacy-page__location-container">
+          <button
+            type="button"
+            className="pharmacy-page__location-button"
+            onClick={() => setShowMap(!showMap)}
+          >
+            <CiLocationOn className="pharmacy-page__location-icon" />
+            {location ? "Location Selected" : "Select Location"}
+          </button>
+        </div>
+
+        {showMap && (
+          <LocationPicker
+            onSelect={setLocation}
+            onClose={() => setShowMap(false)}
+          />
+        )}
+
+        <button className="pharmacy-page__search-button" onClick={handleSearch}>
+          <Search size={16} />
+        </button>
       </div>
 
-      {/* Display medicines or no results message */}
       {!loading && (
         <>
           <div className="pharmacy-page__medicine-grid">
@@ -113,9 +160,20 @@ export default function PharmacyPage() {
                 <div
                   key={medicine._id}
                   className="pharmacy-page__medicine-card"
-                  onClick={() => navigate(`/medicines/${medicine._id}`)}
+                  onClick={() =>
+                    navigate(`/medicines/${medicine._id}`, {
+                      state: { location, distance },
+                    })
+                  }
                   role="button"
                   tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      navigate(`/medicines/${medicine._id}`, {
+                        state: { location, distance },
+                      });
+                    }
+                  }}
                 >
                   <div className="pharmacy-page__medicine-header">
                     <h2 className="pharmacy-page__medicine-name">
@@ -131,11 +189,12 @@ export default function PharmacyPage() {
                 </div>
               ))
             ) : (
-              <p>No medications found. Try searching with a different term!</p>
+              <p className="pharmacy-page__no-results">
+                No medications found. Try searching with a different term!
+              </p>
             )}
           </div>
 
-          {/* Pagination controls */}
           {pagination.totalPages > 1 && (
             <div className="pharmacy-page__pagination">
               <button
