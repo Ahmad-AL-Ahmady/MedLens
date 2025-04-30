@@ -46,6 +46,12 @@ export default function DoctorPage() {
   const [searchName, setSearchName] = useState("");
   const [showAll, setShowAll] = useState(false);
   const [showMap, setShowMap] = useState(false);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 12,
+    totalPages: 1,
+    totalDoctors: 0,
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -91,28 +97,59 @@ export default function DoctorPage() {
   }, []);
 
   const handleSpecializationClick = (specialty) => {
-    setSelectedSpecialization(specialty);
+    if (selectedSpecialization === specialty) {
+      setSelectedSpecialization("");
+      setPagination((prev) => ({ ...prev, page: 1 }));
+    } else {
+      setSelectedSpecialization(specialty);
+      setPagination((prev) => ({ ...prev, page: 1 }));
+    }
   };
 
   // ✅ Fetch doctors list
   useEffect(() => {
-    fetch("http://localhost:4000/api/doctors/all")
-      .then((res) => {
-        // console.log("Response Status:", res.status);
-        return res.json();
-      })
-      .then((data) => {
-        // console.log("Doctors API Response:", data);
-        setDoctors(data.data.doctors);
-        setFilteredDoctors(
-          data.data.doctors.filter(
-            (doc) => doc.specialization === selectedSpecialization
-          )
-        );
-      })
-      .catch((error) => console.error("Error loading doctors:", error));
-  }, []);
-  const displayedDoctors = showAll ? doctors : doctors.slice(0, 6);
+    const fetchDoctors = async () => {
+      try {
+        let url = "http://localhost:4000/api/doctors/all";
+        const queryParams = new URLSearchParams({
+          page: pagination.page,
+          limit: pagination.limit,
+        });
+
+        // Only add specialization if it's not empty
+        if (selectedSpecialization) {
+          queryParams.append("specialization", selectedSpecialization);
+        }
+
+        // Only add name if it's not empty
+        if (searchName) {
+          queryParams.append("name", searchName);
+        }
+
+        const response = await fetch(`${url}?${queryParams.toString()}`);
+        const data = await response.json();
+
+        if (data.data && data.data.doctors) {
+          setDoctors(data.data.doctors);
+          setPagination({
+            page: data.pagination.page,
+            limit: data.pagination.limit,
+            totalPages: data.pagination.totalPages,
+            totalDoctors: data.pagination.totalDoctors,
+          });
+        } else {
+          setDoctors([]);
+          setPagination((prev) => ({ ...prev, totalPages: 1 }));
+        }
+      } catch (error) {
+        console.error("Error loading doctors:", error);
+        setError("Failed to fetch doctors");
+        setDoctors([]);
+      }
+    };
+
+    fetchDoctors();
+  }, [selectedSpecialization, searchName, pagination.page, pagination.limit]);
 
   // ✅ Show specializations list
   useEffect(() => {
@@ -121,25 +158,6 @@ export default function DoctorPage() {
       .then((data) => setSpecializations(data.data.specializations))
       .catch((error) => console.error("Error loading specializations:", error));
   }, []);
-
-  // ✅ Update doctors list based on selected specialization
-  useEffect(() => {
-    setLoading(true);
-    fetch(
-      `http://localhost:4000/api/doctors/all?specialization=${selectedSpecialization}`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        //console.log("Doctors Fetched: ", data);
-        setDoctors(data.data.doctors || []);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error loading doctors:", error);
-        setDoctors([]);
-        setLoading(false);
-      });
-  }, [selectedSpecialization]);
 
   // ✅ Search doctors based on location, distance, and specialization
   const handleSearch = async () => {
@@ -156,11 +174,12 @@ export default function DoctorPage() {
     } else if (searchName) {
       url = `http://localhost:4000/api/doctors/all?name=${searchName}&specialization=${selectedSpecialization}`;
     }
-    //console.log("Fetching URL:", url);
+
     try {
       const response = await fetch(url);
       const data = await response.json();
       let doctorsList = data.data.doctors || [];
+
       if (searchName) {
         const searchLower = searchName.toLowerCase().trim();
         const filteredDoctors = doctorsList.filter((doctor) => {
@@ -175,12 +194,23 @@ export default function DoctorPage() {
           );
         });
 
-        //console.log("Filtered Doctors:", filteredDoctors);
         setDoctors(filteredDoctors);
+        setPagination((prev) => ({
+          ...prev,
+          totalPages: Math.ceil(filteredDoctors.length / prev.limit),
+        }));
       } else if (location?.latitude && location?.longitude) {
         setDoctors(doctorsList.sort((a, b) => a.distance - b.distance));
+        setPagination((prev) => ({
+          ...prev,
+          totalPages: Math.ceil(doctorsList.length / prev.limit),
+        }));
       } else {
         setDoctors(doctorsList);
+        setPagination((prev) => ({
+          ...prev,
+          totalPages: Math.ceil(doctorsList.length / prev.limit),
+        }));
       }
     } catch (error) {
       console.error("Error fetching doctors:", error);
@@ -198,6 +228,12 @@ export default function DoctorPage() {
   const prevSpecialty = () => {
     if (startIndex > 0) {
       setStartIndex((prev) => prev - 1);
+    }
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= pagination.totalPages) {
+      setPagination((prev) => ({ ...prev, page: newPage }));
     }
   };
 
@@ -337,6 +373,26 @@ export default function DoctorPage() {
             <p className="no-doctors">No doctors available</p>
           )}
         </div>
+
+        {pagination.totalPages > 1 && (
+          <div className="pagination">
+            <button
+              onClick={() => handlePageChange(pagination.page - 1)}
+              disabled={pagination.page === 1}
+            >
+              Previous
+            </button>
+            <span>
+              Page {pagination.page} of {pagination.totalPages}
+            </span>
+            <button
+              onClick={() => handlePageChange(pagination.page + 1)}
+              disabled={pagination.page === pagination.totalPages}
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

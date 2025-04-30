@@ -5,6 +5,7 @@
   margin-right: auto;
   padding: 0 1rem;
 }
+
 /* ✅ Specialty buttons */
 .specialty-container {
   display: flex;
@@ -14,7 +15,7 @@
   justify-content: center;
   align-items: center;
   position: relative;
-  width:100%;
+  width: 100%;
   padding: 8px 0;
   gap: 15px;
   margin-bottom: 35px;
@@ -33,11 +34,9 @@
 }
 
 .specialty-btn.active {
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--primary-dark)
-  );
+  background: linear-gradient(135deg,
+      var(--primary-color),
+      var(--primary-dark));
   color: white;
 }
 
@@ -63,11 +62,9 @@
 
 .arrows button {
   font-size: 15px;
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--primary-dark)
-  );
+  background: linear-gradient(135deg,
+      var(--primary-color),
+      var(--primary-dark));
   color: white;
   border: 20px;
   width: 20px;
@@ -113,11 +110,9 @@
 
 .search-button {
   display: flex;
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--primary-dark)
-  );
+  background: linear-gradient(135deg,
+      var(--primary-color),
+      var(--primary-dark));
   color: white;
   border: none;
   padding: 10px 15px;
@@ -132,11 +127,9 @@
 }
 
 .distance-select {
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--primary-dark)
-  );
+  background: linear-gradient(135deg,
+      var(--primary-color),
+      var(--primary-dark));
   border: 1px solid;
   border-radius: 0.6rem;
   padding: 11px 14px;
@@ -152,6 +145,7 @@
   transform: translateY(-1px);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
+
 .distance-select option {
   background-color: rgb(255, 255, 255);
   color: #747474;
@@ -216,6 +210,7 @@
   flex-direction: column;
   align-items: center;
 }
+
 .doctor-card:hover {
   outline: none;
   border-color: #c0d7f2;
@@ -243,6 +238,7 @@
   margin-top: 10px;
   margin-left: 20px;
 }
+
 .doctor-name {
   font-size: 15px;
   font-weight: bold;
@@ -261,6 +257,7 @@
   color: #444;
   margin-top: 5px;
 }
+
 .rating svg {
   stroke: none;
   fill: #f0c51d;
@@ -306,11 +303,13 @@
     margin: 0 auto 35px auto;
     max-width: 1200px;
   }
+
   .specialty-btn {
     padding: 9px 14px;
     font-size: 14px;
   }
 }
+
 @media (max-width: 1200px) {
   .doctor-card {
     width: 280px;
@@ -354,6 +353,7 @@
     flex: 1;
   }
 }
+
 @media (max-width: 768px) {
   .specialty-container {
     overflow-x: auto;
@@ -361,6 +361,7 @@
     gap: 8px;
     padding: 5px 10px;
   }
+
   .specialty-btn {
     padding: 5px 8px;
     font-size: 13px;
@@ -388,6 +389,7 @@
     font-size: 16px;
     padding: 10px;
   }
+
   .search-button {
     flex: 1;
     padding: 10px;
@@ -499,13 +501,53 @@
   }
 
 }
+
 @media (max-width: 992px) {
   .specialty-container {
     gap: 10px;
   }
+
   .specialty-btn {
     font-size: 14px;
     max-width: 240px;
     padding: 7px 10px;
   }
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding: 1rem;
+}
+
+.pagination button {
+  padding: 0.5rem 1.5rem;
+  border: none;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  color: white;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 4px rgba(140, 140, 140, 0.2);
+}
+
+.pagination button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #cbcbd1;
+}
+
+.pagination span {
+  color: #666;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
