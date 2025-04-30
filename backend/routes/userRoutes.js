@@ -39,6 +39,7 @@ router.use(authController.protect);
 
 // Routes accessible to all authenticated users
 router.post("/logout", authController.logout);
+router.delete("/delete-account", authController.deleteUserAndContents);
 router.patch("/completeProfile", authController.completeProfile);
 router.patch("/updatePassword", authController.updatePassword);
 
