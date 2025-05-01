@@ -10,6 +10,7 @@ import {
   BadgeCheck,
   Edit,
 } from "lucide-react";
+import Swal from "sweetalert2";
 import "../Styles/DoctorProfile.css";
 
 const DoctorProfile = () => {
@@ -52,6 +53,17 @@ const DoctorProfile = () => {
     localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
   const fetchDoctorProfile = async () => {
     try {
+      Swal.fire({
+        title: "Loading...",
+        text: "Fetching doctor profile",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
       let apiUrl = id
         ? `http://localhost:4000/api/doctors/${id}`
         : "http://localhost:4000/api/doctors/profile";
@@ -109,12 +121,19 @@ const DoctorProfile = () => {
           ...formData,
           availability: data.data.profile?.availability,
         });
+        Swal.close();
       } else {
-        setError("Failed to fetch doctor data");
+        throw new Error("Failed to fetch doctor data");
       }
     } catch (error) {
       console.error("Error fetching doctor profile:", error);
-      setError("Error fetching doctor profile");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "Error fetching doctor profile",
+        confirmButtonColor: "#3b82f6",
+      });
+      setError(error.message || "Error fetching doctor profile");
     } finally {
       setLoading(false);
     }
@@ -400,9 +419,8 @@ const DoctorProfile = () => {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
-  if (!doctor) return <p>No doctor profile found.</p>;
+  if (!doctor) return null;
 
   return (
     <div className="doctor-profile-container">

@@ -1,3 +1,13 @@
+/* Page Title */
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e40af;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f3f4f6;
+}
+
 /* ✅ Page Style.css*/
 .doctor-profile-container {
   max-width: 1000px;
