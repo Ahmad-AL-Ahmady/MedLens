@@ -222,7 +222,6 @@ userSchema.pre("save", function (next) {
 });
 
 // This will automatically create the appropriate profile when a new user is created
-// This will automatically create the appropriate profile when a new user is created
 userSchema.post("save", async function (doc) {
   if (doc._isNewDocument) {
     console.log(
@@ -255,11 +254,28 @@ userSchema.post("save", async function (doc) {
       } else if (doc.userType === "Doctor") {
         console.log("Creating DoctorProfile...");
         try {
-          const DoctorProfile = mongoose.model("DoctorProfile");
+          // Require the model directly to ensure it's loaded
+          const DoctorProfile = require("./doctorProfileModel");
           profileExists = await DoctorProfile.exists({ user: doc._id });
 
           if (!profileExists) {
-            const doctorProfile = await DoctorProfile.create({ user: doc._id });
+            // Create with properly structured availability
+            const defaultAvailability = {
+              isAvailable: false,
+            };
+
+            const doctorProfile = await DoctorProfile.create({
+              user: doc._id,
+              availability: {
+                monday: defaultAvailability,
+                tuesday: defaultAvailability,
+                wednesday: defaultAvailability,
+                thursday: defaultAvailability,
+                friday: defaultAvailability,
+                saturday: defaultAvailability,
+                sunday: defaultAvailability,
+              },
+            });
             console.log(
               `DoctorProfile created successfully: ${doctorProfile._id}`
             );
@@ -267,7 +283,9 @@ userSchema.post("save", async function (doc) {
             console.log(`DoctorProfile already exists for user ${doc._id}`);
           }
         } catch (modelError) {
-          console.error("Error with DoctorProfile model:", modelError);
+          console.error("Error with DoctorProfile model:", modelError.message);
+          // Throw the error to ensure we know if profile creation fails
+          throw modelError;
         }
       } else if (doc.userType === "Pharmacy") {
         console.log("Creating PharmacyProfile...");
@@ -290,7 +308,8 @@ userSchema.post("save", async function (doc) {
         }
       }
     } catch (error) {
-      console.error("Error in profile creation post-save hook:", error);
+      console.error("Error in profile creation post-save hook:", error.message);
+      throw error; // Re-throw to ensure we know if profile creation fails
     }
   } else {
     console.log(`User ${doc._id} updated (not creating profile)`);

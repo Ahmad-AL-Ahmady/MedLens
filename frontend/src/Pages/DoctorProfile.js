@@ -795,39 +795,53 @@ const DoctorProfile = () => {
               )}
             </div>
             {showReviewForm && (
-              <div className="review-modal-overlay">
-                <div className="review-modal">
-                  <h2 className="review-modal-title">Add Your Review</h2>
-                  <form onSubmit={handleReviewSubmit}>
-                    <textarea
-                      placeholder="Write your review..."
-                      value={comment}
-                      onChange={(e) => setComment(e.target.value)}
-                      required
-                    />
-                    <div className="rating-input">
-                      <input
-                        type="number"
-                        value={rating}
-                        onChange={(e) => setRating(parseFloat(e.target.value))}
-                        step="0.1"
-                        min="1"
-                        max="5"
+              <div className="modal-overlay">
+                <div className="modal-content review-modal">
+                  <span
+                    className="close-btn"
+                    onClick={() => setShowReviewForm(false)}
+                  >
+                    &times;
+                  </span>
+                  <h2 className="modal-content-header">Add Your Review</h2>
+                  <form onSubmit={handleReviewSubmit} className="review-form">
+                    <div className="form-group">
+                      <label>Your Review</label>
+                      <textarea
+                        placeholder="Write your review..."
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
                         required
                       />
-                      <span> ⭐️</span>
-                      <div className="review-rating-buttons">
-                        <button type="submit" className="submit-review-button">
-                          Submit
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setShowReviewForm(false)}
-                          className="close-modal-button"
-                        >
-                          Cancel
-                        </button>
+                    </div>
+                    <div className="form-group rating-group">
+                      <label>Rating</label>
+                      <div className="rating-input">
+                        <input
+                          type="number"
+                          value={rating}
+                          onChange={(e) =>
+                            setRating(parseFloat(e.target.value))
+                          }
+                          step="0.1"
+                          min="1"
+                          max="5"
+                          required
+                        />
+                        <span className="rating-star">⭐️</span>
                       </div>
+                    </div>
+                    <div className="review-form-buttons">
+                      <button type="submit" className="submit-review-button">
+                        Submit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowReviewForm(false)}
+                        className="close-modal-button"
+                      >
+                        Cancel
+                      </button>
                     </div>
                   </form>
                 </div>

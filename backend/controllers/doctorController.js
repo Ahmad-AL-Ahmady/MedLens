@@ -664,11 +664,23 @@ exports.updateAvailability = catchAsync(async (req, res, next) => {
     );
   }
 
-  // Find the doctor profile
-  const doctorProfile = await DoctorProfile.findOne({ user: id });
+  // Find or create the doctor profile
+  let doctorProfile = await DoctorProfile.findOne({ user: id });
 
   if (!doctorProfile) {
-    return next(new AppError("Doctor profile not found", 404));
+    // Create a new doctor profile if it doesn't exist
+    doctorProfile = await DoctorProfile.create({
+      user: id,
+      availability: {
+        monday: {},
+        tuesday: {},
+        wednesday: {},
+        thursday: {},
+        friday: {},
+        saturday: {},
+        sunday: {},
+      },
+    });
   }
 
   // Update only the provided days, keep existing availability for other days
