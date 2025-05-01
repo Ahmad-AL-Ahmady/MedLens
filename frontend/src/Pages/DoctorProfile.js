@@ -9,6 +9,7 @@ import {
   DollarSign,
   BadgeCheck,
   Edit,
+  Trash2,
 } from "lucide-react";
 import Swal from "sweetalert2";
 import "../Styles/DoctorProfile.css";
@@ -658,9 +659,13 @@ const DoctorProfile = () => {
                                       info.isAvailable ? "open" : "closed"
                                     }`}
                                   >
-                                    {info.isAvailable
-                                      ? `${info.start} - ${info.end}`
-                                      : "Closed"}
+                                    {info.isAvailable ? (
+                                      <span style={{ color: "#374151" }}>
+                                        {`${info.start} - ${info.end}`}
+                                      </span>
+                                    ) : (
+                                      "Closed"
+                                    )}
                                   </span>
                                 </div>
                               )
@@ -885,17 +890,18 @@ const DoctorProfile = () => {
                         <span className="doctor-profile-rating">
                           (⭐️ {review.rating})
                         </span>
-                        {review.reviewer?._id === currentUserId && (
-                          <button
-                            className="delete-review-button"
-                            onClick={() => handleDeleteReview(review._id)}
-                          >
-                            Delete
-                          </button>
-                        )}
                       </div>
                       <p className="review-comment">{review.comment}</p>
                     </div>
+                    {review.reviewer?._id === currentUserId && (
+                      <button
+                        className="delete-review-button"
+                        onClick={() => handleDeleteReview(review._id)}
+                        title="Delete Review"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))
