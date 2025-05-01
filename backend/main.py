@@ -45,6 +45,11 @@ nail_model = load_local_model("Models_ai/nail.h5")
 chest_model = load_local_model("Models_ai/chest.h5")
 Eye_model = load_local_model("Models_ai/Eye.h5")
 skin_model = load_local_model("Models_ai/skin_1.h5")
+bone_model = load_local_model("Models_ai/Bone.h5")
+kidney_model = load_local_model("Models_ai/kidney_cancer.h5")
+lung_model = load_local_model("Models_ai/lung_cancer_1.h5")
+brain_model = load_local_model("Models_ai/Brain_Tumor_1.h5")
+
 
 # تعاريف الأسماء لكل تصنيف
 CLASS_NAMES = {
@@ -72,6 +77,21 @@ CLASS_NAMES = {
         "NORMAL",
     ],
     "skin": ["benign", "malignant"],
+    "bone": [
+        "Avulsion fracture",
+        "Comminuted fracture",
+        "Fracture Dislocation",
+        "Greenstick fracture",
+        "Hairline Fracture",
+        "Impacted fracture",
+        "Longitudinal fracture",
+        "Oblique fracture",
+        "Pathological fracture",
+        "Spiral Fracture",
+    ],
+    "kidney": ["Normal", "Tumor"],
+    "lung": ["benign", "malignant", "Normal"],
+    "brain": ["glioma", "meningioma", "Normal", "pituitary"],
 }
 
 BODY_PART_TO_MODEL = {
@@ -84,7 +104,6 @@ BODY_PART_TO_MODEL = {
     "Kidney": "kidney",
     "Nail": "nail",
     "Skin": "skin",
-    "Alzheimer": "Alzheimer",
 }
 
 
@@ -163,6 +182,26 @@ async def predict(file: UploadFile = File(...), bodyPart: str = Form("Chest")):
                 model_pred = skin_model.predict(processed_img)
                 result_idx = np.argmax(model_pred[0])
                 classification_result = CLASS_NAMES["skin"][result_idx]
+                confidence_score = float(np.max(model_pred[0]))
+            elif model_key == "bone":
+                model_pred = bone_model.predict(processed_img)
+                result_idx = np.argmax(model_pred[0])
+                classification_result = CLASS_NAMES["bone"][result_idx]
+                confidence_score = float(np.max(model_pred[0]))
+            elif model_key == "kidney":
+                model_pred = kidney_model.predict(processed_img)
+                result_idx = np.argmax(model_pred[0])
+                classification_result = CLASS_NAMES["kidney"][result_idx]
+                confidence_score = float(np.max(model_pred[0]))
+            elif model_key == "lung":
+                model_pred = lung_model.predict(processed_img)
+                result_idx = np.argmax(model_pred[0])
+                classification_result = CLASS_NAMES["lung"][result_idx]
+                confidence_score = float(np.max(model_pred[0]))
+            elif model_key == "brain":
+                model_pred = brain_model.predict(processed_img)
+                result_idx = np.argmax(model_pred[0])
+                classification_result = CLASS_NAMES["lung"][result_idx]
                 confidence_score = float(np.max(model_pred[0]))
             else:
                 classification_result = "Unknown body part"
