@@ -230,6 +230,17 @@ const DoctorProfile = () => {
       formData.append("avatar", file);
 
       try {
+        Swal.fire({
+          title: "Uploading...",
+          text: "Please wait while we upload your avatar",
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          showConfirmButton: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
         const response = await fetch(
           "http://localhost:4000/api/users/updateAvatar",
           {
@@ -248,10 +259,10 @@ const DoctorProfile = () => {
             title: "Success!",
             text: "Avatar updated successfully!",
             confirmButtonColor: "#3b82f6",
+          }).then(() => {
+            // Refresh the page after successful upload
+            window.location.reload();
           });
-          setSelectedImage(URL.createObjectURL(file));
-
-          await fetchDoctorProfile();
         } else {
           Swal.fire({
             icon: "error",
@@ -288,6 +299,17 @@ const DoctorProfile = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
+          Swal.fire({
+            title: "Deleting...",
+            text: "Please wait while we delete your avatar",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
+
           const response = await fetch(
             "http://localhost:4000/api/users/deleteAvatar",
             {
@@ -304,9 +326,10 @@ const DoctorProfile = () => {
               title: "Success!",
               text: "Avatar deleted successfully!",
               confirmButtonColor: "#3b82f6",
+            }).then(() => {
+              // Refresh the page after successful deletion
+              window.location.reload();
             });
-            setSelectedImage(null);
-            await fetchDoctorProfile();
           } else {
             Swal.fire({
               icon: "error",
