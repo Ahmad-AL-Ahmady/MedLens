@@ -185,18 +185,31 @@ const DoctorProfile = () => {
       const data = await response.json();
 
       if (response.ok && data.status === "success") {
-        alert("Appointment booked successfully!");
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "Appointment booked successfully!",
+          confirmButtonColor: "#3b82f6",
+        });
         setShowModal(false);
       } else {
-        alert(
-          `Failed to book appointment. Reason: ${
+        Swal.fire({
+          icon: "error",
+          title: "Booking Failed",
+          text: `Failed to book appointment. Reason: ${
             data.message || "Unknown error"
-          }`
-        );
+          }`,
+          confirmButtonColor: "#3b82f6",
+        });
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("Failed to book appointment. Error occurred in the request.");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to book appointment. Error occurred in the request.",
+        confirmButtonColor: "#3b82f6",
+      });
     }
   };
 
@@ -230,16 +243,31 @@ const DoctorProfile = () => {
 
         if (response.ok) {
           const data = await response.json();
-          // console.log("Avatar updated successfully!", data);
-          alert("Avatar updated successfully!");
+          Swal.fire({
+            icon: "success",
+            title: "Success!",
+            text: "Avatar updated successfully!",
+            confirmButtonColor: "#3b82f6",
+          });
           setSelectedImage(URL.createObjectURL(file));
 
           await fetchDoctorProfile();
         } else {
-          console.error("Failed to update avatar");
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Failed to update avatar",
+            confirmButtonColor: "#3b82f6",
+          });
         }
       } catch (error) {
         console.error("Error:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "An error occurred while updating avatar",
+          confirmButtonColor: "#3b82f6",
+        });
       }
     }
   };
@@ -249,44 +277,74 @@ const DoctorProfile = () => {
   };
 
   const handleDeleteAvatar = async () => {
-    if (window.confirm("Do you want to delete your avatar?")) {
-      try {
-        const response = await fetch(
-          "http://localhost:4000/api/users/deleteAvatar",
-          {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to delete your avatar?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3b82f6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch(
+            "http://localhost:4000/api/users/deleteAvatar",
+            {
+              method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
 
-        if (response.ok) {
-          alert("Avatar deleted successfully!");
-          setSelectedImage(null);
-        } else {
-          console.error("Failed to delete avatar");
+          if (response.ok) {
+            Swal.fire({
+              icon: "success",
+              title: "Success!",
+              text: "Avatar deleted successfully!",
+              confirmButtonColor: "#3b82f6",
+            });
+            setSelectedImage(null);
+            await fetchDoctorProfile();
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "Failed to delete avatar",
+              confirmButtonColor: "#3b82f6",
+            });
+          }
+        } catch (error) {
+          console.error("Error while deleting avatar:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "An error occurred while deleting avatar",
+            confirmButtonColor: "#3b82f6",
+          });
         }
-      } catch (error) {
-        console.error("Error while deleting avatar:", error);
       }
-    }
+    });
   };
 
   const editHandleSubmit = async (e) => {
     e.preventDefault();
-    const doctorId = profile._id;
-    /* console.log("Submitting Profile Update:", {
-      city: formData.city,
-      state: formData.state,
-      country: formData.country,
-      fees: formData.fees,
-      experienceYears: formData.experienceYears,
+    // THIS IS THE FIXED LINE:
+    const doctorId = doctor.id; // Use the doctor user ID, not the profile ID
+
+    // Loading state
+    Swal.fire({
+      title: "Updating profile...",
+      text: "Please wait while we update your profile",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      showConfirmButton: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
     });
 
-    console.log("Submitting Availability Update:", {
-      availability: formData.availability,
-    });*/
     try {
       const profileRes = await fetch(
         "http://localhost:4000/api/doctors/profile",
@@ -309,7 +367,12 @@ const DoctorProfile = () => {
       const profileData = await profileRes.json();
 
       if (!profileRes.ok) {
-        alert(profileData.message || "Failed to update profile");
+        Swal.fire({
+          icon: "error",
+          title: "Profile Update Failed",
+          text: profileData.message || "Failed to update profile",
+          confirmButtonColor: "#3b82f6",
+        });
         return;
       }
 
@@ -334,18 +397,43 @@ const DoctorProfile = () => {
             "Availability update failed:",
             availabilityData.message
           );
-          alert(availabilityData.message || "Failed to update availability");
+          Swal.fire({
+            icon: "warning",
+            title: "Partial Update",
+            text:
+              "Profile updated but availability settings could not be saved. " +
+              (availabilityData.message || "Please try again later."),
+            confirmButtonColor: "#3b82f6",
+          });
+        } else {
+          // Both updates successful
+          Swal.fire({
+            icon: "success",
+            title: "Success!",
+            text: "Profile updated successfully",
+            confirmButtonColor: "#3b82f6",
+          });
         }
       } catch (availabilityError) {
         console.error("Error updating availability:", availabilityError);
-        alert("Something went wrong while updating availability");
+        Swal.fire({
+          icon: "warning",
+          title: "Partial Update",
+          text: "Profile updated but availability settings could not be saved due to an error.",
+          confirmButtonColor: "#3b82f6",
+        });
       }
-      alert("Profile updated successfully");
+
       await fetchDoctorProfile();
       setShowEditForm(false);
     } catch (error) {
       console.error("Error updating profile:", error);
-      alert("Something went wrong");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Something went wrong while updating your profile",
+        confirmButtonColor: "#3b82f6",
+      });
     }
   };
 
@@ -375,6 +463,13 @@ const DoctorProfile = () => {
       const data = await res.json();
       console.log("Review added:", data);
 
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: "Your review has been submitted successfully!",
+        confirmButtonColor: "#3b82f6",
+      });
+
       setShowReviewForm(false);
       setComment("");
       setRating(5);
@@ -383,41 +478,68 @@ const DoctorProfile = () => {
       await fetchDoctorProfile();
     } catch (error) {
       console.error("Error adding review:", error.message);
-      alert(error.message);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message,
+        confirmButtonColor: "#3b82f6",
+      });
     }
   };
 
   const handleDeleteReview = async (reviewId) => {
-    if (window.confirm("Are you sure you want to delete this review?")) {
-      try {
-        const res = await fetch(
-          `http://localhost:4000/api/reviews/${reviewId}`,
-          {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Are you sure you want to delete this review?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3b82f6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await fetch(
+            `http://localhost:4000/api/reviews/${reviewId}`,
+            {
+              method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.message || "Something went wrong");
           }
-        );
 
-        if (!res.ok) {
-          const errorData = await res.json();
-          throw new Error(errorData.message || "Something went wrong");
+          // Update the profile state to remove the deleted review
+          setProfile((prev) => ({
+            ...prev,
+            reviews: prev.reviews.filter((review) => review._id !== reviewId),
+          }));
+
+          Swal.fire({
+            icon: "success",
+            title: "Deleted!",
+            text: "Your review has been deleted successfully.",
+            confirmButtonColor: "#3b82f6",
+          });
+
+          // Fetch updated doctor profile to get new stats
+          await fetchDoctorProfile();
+        } catch (error) {
+          console.error("Error deleting review:", error.message);
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Failed to delete review. Please try again.",
+            confirmButtonColor: "#3b82f6",
+          });
         }
-
-        // Update the profile state to remove the deleted review
-        setProfile((prev) => ({
-          ...prev,
-          reviews: prev.reviews.filter((review) => review._id !== reviewId),
-        }));
-
-        // Fetch updated doctor profile to get new stats
-        await fetchDoctorProfile();
-      } catch (error) {
-        console.error("Error deleting review:", error.message);
-        alert("Failed to delete review. Please try again.");
       }
-    }
+    });
   };
 
   if (error) return <p style={{ color: "red" }}>{error}</p>;
