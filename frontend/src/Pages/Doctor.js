@@ -35,8 +35,6 @@ export default function DoctorPage() {
   const [specializations, setSpecializations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [startIndex, setStartIndex] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(6);
   const [doctorCardsPerPage, setDoctorCardsPerPage] = useState(6);
   const [location, setLocation] = useState("");
   const [distance, setDistance] = useState("");
@@ -57,15 +55,15 @@ export default function DoctorPage() {
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 576) {
-        setItemsPerPage(1);
+        // setItemsPerPage(1);
       } else if (window.innerWidth >= 576 && window.innerWidth < 768) {
-        setItemsPerPage(2);
+        // setItemsPerPage(2);
       } else if (window.innerWidth >= 768 && window.innerWidth < 992) {
-        setItemsPerPage(3);
+        // setItemsPerPage(3);
       } else if (window.innerWidth >= 992 && window.innerWidth < 1200) {
-        setItemsPerPage(4);
+        // setItemsPerPage(4);
       } else {
-        setItemsPerPage(8);
+        // setItemsPerPage(8);
       }
     };
 
@@ -219,18 +217,6 @@ export default function DoctorPage() {
     }
   };
 
-  const nextSpecialty = () => {
-    if (startIndex + 1 < specializations.length) {
-      setStartIndex((prev) => prev + 1);
-    }
-  };
-
-  const prevSpecialty = () => {
-    if (startIndex > 0) {
-      setStartIndex((prev) => prev - 1);
-    }
-  };
-
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= pagination.totalPages) {
       setPagination((prev) => ({ ...prev, page: newPage }));
@@ -239,51 +225,52 @@ export default function DoctorPage() {
 
   return (
     <div className="doctorpage-container">
-      <div className="arrows">
-        <button onClick={prevSpecialty} disabled={startIndex === 0}>
-          &lt;
-        </button>
-        <button
-          onClick={nextSpecialty}
-          disabled={startIndex + itemsPerPage >= specializations.length}
-        >
-          &gt;
-        </button>
-      </div>
-
       {/* ✅ Specialization bar */}
       <div className="specialty-container">
-        {specializations
-          .slice(startIndex, startIndex + itemsPerPage)
-          .map((specialty) => {
-            const isActive = selectedSpecialization === specialty.name;
-            const icon = specialtyIcons[specialty.name]
-              ? React.cloneElement(specialtyIcons[specialty.name], {
-                  color: isActive
-                    ? "white"
-                    : specialtyIcons[specialty.name].props.color,
-                })
-              : null;
+        {specializations.map((specialty) => {
+          const isActive = selectedSpecialization === specialty.name;
+          const icon = specialtyIcons[specialty.name]
+            ? React.cloneElement(specialtyIcons[specialty.name], {
+                color: isActive
+                  ? "white"
+                  : specialtyIcons[specialty.name].props.color,
+              })
+            : null;
 
-            return (
-              <button
-                key={specialty.name}
-                className={`specialty-btn ${isActive ? "active" : ""}`}
-                onClick={() => setSelectedSpecialization(specialty.name)}
-              >
-                {icon}
-                {specialty.name}
-              </button>
-            );
-          })}
+          return (
+            <button
+              key={specialty.name}
+              className={`specialty-btn ${isActive ? "active" : ""}`}
+              onClick={() => handleSpecializationClick(specialty.name)}
+            >
+              {icon}
+              {specialty.name}
+            </button>
+          );
+        })}
+        {/* Add Clear Filter button if a specialization is selected */}
+        {selectedSpecialization && (
+          <button
+            className="specialty-btn clear-filter-btn"
+            onClick={() => handleSpecializationClick(selectedSpecialization)}
+            style={{
+              marginLeft: 12,
+              background: "#f8d7da",
+              color: "#a71d2a",
+              border: "1.5px solid #f5c2c7",
+            }}
+          >
+            Clear Filter
+          </button>
+        )}
       </div>
 
       {/* ✅ Search bar */}
-      <div className="search-wrapper">
+      <div className="search-bar-card">
         <input
           type="text"
           placeholder="Search name"
-          className="search-input search-box "
+          className="search-input"
           value={searchName}
           onChange={(e) => setSearchName(e.target.value)}
         />
@@ -336,39 +323,39 @@ export default function DoctorPage() {
           {error ? (
             <p className="error-message">{error}</p>
           ) : doctors.length > 0 ? (
-            (showAll ? doctors : doctors.slice(0, doctorCardsPerPage)).map(
-              (doctor) => (
-                <div key={doctor.id} className="doctor-card">
-                  <div className="doctor-info">
-                    <img
-                      src={
-                        doctor.avatar
-                          ? `http://localhost:4000/public/uploads/users/${doctor.avatar}`
-                          : "http://localhost:4000/public/uploads/users/default.jpg"
-                      }
-                      alt={doctor.name}
-                      className="doctor-img"
-                    />
-                    <div className="doctor-details">
-                      <h3 className="doctor-name">
-                        {doctor.firstName} {doctor.lastName}
-                      </h3>
-                      <p className="specialty">{doctor.specialization}</p>
-                      <p className="rating">
-                        <StarIcon size={16} /> {doctor.averageRating} (
-                        {doctor.totalReviews} reviews)
-                      </p>
-                    </div>
+            doctors.map((doctor) => (
+              <div key={doctor.id} className="doctor-card">
+                <div className="doctor-info">
+                  <img
+                    src={
+                      doctor.avatar
+                        ? `http://localhost:4000/public/uploads/users/${doctor.avatar}`
+                        : "http://localhost:4000/public/uploads/users/default.jpg"
+                    }
+                    alt={doctor.name}
+                    className="doctor-img"
+                  />
+                  <div className="doctor-details">
+                    <h3 className="doctor-name">
+                      {doctor.firstName} {doctor.lastName}
+                    </h3>
+                    <span className="specialty-badge">
+                      {doctor.specialization}
+                    </span>
+                    <p className="rating">
+                      <StarIcon size={16} /> {doctor.averageRating} (
+                      {doctor.totalReviews} reviews)
+                    </p>
                   </div>
-                  <button
-                    className="profile-btn"
-                    onClick={() => navigate(`/doctors/${doctor.id}`)}
-                  >
-                    Profile
-                  </button>
                 </div>
-              )
-            )
+                <button
+                  className="profile-btn"
+                  onClick={() => navigate(`/doctors/${doctor.id}`)}
+                >
+                  Profile
+                </button>
+              </div>
+            ))
           ) : (
             <p className="no-doctors">No doctors available</p>
           )}
