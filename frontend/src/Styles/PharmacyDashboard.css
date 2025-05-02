@@ -247,7 +247,7 @@
   font-weight: 700;
   color: var(--primary-dark);
   text-transform: uppercase;
-  text-align: center; /* Center table headers */
+  text-align: center;
 }
 
 .pharmacy-dashboard-table-row {
@@ -263,10 +263,10 @@
   padding: var(--spacing-md);
   font-size: 0.925rem;
   color: var(--text-primary);
-  text-align: center; /* Center table data */
+  text-align: center;
 }
 
-/* Buttons */
+/* Buttons - Updated Hover States */
 .pharmacy-dashboard-add-button {
   background: linear-gradient(
     135deg,
@@ -289,11 +289,12 @@
 .pharmacy-dashboard-add-button:hover {
   background: linear-gradient(
     135deg,
-    var(--primary-light),
-    var(--primary-color)
+    var(--primary-dark),
+    var(--primary-hover)
   );
   transform: translateY(-2px) scale(1.04);
   box-shadow: var(--shadow-lg);
+  filter: brightness(0.9);
 }
 
 .pharmacy-dashboard-edit-button,
@@ -309,7 +310,7 @@
 }
 
 .pharmacy-dashboard-edit-button:hover {
-  background: var(--primary-color);
+  background: var(--primary-hover);
   color: #fff;
   transform: scale(1.05);
 }
@@ -414,14 +415,14 @@
 
 .pharmacy-dashboard-form-group input:hover,
 .pharmacy-dashboard-select:hover {
-  border-color: var(--primary-color);
+  border-color: var(--primary-hover);
   background: #fff;
 }
 
 .pharmacy-dashboard-form-group input:focus,
 .pharmacy-dashboard-select:focus {
   outline: none;
-  border-color: var(--primary-color);
+  border-color: var(--primary-hover);
   box-shadow: 0 0 0 4px rgba(3, 105, 161, 0.08);
   background: #fff;
 }
@@ -489,7 +490,7 @@
 }
 
 .pharmacy-dashboard-form-group--radio label:hover {
-  border-color: var(--primary-color);
+  border-color: var(--primary-hover);
   box-shadow: var(--shadow-sm);
 }
 
@@ -553,7 +554,7 @@
 
 .pharmacy-dashboard-form-cancel:hover {
   background: linear-gradient(to bottom, #f8fafc, #e5e7eb);
-  color: var(--primary-color);
+  color: var(--primary-hover);
   transform: translateY(-2px);
 }
 
@@ -576,11 +577,12 @@
 .pharmacy-dashboard-form-submit:hover {
   background: linear-gradient(
     135deg,
-    var(--primary-light),
-    var(--primary-color)
+    var(--primary-dark),
+    var(--primary-hover)
   );
   transform: translateY(-2px) scale(1.04);
   box-shadow: var(--shadow-lg);
+  filter: brightness(0.9);
 }
 
 /* Responsive Design */
