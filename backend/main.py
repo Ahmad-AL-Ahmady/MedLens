@@ -21,7 +21,8 @@ app.add_middleware(
 )
 
 # تحميل النموذج من HuggingFace
-model_name = "D://AI Project//flan-t5-large"  # المسار إلى النموذج المحفوظ محليًا
+# المسار إلى النموذج المحفوظ محليًا
+model_name = "D:\\HealthVision\\backend\\Models_ai\\flan-t5-large"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
 
@@ -138,7 +139,8 @@ diagnosis = DiagnosisInfo()
 
 # دالة لتوليد الاستجابة من النموذج
 def generate_response(prompt: str):
-    inputs = tokenizer(prompt, return_tensors="pt", padding=True, truncation=True)
+    inputs = tokenizer(prompt, return_tensors="pt",
+                       padding=True, truncation=True)
     outputs = model.generate(**inputs, max_length=500)
     response = tokenizer.decode(outputs[0], skip_special_tokens=True)
     return response
@@ -242,7 +244,8 @@ async def chat(request: ChatRequest):
 
     if is_info_request:
         disease_name = (
-            request.message.replace("Provide information and treatments for", "")
+            request.message.replace(
+                "Provide information and treatments for", "")
             .replace("Provide information for", "")
             .strip()
         )

@@ -131,6 +131,8 @@ dist
 
 # AI models
 *.h5
+.venv
+Models_ai/
 
 # # Upload directories
 # backend/public/uploads/*
