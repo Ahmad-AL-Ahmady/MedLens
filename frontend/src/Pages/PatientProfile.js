@@ -1,10 +1,9 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import {
   Mail,
   Calendar,
   User,
+  Activity,
   Stethoscope,
   ClipboardList,
   ScanBarcode,
@@ -327,8 +326,8 @@ export default function PatientProfile() {
       ) : (
         <div className="patient-profile">
           {/* Personal Data */}
-          <div className="patient-profile-header">
-            <div className="patient-header-top">
+          <div className="patient-profile-edit-icon">
+            <div className="patient-profile-header">
               <div className="patient-profile-image-container">
                 <img
                   src={
@@ -338,7 +337,7 @@ export default function PatientProfile() {
                         }`
                       : "http://localhost:4000/public/uploads/users/default.jpg"
                   }
-                  alt="Patient"
+                  alt=" Patient"
                   className="patient-profile-image"
                 />
                 {!id && (
@@ -383,7 +382,7 @@ export default function PatientProfile() {
               <div className="patient-profile-info">
                 <h1>{`${patientData.firstName} ${patientData.lastName}`}</h1>
                 <p className="email">
-                  <Mail size={16} color="#1e56cf" />
+                  <Mail size={16} color="#1f61a8" />
                   {patientData.email}
                 </p>
                 <div className="patient-extra-info">
@@ -396,59 +395,65 @@ export default function PatientProfile() {
                   </p>
                 </div>
               </div>
-              <button
-                onClick={() => setShowEditForm(true)}
-                className="edit-patient-profile-button"
-              >
-                <Edit size={15} color="white" />
-                Edit Profile
-              </button>
+              <div className="patient-profile-edit-btn">
+                <button
+                  onClick={() => setShowEditForm(true)}
+                  className="edit-patient-profile-button"
+                >
+                  <Edit size={15} color="white" />
+                  Edit Profile
+                </button>
+              </div>
             </div>
+          </div>
 
-            {/* Summary Cards */}
-            <div className="patient-profile-summary-cards">
-              <div className="patient-profile-card">
-                <Stethoscope size={16} color="#1f61a8" />
-                <h3>{patientData.visits || 0}</h3>
-                <p>Visits</p>
-              </div>
-              <div className="patient-profile-card">
-                <Calendar size={16} color="#1f61a8" />
-                <h3>
-                  {patientData.profile.createdAt
-                    ? (() => {
-                        const now = new Date();
-                        const createdDate = new Date(
-                          patientData.profile.createdAt
-                        );
-                        const years =
-                          now.getFullYear() - createdDate.getFullYear();
-                        const months = now.getMonth() - createdDate.getMonth();
+          {/* Summary Cards */}
+          <div className="patient-profile-summary-cards">
+            <div className="patient-profile-card">
+              <Stethoscope size={16} color="#1f61a8" />
+              <h3>{patientData.visits || 0}</h3>
+              <p>Visits</p>
+            </div>
+            <div className="patient-profile-card">
+              <Calendar size={16} color="green" />
+              <h3>
+                {patientData.profile.createdAt
+                  ? (() => {
+                      const now = new Date();
+                      const createdDate = new Date(
+                        patientData.profile.createdAt
+                      );
+                      const years =
+                        now.getFullYear() - createdDate.getFullYear();
+                      const months = now.getMonth() - createdDate.getMonth();
 
-                        if (years > 0) {
-                          return years === 1 ? "1 year" : `${years} years`;
-                        } else if (months > 0) {
-                          return months === 1 ? "1 month" : `${months} months`;
-                        } else {
-                          return "< 1 month";
-                        }
-                      })()
-                    : "N/A"}
-                </h3>
-                <p>Patient Since</p>
-              </div>
-              <div className="patient-profile-card">
-                <ClipboardList size={16} color="#1f61a8" />
-                <h3>{patientData.reports || 0}</h3>
-                <p>Reports</p>
-              </div>
+                      if (years > 0) {
+                        return years === 1
+                          ? "Joined 1 year ago"
+                          : `Joined ${years} years ago`;
+                      } else if (months > 0) {
+                        return months === 1
+                          ? "Joined 1 month ago"
+                          : `Joined ${months} months ago`;
+                      } else {
+                        return "Joined less than a month ago";
+                      }
+                    })()
+                  : "N/A"}
+              </h3>
+              <p>Patient Since</p>
+            </div>
+            <div className="patient-profile-card">
+              <ClipboardList size={16} color="#1f61a8" />
+              <h3>{patientData.reports || 0}</h3>
+              <p>Reports</p>
             </div>
           </div>
 
           {/* Past Scans */}
           <div className="patient-profile-scan-section">
             <h2>
-              <ScanBarcode size={20} color="#1e40af" />
+              <ScanBarcode size={15} color="#1f61a8" />
               Scans
             </h2>
             <table className="patient-profile-data-table">
@@ -484,7 +489,7 @@ export default function PatientProfile() {
           {/* Past Appointments */}
           <div className="patient-profile-scan-section">
             <h2>
-              <Calendar size={20} color="#1e40af" />
+              <Calendar size={15} color="#1f61a8" />
               Appointments
             </h2>
             <table className="patient-profile-data-table">
