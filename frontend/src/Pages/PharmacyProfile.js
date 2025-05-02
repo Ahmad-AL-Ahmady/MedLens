@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from "react";
+"use client";
+
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Mail, Clock, ThumbsUp, Star, Calendar, Edit } from "lucide-react";
+import { Mail, Phone, ThumbsUp, Star, Calendar, Edit } from "lucide-react";
+import Swal from "sweetalert2";
 import "../Styles/PharmacyProfile.css";
 
 const PharmacyProfile = () => {
@@ -17,38 +20,32 @@ const PharmacyProfile = () => {
     firstName: "",
     lastName: "",
     email: "",
-    phoneNumber: "",
-    locationName: "",
-    formattedAddress: "",
-    city: "",
-    state: "",
-    country: "",
-    operatingHours: {
-      Monday: { isOpen: false, startTime: "", endTime: "" },
-      Tuesday: { isOpen: false, startTime: "", endTime: "" },
-      Wednesday: { isOpen: false, startTime: "", endTime: "" },
-      Thursday: { isOpen: false, startTime: "", endTime: "" },
-      Friday: { isOpen: false, startTime: "", endTime: "" },
-      Saturday: { isOpen: false, startTime: "", endTime: "" },
-      Sunday: { isOpen: false, startTime: "", endTime: "" },
+    profile: {
+      phoneNumber: "",
+      locationName: "",
+      formattedAddress: "",
+      city: "",
+      state: "",
+      country: "",
     },
-    // operatingHours: {},
-    avatar: "",
   });
 
   const token =
     localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
 
   const fetchPharmacyProfile = async () => {
-    const token =
-      localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
-    if (!token) {
-      console.error("No token found");
-      setError("No token found");
-      setLoading(false);
-      return;
-    }
     try {
+      Swal.fire({
+        title: "Loading...",
+        text: "Fetching pharmacy profile",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
       const response = await fetch(
         "http://localhost:4000/api/pharmacies/profile",
         {
@@ -63,54 +60,35 @@ const PharmacyProfile = () => {
       }
 
       const data = await response.json();
-      //console.log("Pharmacy profile data:", data);
-      setFormData(data.data);
       if (data.status === "success" && data.data) {
-        const defaultOperatingHours = {
-          Monday: { isOpen: false, startTime: "", endTime: "" },
-          Tuesday: { isOpen: false, startTime: "", endTime: "" },
-          Wednesday: { isOpen: false, startTime: "", endTime: "" },
-          Thursday: { isOpen: false, startTime: "", endTime: "" },
-          Friday: { isOpen: false, startTime: "", endTime: "" },
-          Saturday: { isOpen: false, startTime: "", endTime: "" },
-          Sunday: { isOpen: false, startTime: "", endTime: "" },
-        };
-
-        const rawOperatingHours = data.data.profile?.operatingHours || {};
-        const formattedOperatingHours = {};
-
-        Object.entries(defaultOperatingHours).forEach(([day, defaults]) => {
-          const lowerDay = day.toLowerCase();
-          const backendDay = rawOperatingHours[lowerDay] || {};
-          formattedOperatingHours[day] = {
-            isOpen: backendDay.isOpen || false,
-            startTime: backendDay.open || "",
-            endTime: backendDay.close || "",
-          };
-        });
-
         setPharmacy(data.data);
         setProfile(data.data.profile);
         setFormData({
           firstName: data.data.firstName || "",
           lastName: data.data.lastName || "",
           email: data.data.email || "",
-          phoneNumber: data.data.profile?.phoneNumber || "",
-          locationName: data.data.profile?.locationName || "",
-          formattedAddress: data.data.profile?.formattedAddress || "",
-          city: data.data.profile?.city || "",
-          state: data.data.profile?.state || "",
-          country: data.data.profile?.country || "",
-          operatingHours: formattedOperatingHours,
-          avatar: data.data?.avatar || null,
-          //avatar: null,
+          profile: {
+            phoneNumber: data.data.profile?.phoneNumber || "",
+            locationName: data.data.profile?.locationName || "",
+            formattedAddress: data.data.profile?.formattedAddress || "",
+            city: data.data.profile?.city || "",
+            state: data.data.profile?.state || "",
+            country: data.data.profile?.country || "",
+          },
         });
+        Swal.close();
       } else {
-        setError("Failed to fetch pharmacy data");
+        throw new Error("Failed to fetch pharmacy data");
       }
     } catch (error) {
       console.error("Error fetching pharmacy profile:", error);
-      setError("Error fetching pharmacy profile");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "Error fetching pharmacy profile",
+        confirmButtonColor: "#3b82f6",
+      });
+      setError(error.message || "Error fetching pharmacy profile");
     } finally {
       setLoading(false);
     }
@@ -128,61 +106,80 @@ const PharmacyProfile = () => {
   }, [token]);
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === "avatar") {
-      setFormData({ ...formData, avatar: files[0] });
+    const { name, value } = e.target;
+
+    // Check if the field belongs to the profile object
+    const profileFields = [
+      "phoneNumber",
+      "locationName",
+      "formattedAddress",
+      "city",
+      "state",
+      "country",
+    ];
+
+    if (profileFields.includes(name)) {
+      setFormData((prev) => ({
+        ...prev,
+        profile: {
+          ...prev.profile,
+          [name]: value,
+        },
+      }));
     } else {
-      setFormData({ ...formData, [name]: value });
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    //console.log("Submitting formData:", formData);
-    const form = new FormData();
 
-    const transformedOperatingHours = {};
-    Object.entries(formData.operatingHours).forEach(([day, value]) => {
-      const lowerDay = day.toLowerCase();
-
-      // send only days that have values or are open
-      if (value.isOpen || value.startTime || value.endTime) {
-        transformedOperatingHours[lowerDay] = {
-          isOpen: value.isOpen,
-          open: value.isOpen ? value.startTime : "",
-          close: value.isOpen ? value.endTime : "",
-        };
-      }
+    Swal.fire({
+      title: "Updating profile...",
+      text: "Please wait while we update your profile",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      showConfirmButton: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
     });
-
-    //console.log("Final Operating Hours being sent:", transformedOperatingHours);
-
-    form.append("operatingHours", JSON.stringify(transformedOperatingHours));
-    for (const key in formData) {
-      if (key === "operatingHours") continue;
-      if (formData[key]) form.append(key, formData[key]);
-    }
 
     try {
       const res = await fetch("http://localhost:4000/api/pharmacies/profile", {
         method: "PATCH",
-        headers: { Authorization: `Bearer ${token}` },
-        body: form,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
       });
 
       const result = await res.json();
-      //console.log("Update result:", result);
 
       if (result.status === "success") {
-        alert("Profile updated!");
-        await fetchPharmacyProfile(); // Refresh the profile data
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "Profile updated successfully!",
+          confirmButtonColor: "#3b82f6",
+        });
+        await fetchPharmacyProfile();
         setShowEditForm(false);
       } else {
-        alert("Failed to update profile");
+        throw new Error(result.message || "Failed to update profile");
       }
     } catch (err) {
       console.error(err);
-      alert("An error occurred");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: err.message || "An error occurred while updating profile",
+        confirmButtonColor: "#3b82f6",
+      });
     }
   };
 
@@ -194,6 +191,17 @@ const PharmacyProfile = () => {
       formData.append("avatar", file);
 
       try {
+        Swal.fire({
+          title: "Uploading...",
+          text: "Please wait while we upload your avatar",
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          showConfirmButton: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
         const response = await fetch(
           "http://localhost:4000/api/users/updateAvatar",
           {
@@ -207,15 +215,30 @@ const PharmacyProfile = () => {
 
         if (response.ok) {
           const data = await response.json();
-          // console.log("Avatar updated successfully!", data);
-          alert("Avatar updated successfully!");
-          setSelectedImage(URL.createObjectURL(file));
-          await fetchPharmacyProfile();
+          Swal.fire({
+            icon: "success",
+            title: "Success!",
+            text: "Avatar updated successfully!",
+            confirmButtonColor: "#3b82f6",
+          }).then(() => {
+            window.location.reload();
+          });
         } else {
-          console.error("Failed to update avatar");
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Failed to update avatar",
+            confirmButtonColor: "#3b82f6",
+          });
         }
       } catch (error) {
         console.error("Error:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "An error occurred while updating avatar",
+          confirmButtonColor: "#3b82f6",
+        });
       }
     }
   };
@@ -225,28 +248,66 @@ const PharmacyProfile = () => {
   };
 
   const handleDeleteAvatar = async () => {
-    if (window.confirm("Do you want to delete your avatar?")) {
-      try {
-        const response = await fetch(
-          "http://localhost:4000/api/users/deleteAvatar",
-          {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${token}`,
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to delete your avatar?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3b82f6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          Swal.fire({
+            title: "Deleting...",
+            text: "Please wait while we delete your avatar",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: () => {
+              Swal.showLoading();
             },
-          }
-        );
+          });
 
-        if (response.ok) {
-          alert("Avatar deleted successfully!");
-          setSelectedImage(null);
-        } else {
-          console.error("Failed to delete avatar");
+          const response = await fetch(
+            "http://localhost:4000/api/users/deleteAvatar",
+            {
+              method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (response.ok) {
+            Swal.fire({
+              icon: "success",
+              title: "Success!",
+              text: "Avatar deleted successfully!",
+              confirmButtonColor: "#3b82f6",
+            }).then(() => {
+              window.location.reload();
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "Failed to delete avatar",
+              confirmButtonColor: "#3b82f6",
+            });
+          }
+        } catch (error) {
+          console.error("Error while deleting avatar:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "An error occurred while deleting avatar",
+            confirmButtonColor: "#3b82f6",
+          });
         }
-      } catch (error) {
-        console.error("Error while deleting avatar:", error);
       }
-    }
+    });
   };
 
   if (loading) return <p>Loading...</p>;
@@ -256,189 +317,150 @@ const PharmacyProfile = () => {
     return <p>No pharmacy profile found.</p>;
   }
 
+  // Update the JSX structure to match the doctor profile layout
   return (
     <div className="pharmacy-profile-container">
       {showEditForm ? (
-        <form
-          onSubmit={handleSubmit}
-          className="edit-profile-form full-page-form"
-        >
-          <h2>Update Your Profile</h2>
-          <div className="form-group">
-            <label htmlFor="firstName">First Name</label>
-            <input
-              type="text"
-              name="firstName"
-              placeholder="First Name"
-              value={formData.firstName}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="lastName">Last Name</label>
-            <input
-              type="text"
-              name="lastName"
-              placeholder="Last Name"
-              value={formData.lastName}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="phoneNumber">Phone Number</label>
-            <input
-              type="text"
-              name="phoneNumber"
-              placeholder="Phone Number"
-              value={formData.phoneNumber}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="locationName">Location Name</label>
-            <input
-              type="text"
-              name="locationName"
-              placeholder="Location Name"
-              value={formData.locationName}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="formattedAddress">Formatted Address</label>
-            <input
-              type="text"
-              name="formattedAddress"
-              placeholder="Formatted Address"
-              value={formData.formattedAddress}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="city">City</label>
-            <input
-              type="text"
-              name="city"
-              placeholder="City"
-              value={formData.city}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="state">State</label>
-            <input
-              type="text"
-              name="state"
-              placeholder="State"
-              value={formData.state}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="country">Country</label>
-            <input
-              type="text"
-              name="country"
-              placeholder="Country"
-              value={formData.country}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="operating-hours-edit">
-            <h3>Operating Hours</h3>
-            {Object.entries(formData.operatingHours).map(([day, info]) => (
-              <div key={day} className="day-row">
-                <label className="day-label">
-                  {day.charAt(0).toUpperCase() + day.slice(1)}:
-                </label>
+        <div className="edit-profile-form-container">
+          <form onSubmit={handleSubmit} className="edit-profile-form">
+            <h2>Update Your Profile</h2>
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="firstName">First Name</label>
                 <input
-                  type="checkbox"
-                  checked={info.isOpen}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      operatingHours: {
-                        ...formData.operatingHours,
-                        [day]: {
-                          ...formData.operatingHours[day],
-                          isOpen: e.target.checked,
-                        },
-                      },
-                    })
-                  }
+                  type="text"
+                  id="firstName"
+                  name="firstName"
+                  placeholder="First Name"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  required
                 />
-
-                {info.isOpen && (
-                  <>
-                    <input
-                      type="time"
-                      value={info.startTime}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          operatingHours: {
-                            ...formData.operatingHours,
-                            [day]: {
-                              ...formData.operatingHours[day],
-                              startTime: e.target.value,
-                            },
-                          },
-                        })
-                      }
-                    />
-                    <input
-                      type="time"
-                      value={info.endTime}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          operatingHours: {
-                            ...formData.operatingHours,
-                            [day]: {
-                              ...formData.operatingHours[day],
-                              endTime: e.target.value,
-                            },
-                          },
-                        })
-                      }
-                    />
-                  </>
-                )}
               </div>
-            ))}
-          </div>
-          <div className="form-btns">
-            <button type="submit" className="save-btn">
-              Save Changes
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowEditForm(false)}
-              className="cancel-btn"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
+              <div className="form-group">
+                <label htmlFor="lastName">Last Name</label>
+                <input
+                  type="text"
+                  id="lastName"
+                  name="lastName"
+                  placeholder="Last Name"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="email">Email</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder="Email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="phoneNumber">Phone Number</label>
+                <input
+                  type="tel"
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  placeholder="Phone Number"
+                  value={formData.profile.phoneNumber}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="form-group full-width">
+              <label htmlFor="locationName">Location Name</label>
+              <input
+                type="text"
+                id="locationName"
+                name="locationName"
+                placeholder="Location Name"
+                value={formData.profile.locationName}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="form-group full-width">
+              <label htmlFor="formattedAddress">Formatted Address</label>
+              <input
+                type="text"
+                id="formattedAddress"
+                name="formattedAddress"
+                placeholder="Formatted Address"
+                value={formData.profile.formattedAddress}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="city">City</label>
+                <input
+                  type="text"
+                  id="city"
+                  name="city"
+                  placeholder="City"
+                  value={formData.profile.city}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="state">State</label>
+                <input
+                  type="text"
+                  id="state"
+                  name="state"
+                  placeholder="State"
+                  value={formData.profile.state}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="country">Country</label>
+                <input
+                  type="text"
+                  id="country"
+                  name="country"
+                  placeholder="Country"
+                  value={formData.profile.country}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="form-btns">
+              <button type="submit" className="save-btn">
+                Save Changes
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowEditForm(false)}
+                className="cancel-btn"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
       ) : (
         <>
           <div className="pharmacy-profile-header">
             <div className="pharmacy-header-top">
-              {/* {console.log(
-                "Debugging avatar source:",
-                http://localhost:4000/public/uploads/users/${pharmacy.avatar}
-              )} */}
               <div className="pharmacy-profile-image-container">
                 <img
                   src={
@@ -491,73 +513,19 @@ const PharmacyProfile = () => {
                 />
               </div>
               <div className="pharmacy-profile-info">
-                <div className="pharmacy-profile-info-text">
-                  <h1 className="pharmacy-profile-name">
-                    {pharmacy.firstName} {pharmacy.lastName}
-                  </h1>
-                  <p className="pharmacy-profile-usertype">Pharmacist</p>
-                </div>
-                <div className="top-right-buttons">
+                <h1 className="pharmacy-profile-name">
+                  {pharmacy.firstName} {pharmacy.lastName}
+                </h1>
+                <p className="pharmacy-profile-usertype">Pharmacist</p>
+                <div className="pharmacy-profile-details">
                   <p className="pharmacy-profile-email">
                     <Mail size={16} color="#1e56cf" />
                     {pharmacy.email}
                   </p>
-                  <p
-                    className="operating-hours-text"
-                    onClick={() => setIsModalOpen(true)}
-                    style={{
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.8px",
-                    }}
-                  >
-                    <Clock size={15} color="#1e56cf" />
-                    Operating Hours
+                  <p className="pharmacy-profile-phone">
+                    <Phone size={16} color="#1e56cf" />
+                    {profile?.phoneNumber || "No phone number provided"}
                   </p>
-
-                  {isModalOpen && (
-                    <>
-                      <div
-                        className="modal-overlay"
-                        onClick={() => setIsModalOpen(false)}
-                      ></div>
-                      <div className="modal-content">
-                        <span
-                          className="close-btn"
-                          onClick={() => setIsModalOpen(false)}
-                        >
-                          &times;
-                        </span>
-                        <h2>Operating Hours</h2>
-                        <div className="operating-hours-grid">
-                          {profile?.operatingHours ? (
-                            Object.entries(profile.operatingHours).map(
-                              ([day, info]) => (
-                                <div key={day} className="operating-hours-item">
-                                  <span className="day">
-                                    {day.charAt(0).toUpperCase() + day.slice(1)}
-                                    :
-                                  </span>
-                                  <span
-                                    className={`status ${
-                                      info.isOpen ? "open" : "closed"
-                                    }`}
-                                  >
-                                    {info.isOpen
-                                      ? `${info.startTime} - ${info.endTime}`
-                                      : "Closed"}
-                                  </span>
-                                </div>
-                              )
-                            )
-                          ) : (
-                            <p>No operating hours available</p>
-                          )}
-                        </div>
-                      </div>
-                    </>
-                  )}
                 </div>
               </div>
               <button
@@ -573,7 +541,7 @@ const PharmacyProfile = () => {
             <div className="pharmacy-profile-stats">
               <div className="pharmacy-profile-card">
                 <Calendar size={16} color="#1f61a8" />
-                <h3 className="pharmacy-profile-card-title">
+                <span>
                   {profile?.createdAt
                     ? (() => {
                         const now = new Date();
@@ -583,19 +551,15 @@ const PharmacyProfile = () => {
                         const months = now.getMonth() - createdDate.getMonth();
 
                         if (years > 0) {
-                          return years === 1
-                            ? "Joined 1 year ago"
-                            : `Joined ${years} years ago`;
+                          return years === 1 ? "1 year" : `${years} years`;
                         } else if (months > 0) {
-                          return months === 1
-                            ? "Joined 1 month ago"
-                            : `Joined ${months} months ago`;
+                          return months === 1 ? "1 month" : `${months} months`;
                         } else {
-                          return "Joined less than a month ago";
+                          return "< 1 month";
                         }
                       })()
                     : "N/A"}
-                </h3>
+                </span>
                 <p>Pharmacy Since</p>
               </div>
               <div className="pharmacy-profile-card">
@@ -630,9 +594,9 @@ const PharmacyProfile = () => {
               profile.reviews.map((review) => (
                 <div key={review._id} className="pharmacy-profile-review">
                   <p>
-                    <strong>{review.user?.name || "Anonymous"}</strong> -{" "}
-                    {review.comment}
+                    <strong>{review.user?.name || "Anonymous"}</strong>
                   </p>
+                  <p>{review.comment}</p>
                   <span className="pharmacy-profile-rating">
                     ⭐️ {review.rating}
                   </span>
