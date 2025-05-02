@@ -136,12 +136,14 @@ export default function HomePage() {
           </div>
 
           <div className="home-nav-buttons">
-            {["Services", "About Us", "Careers", "News"].map((item) => (
+            {["Services", "About Us"].map((item) => (
               <button
                 key={item}
                 className="home-nav-button"
                 onClick={() =>
-                  navigate(`/${item.toLowerCase().replace(" ", "-")}`)
+                  navigate(
+                    item === "About Us" ? "/aboutuspage" : "/servicespage"
+                  )
                 }
               >
                 {item}

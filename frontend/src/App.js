@@ -20,6 +20,8 @@ import DoctorProfile from "./Pages/DoctorProfile";
 import PharmacyProfile from "./Pages/PharmacyProfile";
 import AuthenticatedRoute from "./components/AuthenticatedRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AboutUsPage from "./Pages/AboutUsPage";
+import ServicesPage from "./Pages/ServicesPage";
 
 function App() {
   return (
@@ -32,6 +34,9 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/confirm-code" element={<ConfirmResetCode />} />
         <Route path="/new-password" element={<NewPassword />} />
+        <Route path="/aboutuspage" element={<AboutUsPage />} />
+        <Route path="/servicespage" element={<ServicesPage />} />
+
         <Route
           path="/verify-email-instructions"
           element={<VerifyEmailInstructions />}
