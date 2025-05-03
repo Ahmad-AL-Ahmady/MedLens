@@ -19,7 +19,6 @@
   --shadow-sm: 0 2px 8px rgba(31, 97, 168, 0.1);
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
 /* Navbar styles */
 .home-navbar {
   width: 100%;
@@ -40,11 +39,11 @@
   max-width: 90%;
   margin: 0 auto;
   display: flex;
-  flex-direction: row; /* Ensure horizontal layout */
-  align-items: center; /* Vertically center items */
-  justify-content: space-between; /* Space between logo and hamburger */
-  gap: 0.5rem; /* Minimal gap */
-  flex-wrap: nowrap; /* Prevent wrapping */
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
 }
 
 .home-logo {
@@ -53,7 +52,7 @@
   gap: 0.5rem;
   cursor: pointer;
   transition: transform 0.3s ease;
-  flex-shrink: 0; /* Prevent logo from shrinking */
+  flex-shrink: 0;
 }
 
 .home-logo:hover {
@@ -205,7 +204,7 @@
   color: var(--text-secondary);
   padding: 0.5rem;
   transition: var(--transition);
-  flex-shrink: 0; /* Prevent button from shrinking */
+  flex-shrink: 0;
 }
 
 .mobile-menu-button:hover {
@@ -247,7 +246,6 @@
 
   .home-nav-content {
     max-width: 80%;
-    flex-direction: row;
   }
 
   .home-logo-text {
@@ -284,6 +282,8 @@
 
   .home-nav-content {
     max-width: 1000px;
+    justify-content: space-between;
+    gap: 1rem;
   }
 
   .home-logo-text {
@@ -296,7 +296,7 @@
   }
 
   .home-nav-buttons {
-    display: flex; /* Show on tablets and above */
+    display: flex;
     position: static;
     width: auto;
     height: auto;
@@ -307,6 +307,15 @@
     padding: 0;
     transform: none;
     z-index: auto;
+  }
+
+  /* Ensure Services and About Us are centered together */
+  .home-nav-buttons .home-nav-button:nth-child(1) {
+    margin-right: 0.25rem;
+  }
+
+  .home-nav-buttons .home-nav-button:nth-child(2) {
+    margin-left: 0.25rem;
   }
 
   .home-nav-button {
@@ -327,11 +336,12 @@
   .home-contact-btn {
     width: auto;
     max-width: none;
+    margin-left: auto; /* Push Login to the right */
   }
 
   .mobile-menu-button,
   .mobile-close-button {
-    display: none; /* Hide hamburger and close buttons */
+    display: none;
   }
 }
 
@@ -340,12 +350,60 @@
   .home-nav-content {
     max-width: 1200px;
   }
+
+  .home-nav-buttons {
+    justify-content: center;
+    gap: 1.75rem;
+  }
+
+  .home-nav-buttons .home-nav-button:nth-child(1) {
+    margin-right: 0.25rem;
+  }
+
+  .home-nav-buttons .home-nav-button:nth-child(2) {
+    margin-left: 0.25rem;
+  }
+
+  .home-contact-btn {
+    padding: 0.75rem 2rem;
+    font-size: 1.1rem;
+    margin-left: auto;
+  }
+
+  .home-contact-btn svg {
+    width: 20px;
+    height: 20px;
+  }
 }
 
 /* Extra-large devices (large desktops, 1200px and up) */
 @media (min-width: 1200px) {
   .home-nav-content {
     max-width: 1440px;
+  }
+
+  .home-nav-buttons {
+    justify-content: center;
+    gap: 2rem;
+  }
+
+  .home-nav-buttons .home-nav-button:nth-child(1) {
+    margin-right: 0.25rem;
+  }
+
+  .home-nav-buttons .home-nav-button:nth-child(2) {
+    margin-left: 0.25rem;
+  }
+
+  .home-contact-btn {
+    padding: 0.75rem 2rem;
+    font-size: 1.1rem;
+    margin-left: auto;
+  }
+
+  .home-contact-btn svg {
+    width: 20px;
+    height: 20px;
   }
 }
 
@@ -377,13 +435,11 @@
   }
 }
 
-/* Base styles (Mobile-first) */
-
 /* Hero Section */
 .home-hero {
   position: relative;
   width: 100%;
-  min-height: 80vh; /* Reduced for mobile */
+  min-height: 80vh;
   display: flex;
   align-items: center;
   overflow: hidden;
@@ -571,76 +627,8 @@
   transform: translateX(3px);
 }
 
-/* Navbar (included due to dependency in provided breakpoints) */
-.home-navbar {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 10;
-  background: transparent;
-}
-
-.home-navbar.scrolled {
-  padding: 0.5rem 1rem;
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-}
-
-.home-nav-content {
-  max-width: 90%;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: 0.5rem;
-}
-
-.home-logo-text {
-  font-size: 1.25rem;
-  font-weight: 700;
-  background: linear-gradient(to right, #e0f2fe 0%, #93c5fd 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  letter-spacing: -0.02em;
-}
-
-.home-nav-buttons {
-  display: none; /* Hidden by default on mobile */
-}
-
-.home-contact-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-  color: white;
-  padding: 0.6rem 1.5rem;
-  border-radius: 25px;
-  border: none;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 2px 12px rgba(37, 99, 235, 0.2);
-}
-
-.home-contact-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.3);
-}
-
-.home-contact-btn svg {
-  width: 16px;
-  height: 16px;
-}
-
 /* Small devices (landscape phones, 576px and up) */
 @media (min-width: 576px) {
-  /* Hero Section */
   .home-hero {
     min-height: 85vh;
   }
@@ -668,34 +656,10 @@
     width: 22px;
     height: 22px;
   }
-
-  /* Navbar */
-  .home-navbar {
-    padding: 1rem 1.5rem;
-  }
-
-  .home-nav-content {
-    max-width: 80%;
-  }
-
-  .home-logo-text {
-    font-size: 1.5rem;
-  }
-
-  .home-contact-btn {
-    padding: 0.75rem 1.75rem;
-    font-size: 1rem;
-  }
-
-  .home-contact-btn svg {
-    width: 18px;
-    height: 18px;
-  }
 }
 
 /* Medium devices (tablets, 768px and up) */
 @media (min-width: 768px) {
-  /* Hero Section */
   .home-hero {
     min-height: 90vh;
   }
@@ -731,26 +695,10 @@
     padding: 1.25rem 2.5rem;
     margin-top: 3rem;
   }
-
-  /* Navbar */
-  .home-nav-content {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-  }
-
-  .home-nav-buttons {
-    display: flex;
-    gap: 1.25rem;
-    flex-grow: 1;
-    justify-content: center;
-  }
 }
 
 /* Large devices (desktops, 992px and up) */
 @media (min-width: 992px) {
-  /* Hero Section */
   .home-hero {
     min-height: 100vh;
   }
@@ -782,30 +730,10 @@
     width: 24px;
     height: 24px;
   }
-
-  /* Navbar */
-  .home-navbar {
-    padding: 1.5rem 2.5rem;
-  }
-
-  .home-nav-buttons {
-    gap: 1.75rem;
-  }
-
-  .home-contact-btn {
-    padding: 0.75rem 2rem;
-    font-size: 1.1rem;
-  }
-
-  .home-contact-btn svg {
-    width: 20px;
-    height: 20px;
-  }
 }
 
 /* Extra-large devices (large desktops, 1200px and up) */
 @media (min-width: 1200px) {
-  /* Hero Section */
   .home-hero-content {
     padding: 2rem 4rem;
   }
@@ -818,19 +746,6 @@
   .home-hero-content h1::after {
     width: 100px;
     height: 4px;
-  }
-
-  /* Navbar */
-  .home-navbar {
-    padding: 1.5rem 4rem;
-  }
-
-  .home-nav-content {
-    max-width: 1440px;
-  }
-
-  .home-nav-buttons {
-    gap: 2rem;
   }
 }
 
