@@ -22,7 +22,7 @@ app.add_middleware(
 
 # تحميل النموذج من HuggingFace
 # المسار إلى النموذج المحفوظ محليًا
-model_name = "D:\\HealthVision\\backend\\Models_ai\\flan-t5-large"
+model_name = "C:\\Users\\user\\Documents\\GitHub\\HealthVision\\flan-t5-large"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
 
