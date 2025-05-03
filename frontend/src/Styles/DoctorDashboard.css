@@ -406,23 +406,9 @@
 }
 
 /* Responsive Design */
-@media (max-width: 1200px) {
-  .doctor-dashboard-container {
-    padding: var(--spacing-md);
-  }
-}
 
-@media (max-width: 992px) {
-  .doctor-dashboard-stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .doctor-dashboard-appointments-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 768px) {
+/* Mobile Very Small: max-width 349px */
+@media (max-width: 349px) {
   .doctor-dashboard-container {
     padding: var(--spacing-sm);
   }
@@ -430,15 +416,125 @@
   .doctor-dashboard-profile-header {
     flex-direction: column;
     align-items: flex-start;
+    padding: var(--spacing-md);
+  }
+
+  .doctor-dashboard-profile-image {
+    width: 64px;
+    height: 64px;
+  }
+
+  .doctor-dashboard-profile-name {
+    font-size: 1.25rem;
+  }
+
+  .doctor-dashboard-profile-email {
+    font-size: 0.9rem;
+  }
+
+  .doctor-dashboard-stats-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+
+  .doctor-dashboard-appointments-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+
+  .doctor-dashboard-card {
+    padding: var(--spacing-md);
+  }
+
+  .doctor-dashboard-card__value {
+    font-size: 1.75rem;
+  }
+
+  .doctor-dashboard-card__title {
+    font-size: 1rem;
+  }
+
+  .doctor-dashboard-card__icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .doctor-dashboard-appointment-card {
+    padding: var(--spacing-md);
+  }
+
+  .doctor-dashboard-patient-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .doctor-dashboard-patient-name {
+    font-size: 1rem;
+  }
+
+  .doctor-dashboard-title {
+    font-size: 1.2rem;
   }
 
   .doctor-dashboard-header {
     flex-direction: column;
     align-items: flex-start;
   }
+
+  .doctor-dashboard-retry-button {
+    padding: 0.5rem var(--spacing-sm);
+    font-size: 0.85rem;
+  }
+
+  .doctor-dashboard-skeleton__header {
+    height: 80px;
+    width: 60%;
+  }
+
+  .doctor-dashboard-skeleton__card {
+    height: 120px;
+  }
+
+  .doctor-dashboard-skeleton__appointment {
+    height: 100px;
+  }
 }
 
-@media (max-width: 576px) {
+/* Mobile Small: 350px - 480px */
+@media (min-width: 350px) and (max-width: 480px) {
+  .doctor-dashboard-container {
+    padding: var(--spacing-sm);
+  }
+
+  .doctor-dashboard-profile-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--spacing-md);
+  }
+
+  .doctor-dashboard-profile-image {
+    width: 72px;
+    height: 72px;
+  }
+
+  .doctor-dashboard-profile-name {
+    font-size: 1.5rem;
+  }
+
+  .doctor-dashboard-profile-email {
+    font-size: 0.95rem;
+  }
+
+  .doctor-dashboard-stats-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+
+  .doctor-dashboard-appointments-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+
   .doctor-dashboard-card {
     padding: var(--spacing-md);
   }
@@ -447,16 +543,299 @@
     font-size: 2rem;
   }
 
-  .doctor-dashboard-profile-name {
-    font-size: 1.5rem;
+  .doctor-dashboard-card__title {
+    font-size: 1.05rem;
   }
 
-  .doctor-dashboard-title {
-    font-size: 1.35rem;
+  .doctor-dashboard-card__icon {
+    width: 44px;
+    height: 44px;
   }
 
   .doctor-dashboard-appointment-card {
     padding: var(--spacing-md);
+  }
+
+  .doctor-dashboard-patient-avatar {
+    width: 44px;
+    height: 44px;
+  }
+
+  .doctor-dashboard-patient-name {
+    font-size: 1.05rem;
+  }
+
+  .doctor-dashboard-title {
+    font-size: 1.3rem;
+  }
+
+  .doctor-dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .doctor-dashboard-retry-button {
+    padding: 0.6rem var(--spacing-md);
+    font-size: 0.9rem;
+  }
+
+  .doctor-dashboard-skeleton__header {
+    height: 90px;
+    width: 55%;
+  }
+
+  .doctor-dashboard-skeleton__card {
+    height: 130px;
+  }
+
+  .doctor-dashboard-skeleton__appointment {
+    height: 110px;
+  }
+}
+
+/* Mobile Large: 481px - 768px */
+@media (min-width: 481px) and (max-width: 768px) {
+  .doctor-dashboard-container {
+    padding: var(--spacing-md);
+  }
+
+  .doctor-dashboard-profile-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--spacing-lg);
+  }
+
+  .doctor-dashboard-profile-image {
+    width: 80px;
+    height: 80px;
+  }
+
+  .doctor-dashboard-profile-name {
+    font-size: 1.6rem;
+  }
+
+  .doctor-dashboard-profile-email {
+    font-size: 1rem;
+  }
+
+  .doctor-dashboard-stats-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+  }
+
+  .doctor-dashboard-appointments-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+  }
+
+  .doctor-dashboard-card {
+    padding: var(--spacing-lg);
+  }
+
+  .doctor-dashboard-card__value {
+    font-size: 2.25rem;
+  }
+
+  .doctor-dashboard-card__title {
+    font-size: 1.1rem;
+  }
+
+  .doctor-dashboard-card__icon {
+    width: 46px;
+    height: 46px;
+  }
+
+  .doctor-dashboard-appointment-card {
+    padding: var(--spacing-lg);
+  }
+
+  .doctor-dashboard-patient-avatar {
+    width: 48px;
+    height: 48px;
+  }
+
+  .doctor-dashboard-patient-name {
+    font-size: 1.1rem;
+  }
+
+  .doctor-dashboard-title {
+    font-size: 1.4rem;
+  }
+
+  .doctor-dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .doctor-dashboard-retry-button {
+    padding: 0.7rem var(--spacing-md);
+    font-size: 0.95rem;
+  }
+}
+
+/* Tablet: 769px - 1024px */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .doctor-dashboard-container {
+    padding: var(--spacing-md);
+    max-width: 960px;
+  }
+
+  .doctor-dashboard-profile-header {
+    flex-direction: row;
+    padding: var(--spacing-lg);
+  }
+
+  .doctor-dashboard-profile-image {
+    width: 84px;
+    height: 84px;
+  }
+
+  .doctor-dashboard-profile-name {
+    font-size: 1.65rem;
+  }
+
+  .doctor-dashboard-stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-md);
+  }
+
+  .doctor-dashboard-appointments-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-md);
+  }
+
+  .doctor-dashboard-card {
+    padding: var(--spacing-md);
+  }
+
+  .doctor-dashboard-card__value {
+    font-size: 2.25rem;
+  }
+
+  .doctor-dashboard-card__title {
+    font-size: 1.1rem;
+  }
+
+  .doctor-dashboard-appointment-card {
+    padding: var(--spacing-md);
+  }
+
+  .doctor-dashboard-title {
+    font-size: 1.5rem;
+  }
+
+  .doctor-dashboard-header {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+/* Laptop: 1025px - 1280px */
+@media (min-width: 1025px) and (max-width: 1280px) {
+  .doctor-dashboard-container {
+    max-width: 1200px;
+    padding: var(--spacing-lg);
+  }
+
+  .doctor-dashboard-profile-header {
+    padding: var(--spacing-lg);
+  }
+
+  .doctor-dashboard-stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+  }
+
+  .doctor-dashboard-appointments-grid {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--spacing-lg);
+  }
+
+  .doctor-dashboard-card {
+    padding: var(--spacing-lg);
+  }
+
+  .doctor-dashboard-card__value {
+    font-size: 2.5rem;
+  }
+
+  .doctor-dashboard-title {
+    font-size: 1.6rem;
+  }
+}
+
+/* Desktop: 1281px - 1536px */
+@media (min-width: 1281px) and (max-width: 1536px) {
+  .doctor-dashboard-container {
+    max-width: 1280px;
+    padding: var(--spacing-lg);
+  }
+
+  /* Default styles are sufficient, no major changes needed */
+}
+
+/* Large Desktop: min-width 1537px */
+@media (min-width: 1537px) {
+  .doctor-dashboard-container {
+    max-width: 1440px;
+    padding: var(--spacing-lg);
+  }
+
+  .doctor-dashboard-profile-image {
+    width: 96px;
+    height: 96px;
+  }
+
+  .doctor-dashboard-profile-name {
+    font-size: 1.85rem;
+  }
+
+  .doctor-dashboard-profile-email {
+    font-size: 1.1rem;
+  }
+
+  .doctor-dashboard-stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--spacing-lg);
+  }
+
+  .doctor-dashboard-appointments-grid {
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: var(--spacing-lg);
+  }
+
+  .doctor-dashboard-card {
+    padding: var(--spacing-lg);
+  }
+
+  .doctor-dashboard-card__value {
+    font-size: 2.75rem;
+  }
+
+  .doctor-dashboard-card__title {
+    font-size: 1.2rem;
+  }
+
+  .doctor-dashboard-card__icon {
+    width: 52px;
+    height: 52px;
+  }
+
+  .doctor-dashboard-appointment-card {
+    padding: var(--spacing-lg);
+  }
+
+  .doctor-dashboard-patient-avatar {
+    width: 56px;
+    height: 56px;
+  }
+
+  .doctor-dashboard-patient-name {
+    font-size: 1.2rem;
+  }
+
+  .doctor-dashboard-title {
+    font-size: 1.7rem;
   }
 }
 
