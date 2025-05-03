@@ -10,6 +10,7 @@ import {
   ScanBarcode,
   Edit,
   Lock,
+  Trash2,
 } from "lucide-react";
 import Swal from "sweetalert2";
 import "../Styles/PatientProfile.css";
@@ -127,6 +128,55 @@ export default function PatientProfile() {
         title: "Password Update Failed",
         text: error.message || "Something went wrong. Please try again later.",
       });
+    }
+  };
+
+  const handleCancelAppointment = async (appointmentId) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to cancel this appointment?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, cancel it!",
+      cancelButtonText: "No, keep it",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const response = await fetch(
+          `http://localhost:4000/api/appointments/${appointmentId}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to cancel appointment");
+        }
+
+        // Update appointments list
+        const updatedAppointments = appointments.filter(
+          (appt) => appt._id !== appointmentId
+        );
+        setAppointments(updatedAppointments);
+
+        Swal.fire({
+          icon: "success",
+          title: "Cancelled!",
+          text: "The appointment has been cancelled.",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Oops!",
+          text: "Something went wrong while cancelling the appointment. Please try again.",
+        });
+      }
     }
   };
 
@@ -639,6 +689,7 @@ export default function PatientProfile() {
                   <th>Doctor</th>
                   <th>Department</th>
                   <th>Notes</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -653,11 +704,22 @@ export default function PatientProfile() {
                       </td>
                       <td>{appointment?.doctor?.specialization || "N/A"}</td>
                       <td>{appointment?.reason || "N/A"}</td>
+                      <td>
+                        <button
+                          className="delete-appointment-button"
+                          onClick={() =>
+                            handleCancelAppointment(appointment._id)
+                          }
+                          title="Cancel Appointment"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="4">No appointments scheduled.</td>
+                    <td colSpan="5">No appointments scheduled.</td>
                   </tr>
                 )}
               </tbody>

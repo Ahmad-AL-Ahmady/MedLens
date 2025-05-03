@@ -12,6 +12,7 @@ import {
   Trash2,
   MapPin,
   User,
+  Calendar,
 } from "lucide-react";
 import Swal from "sweetalert2";
 import "../Styles/DoctorProfile.css";
@@ -534,13 +535,16 @@ const DoctorProfile = () => {
         }),
       });
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Something went wrong");
+      let data;
+      try {
+        data = await res.json();
+      } catch (jsonError) {
+        throw new Error("Can't add multiple reviews for the same entity.");
       }
 
-      const data = await res.json();
-      console.log("Review added:", data);
+      if (!res.ok) {
+        throw new Error(data.message || "Something went wrong");
+      }
 
       Swal.fire({
         icon: "success",
@@ -556,11 +560,14 @@ const DoctorProfile = () => {
       // Fetch updated doctor profile to get new stats and reviews
       await fetchDoctorProfile();
     } catch (error) {
-      console.error("Error adding review:", error.message);
       Swal.fire({
         icon: "error",
-        title: "Error",
-        text: error.message,
+        title: "Review Submission Failed",
+        text:
+          error.message === "You have already reviewed this doctor"
+            ? "You have already submitted a review for this doctor. You can edit or delete your existing review."
+            : error.message ||
+              "Something went wrong while submitting your review. Please try again.",
         confirmButtonColor: "#3b82f6",
       });
     }
@@ -1069,72 +1076,94 @@ const DoctorProfile = () => {
                     </>
                   )}
                   {showModal && (
-                    <div className="modal-overlay">
-                      <div className="modal-container">
-                        <span
-                          className="close-bt"
+                    <div className="edit-doctor-profile-form-overlay">
+                      <div className="edit-doctor-profile-form">
+                        <button
+                          type="button"
+                          className="close-form-btn"
                           onClick={() => setShowModal(false)}
                         >
-                          &times;
-                        </span>
-                        <h2 className="appointment-form-title">
-                          Book Appointment
-                        </h2>
-                        <form onSubmit={handleSubmit}>
-                          <div>
-                            <label className="appointment-form-label">
-                              Date
-                            </label>
-                            <input
-                              type="date"
-                              value={date}
-                              onChange={(e) => setDate(e.target.value)}
-                              className="appointment-form-input"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="appointment-form-label">
-                              Start Time
-                            </label>
-                            <input
-                              type="time"
-                              value={startTime}
-                              onChange={(e) => setStartTime(e.target.value)}
-                              className="appointment-form-input"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="appointment-form-label">
-                              End Time
-                            </label>
-                            <input
-                              type="time"
-                              value={endTime}
-                              onChange={(e) => setEndTime(e.target.value)}
-                              className="appointment-form-input"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="appointment-form-label">
-                              Reason
-                            </label>
-                            <textarea
-                              value={reason}
-                              onChange={(e) => setReason(e.target.value)}
-                              className="appointment-form-textarea"
-                              rows="4"
-                            ></textarea>
-                          </div>
-
-                          <button
-                            type="submit"
-                            className="appointment-form-button"
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           >
-                            Book Appointment
-                          </button>
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                          </svg>
+                        </button>
+
+                        <h2>Book Appointment</h2>
+
+                        <form onSubmit={handleSubmit}>
+                          <div className="form-section">
+                            <div className="form-section-title">
+                              <Calendar size={18} />
+                              Appointment Details
+                            </div>
+                            <div className="form-row">
+                              <div className="doctor-form-group">
+                                <label>Date</label>
+                                <input
+                                  type="date"
+                                  value={date}
+                                  onChange={(e) => setDate(e.target.value)}
+                                  required
+                                />
+                              </div>
+                            </div>
+
+                            <div className="form-row">
+                              <div className="doctor-form-group">
+                                <label>Start Time</label>
+                                <input
+                                  type="time"
+                                  value={startTime}
+                                  onChange={(e) => setStartTime(e.target.value)}
+                                  required
+                                />
+                              </div>
+                              <div className="doctor-form-group">
+                                <label>End Time</label>
+                                <input
+                                  type="time"
+                                  value={endTime}
+                                  onChange={(e) => setEndTime(e.target.value)}
+                                  required
+                                />
+                              </div>
+                            </div>
+
+                            <div className="form-row">
+                              <div className="doctor-form-group full-width">
+                                <label>Reason for Visit</label>
+                                <textarea
+                                  value={reason}
+                                  onChange={(e) => setReason(e.target.value)}
+                                  placeholder="Please describe your reason for visit"
+                                  rows="4"
+                                  required
+                                ></textarea>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="form-btns">
+                            <button
+                              type="button"
+                              onClick={() => setShowModal(false)}
+                              className="cancel-btn"
+                            >
+                              Cancel
+                            </button>
+                            <button type="submit" className="save-btn">
+                              Book Appointment
+                            </button>
+                          </div>
                         </form>
                       </div>
                     </div>
@@ -1238,52 +1267,80 @@ const DoctorProfile = () => {
               )}
             </div>
             {showReviewForm && (
-              <div className="modal-overlay">
-                <div className="modal-content review-modal">
-                  <span
-                    className="close-btn"
+              <div className="edit-doctor-profile-form-overlay">
+                <div className="edit-doctor-profile-form">
+                  <button
+                    type="button"
+                    className="close-form-btn"
                     onClick={() => setShowReviewForm(false)}
                   >
-                    &times;
-                  </span>
-                  <h2 className="modal-content-header">Add Your Review</h2>
-                  <form onSubmit={handleReviewSubmit} className="review-form">
-                    <div className="form-group">
-                      <label>Your Review</label>
-                      <textarea
-                        placeholder="Write your review..."
-                        value={comment}
-                        onChange={(e) => setComment(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="form-group rating-group">
-                      <label>Rating</label>
-                      <div className="rating-input">
-                        <input
-                          type="number"
-                          value={rating}
-                          onChange={(e) =>
-                            setRating(Number.parseFloat(e.target.value))
-                          }
-                          step="0.1"
-                          min="1"
-                          max="5"
-                          required
-                        />
-                        <span className="rating-star">⭐️</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+
+                  <h2>Add Your Review</h2>
+
+                  <form onSubmit={handleReviewSubmit}>
+                    <div className="form-section">
+                      <div className="form-section-title">
+                        <Star size={18} />
+                        Review Details
+                      </div>
+
+                      <div className="form-row">
+                        <div className="doctor-form-group full-width">
+                          <label>Your Review</label>
+                          <textarea
+                            placeholder="Write your review..."
+                            value={comment}
+                            onChange={(e) => setComment(e.target.value)}
+                            required
+                            rows="4"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="form-row">
+                        <div className="doctor-form-group">
+                          <label>Rating</label>
+                          <div className="rating-input-container">
+                            <input
+                              type="number"
+                              value={rating}
+                              onChange={(e) =>
+                                setRating(Number.parseFloat(e.target.value))
+                              }
+                              step="0.1"
+                              min="1"
+                              max="5"
+                              required
+                            />
+                            <span className="rating-star">⭐️</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div className="review-form-buttons">
-                      <button type="submit" className="submit-review-button">
-                        Submit
-                      </button>
+
+                    <div className="form-btns">
                       <button
                         type="button"
                         onClick={() => setShowReviewForm(false)}
-                        className="close-modal-button"
+                        className="cancel-btn"
                       >
                         Cancel
+                      </button>
+                      <button type="submit" className="save-btn">
+                        Submit Review
                       </button>
                     </div>
                   </form>

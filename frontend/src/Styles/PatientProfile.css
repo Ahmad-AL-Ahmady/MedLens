@@ -297,27 +297,67 @@
   gap: 8px;
 }
 
-.edit-doctor-profile-form label {
-  font-weight: 500;
-  color: #374151;
-  font-size: 14px;
+.doctor-form-group.full-width {
+  grid-column: 1 / -1;
 }
 
-.edit-doctor-profile-form input[type="text"],
-.edit-doctor-profile-form input[type="number"] {
+.doctor-form-group input[type="text"],
+.doctor-form-group input[type="number"],
+.doctor-form-group input[type="date"],
+.doctor-form-group input[type="time"] {
   padding: 10px 14px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
   font-size: 15px;
   transition: all 0.2s ease;
   background-color: #ffffff;
+  width: 100%;
+  color: #374151;
 }
 
-.edit-doctor-profile-form input[type="text"]:focus,
-.edit-doctor-profile-form input[type="number"]:focus {
+.doctor-form-group input[type="date"],
+.doctor-form-group input[type="time"] {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  background: #ffffff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='4' width='18' height='18' rx='2' ry='2'></rect><line x1='16' y1='2' x2='16' y2='6'></line><line x1='8' y1='2' x2='8' y2='6'></line><line x1='3' y1='10' x2='21' y2='10'></line></svg>") no-repeat 98% center;
+  background-size: 20px;
+  cursor: pointer;
+}
+
+.doctor-form-group input[type="time"] {
+  background: #ffffff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='10'></circle><polyline points='12 6 12 12 16 14'></polyline></svg>") no-repeat 98% center;
+  background-size: 20px;
+}
+
+.doctor-form-group input[type="date"]::-webkit-calendar-picker-indicator,
+.doctor-form-group input[type="time"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+}
+
+.doctor-form-group input[type="text"]:focus,
+.doctor-form-group input[type="number"]:focus,
+.doctor-form-group input[type="date"]:focus,
+.doctor-form-group input[type="time"]:focus {
   border-color: #3b82f6;
   outline: none;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.doctor-form-group input::placeholder {
+  color: #9CA3AF;
+}
+
+.edit-doctor-profile-form label {
+  font-weight: 500;
+  color: #374151;
+  font-size: 14px;
 }
 
 .close-form-btn {
@@ -547,3 +587,79 @@
 }
 
 /* Working Hours */
+
+/* Delete Appointment Button */
+.delete-appointment-button {
+  background: none;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.delete-appointment-button:hover {
+  background-color: rgba(220, 53, 69, 0.1);
+  transform: scale(1.1);
+}
+
+.doctor-form-group textarea {
+  padding: 10px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: all 0.2s ease;
+  background-color: #ffffff;
+  width: 100%;
+  resize: vertical;
+  min-height: 100px;
+  color: #374151;
+}
+
+.doctor-form-group textarea:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Rating Input Styles */
+.rating-input-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 8px 14px;
+  transition: all 0.2s ease;
+}
+
+.rating-input-container:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.rating-input-container input {
+  border: none;
+  outline: none;
+  width: 60px;
+  font-size: 15px;
+  color: #374151;
+  padding: 0;
+  -moz-appearance: textfield;
+}
+
+.rating-input-container input::-webkit-outer-spin-button,
+.rating-input-container input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.rating-star {
+  font-size: 18px;
+  color: #fbbf24;
+}
