@@ -566,33 +566,7 @@
 
 /* Add Appointment Button*/
 .add-appointment-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #377be8 0%, #1c5c9f 100%);
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-  border: none;
-  border-radius: 5px;
-  padding: 12px 13px;
-  cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
-  text-decoration: none;
-  width: fit-content;
-  position: absolute;
-  right: 20px;
-  top: 20px;
-}
-
-.add-appointment-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-.add-appointment-btn svg {
-  margin-right: 8px;
-  font-size: 15px;
+  display: none;
 }
 
 .modal-overlay {
@@ -1097,20 +1071,6 @@
   box-sizing: border-box;
 }
 
-.modal-content {
-  background: white;
-  padding: 30px;
-  border-radius: 20px;
-  width: max-content;
-  min-width: 320px;
-  max-width: 90vw;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
 .close-btn {
   position: absolute;
   top: 15px;
@@ -1205,38 +1165,6 @@
   border: 1px solid #fca5a5;
 }
 
-@media (max-width: 640px) {
-  .modal-content {
-    padding: 20px;
-    min-width: unset;
-    width: 100%;
-  }
-
-  .operating-hours-grid {
-    grid-template-columns: 1fr;
-  }
-
-  /* Adjust Sunday card on mobile */
-  .operating-hours-grid>div:last-child {
-    width: 100%;
-  }
-
-  .operating-hours-item {
-    padding: 12px 16px;
-  }
-
-  .operating-hours-item .day {
-    font-size: 14px;
-    min-width: 80px;
-  }
-
-  .status {
-    font-size: 13px;
-    padding: 6px 10px;
-    min-width: 100px;
-  }
-}
-
 .location-picker-centered {
   display: flex;
   justify-content: center;
@@ -1297,14 +1225,6 @@
   box-shadow: 0 2px 4px rgba(31, 97, 168, 0.05);
 }
 
-@media (max-width: 768px) {
-  .location-selected {
-    font-size: 0.8rem;
-    padding: 0.5rem 1rem;
-    max-width: 100%;
-  }
-}
-
 .profile-action-buttons {
   display: flex;
   gap: 16px;
@@ -1346,4 +1266,303 @@
   border-color: #3b82f6;
   outline: none;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Check Availability Button */
+.check-availability-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #377be8 0%, #1c5c9f 100%);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  width: fit-content;
+}
+
+.check-availability-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.check-availability-button svg {
+  margin-right: 8px;
+}
+
+/* Availability Modal */
+.availability-modal {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.availability-modal h2 {
+  margin-bottom: 20px;
+  color: #1f61a8;
+  text-align: center;
+}
+
+.availability-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.availability-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.availability-form label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.availability-form input[type="date"] {
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.loading-slots {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+}
+
+.loading-slots .spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #f3f4f6;
+  border-top-color: #1f61a8;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.availability-error {
+  background-color: #fee2e2;
+  color: #991b1b;
+  padding: 12px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.time-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.time-slot-button {
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  text-align: center;
+}
+
+.time-slot-button.available {
+  border-color: #93c5fd;
+  background-color: #eff6ff;
+}
+
+.time-slot-button.available:hover {
+  background-color: #dbeafe;
+  transform: translateY(-1px);
+}
+
+.time-slot-button.unavailable {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.time-slot-button.selected {
+  background-color: #1f61a8;
+  color: white;
+  border-color: #1f61a8;
+}
+
+/* FIX: Fixed availability modal buttons layout */
+.availability-modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+  width: 100%;
+  flex-direction: row;
+  /* Explicitly set direction to row */
+}
+
+.cancel-button,
+.book-appointment-button {
+  flex: 1;
+  /* Make buttons take equal space */
+  height: 48px;
+  padding: 0 24px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: none;
+  /* Remove any max-width restrictions */
+  width: auto;
+  /* Let flex handle the width */
+}
+
+.cancel-button {
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.cancel-button:hover {
+  background-color: #e5e7eb;
+  transform: translateY(-2px);
+}
+
+.book-appointment-button {
+  background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+  color: white;
+  border: none;
+}
+
+.book-appointment-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.close-modal-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  color: #6b7280;
+  transition: color 0.2s ease;
+}
+
+.close-modal-btn:hover {
+  color: #1f61a8;
+}
+
+/* Only apply column layout on very small screens */
+@media (max-width: 400px) {
+  .availability-modal-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .cancel-button,
+  .book-appointment-button {
+    width: 100%;
+  }
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .availability-modal {
+    width: 95%;
+    padding: 15px;
+  }
+
+  .time-slots-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+
+  .time-slot-button {
+    padding: 8px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 640px) {
+  .modal-content {
+    padding: 20px;
+    min-width: unset;
+    width: 100%;
+  }
+
+  .operating-hours-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Adjust Sunday card on mobile */
+  .operating-hours-grid>div:last-child {
+    width: 100%;
+  }
+
+  .operating-hours-item {
+    padding: 12px 16px;
+  }
+
+  .operating-hours-item .day {
+    font-size: 14px;
+    min-width: 80px;
+  }
+
+  .status {
+    font-size: 13px;
+    padding: 6px 10px;
+    min-width: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .time-slots-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+
+  .time-slot-button {
+    padding: 6px;
+    font-size: 12px;
+  }
+}
+
+/* Readonly input styles */
+.readonly-input {
+  background-color: #f3f4f6;
+  color: #374151;
+  cursor: not-allowed;
+  border: 1px solid #e5e7eb;
+  opacity: 0.8;
+}
+
+.readonly-input:focus {
+  border-color: #e5e7eb;
+  box-shadow: none;
+  outline: none;
 }
