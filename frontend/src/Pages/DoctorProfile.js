@@ -38,6 +38,12 @@ const DoctorProfile = () => {
   const [rating, setRating] = useState(5);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
+  const [showAvailabilityModal, setShowAvailabilityModal] = useState(false);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [availableSlots, setAvailableSlots] = useState([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
+  const [selectedSlot, setSelectedSlot] = useState(null);
+  const [availabilityError, setAvailabilityError] = useState(null);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -700,6 +706,75 @@ const DoctorProfile = () => {
     }
   };
 
+  const handleCheckAvailability = () => {
+    setShowAvailabilityModal(true);
+    setSelectedDate("");
+    setAvailableSlots([]);
+    setSelectedSlot(null);
+    setAvailabilityError(null);
+  };
+
+  const handleCloseAvailabilityModal = () => {
+    setShowAvailabilityModal(false);
+    setSelectedDate("");
+    setAvailableSlots([]);
+    setSelectedSlot(null);
+    setAvailabilityError(null);
+  };
+
+  const handleModalOverlayClick = (e) => {
+    if (e.target === e.currentTarget) {
+      handleCloseAvailabilityModal();
+    }
+  };
+
+  const handleDateSelect = async (e) => {
+    const selectedDate = e.target.value;
+    setSelectedDate(selectedDate);
+    setLoadingSlots(true);
+    setAvailabilityError(null);
+
+    try {
+      const response = await fetch(
+        `http://localhost:4000/api/appointments/available-slots/${id}/${selectedDate}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok && data.status === "success") {
+        if (!data.data.available) {
+          setAvailabilityError(data.data.message);
+          setAvailableSlots([]);
+        } else {
+          setAvailableSlots(data.data.timeSlots);
+        }
+      } else {
+        setAvailabilityError(
+          "Failed to fetch available slots. Please try again."
+        );
+      }
+    } catch (error) {
+      setAvailabilityError("An error occurred while fetching available slots.");
+    } finally {
+      setLoadingSlots(false);
+    }
+  };
+
+  const handleSlotSelect = (slot) => {
+    setSelectedSlot(slot);
+    setStartTime(slot.startTime);
+    setEndTime(slot.endTime);
+    setDate(selectedDate);
+  };
+
+  const handleBookSelectedSlot = () => {
+    setShowAvailabilityModal(false);
+    setShowModal(true);
+  };
+
   if (error) return <p style={{ color: "red" }}>{error}</p>;
   if (!doctor) return null;
 
@@ -1107,12 +1182,13 @@ const DoctorProfile = () => {
                             </div>
                             <div className="form-row">
                               <div className="doctor-form-group">
-                                <label>Date</label>
+                                <label>Selected Date</label>
                                 <input
                                   type="date"
                                   value={date}
-                                  onChange={(e) => setDate(e.target.value)}
-                                  required
+                                  readOnly
+                                  disabled
+                                  className="readonly-input"
                                 />
                               </div>
                             </div>
@@ -1123,8 +1199,9 @@ const DoctorProfile = () => {
                                 <input
                                   type="time"
                                   value={startTime}
-                                  onChange={(e) => setStartTime(e.target.value)}
-                                  required
+                                  readOnly
+                                  disabled
+                                  className="readonly-input"
                                 />
                               </div>
                               <div className="doctor-form-group">
@@ -1132,8 +1209,9 @@ const DoctorProfile = () => {
                                 <input
                                   type="time"
                                   value={endTime}
-                                  onChange={(e) => setEndTime(e.target.value)}
-                                  required
+                                  readOnly
+                                  disabled
+                                  className="readonly-input"
                                 />
                               </div>
                             </div>
@@ -1207,12 +1285,14 @@ const DoctorProfile = () => {
                   </button>
                 </div>
               ) : (
-                <button
-                  className="add-appointment-btn"
-                  onClick={() => setShowModal(true)}
-                >
-                  <FaRegCalendarAlt /> Add Appointment
-                </button>
+                <div className="profile-action-buttons">
+                  <button
+                    className="check-availability-button"
+                    onClick={handleCheckAvailability}
+                  >
+                    <Calendar size={15} color="white" /> Check Availability
+                  </button>
+                </div>
               )}
             </div>
 
@@ -1491,6 +1571,94 @@ const DoctorProfile = () => {
                   </button>
                 </div>
               </form>
+            </div>
+          )}
+
+          {/* Availability Modal */}
+          {showAvailabilityModal && (
+            <div className="modal-overlay" onClick={handleModalOverlayClick}>
+              <div className="availability-modal">
+                <button
+                  className="close-modal-btn"
+                  onClick={handleCloseAvailabilityModal}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+
+                <h2>Check Availability</h2>
+
+                <div className="availability-form">
+                  <div className="form-group">
+                    <label>Select Date</label>
+                    <input
+                      type="date"
+                      value={selectedDate}
+                      onChange={handleDateSelect}
+                      min={new Date().toISOString().split("T")[0]}
+                    />
+                  </div>
+
+                  {loadingSlots && (
+                    <div className="loading-slots">
+                      <div className="spinner"></div>
+                      <p>Loading available slots...</p>
+                    </div>
+                  )}
+
+                  {availabilityError && (
+                    <div className="availability-error">
+                      <p>{availabilityError}</p>
+                    </div>
+                  )}
+
+                  {availableSlots.length > 0 && (
+                    <div className="time-slots-grid">
+                      {availableSlots.map((slot, index) => (
+                        <button
+                          key={index}
+                          className={`time-slot-button ${
+                            slot.isAvailable ? "available" : "unavailable"
+                          } ${selectedSlot === slot ? "selected" : ""}`}
+                          onClick={() =>
+                            slot.isAvailable && handleSlotSelect(slot)
+                          }
+                          disabled={!slot.isAvailable}
+                        >
+                          {slot.startTime} - {slot.endTime}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="availability-modal-buttons">
+                    <button
+                      className="cancel-button"
+                      onClick={handleCloseAvailabilityModal}
+                    >
+                      Cancel
+                    </button>
+                    {selectedSlot && (
+                      <button
+                        className="book-appointment-button"
+                        onClick={handleBookSelectedSlot}
+                      >
+                        Book Appointment
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </>

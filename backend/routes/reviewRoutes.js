@@ -33,7 +33,11 @@ router.use(authController.protect);
  * Patients can only review doctors they've had appointments with
  * Used in doctor or pharmacy detail page to submit a review
  */
-router.post("/", reviewController.createReview);
+router.post(
+  "/",
+  authController.restrictTo("Patient"),
+  reviewController.createReview
+);
 
 /**
  * GET /api/reviews/my-reviews
