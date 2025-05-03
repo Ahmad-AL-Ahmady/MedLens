@@ -1,6 +1,4 @@
-import React from "react";
-import { useState } from "react";
-
+import React, { useState } from "react";
 import {
   Brain,
   Stethoscope,
@@ -12,15 +10,19 @@ import {
   PlusCircle,
   Mail,
   Pill,
+  Menu,
+  X,
 } from "lucide-react";
 import "../Styles/Homepage.css";
 import { useNavigate } from "react-router-dom";
 import WhiteLogo from "../assets/images/Whitelogo.png";
+
 export default function HomePage() {
   const navigate = useNavigate();
   const [openFaq, setOpenFaq] = useState(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [autoSlide, setAutoSlide] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const testimonials = [
     {
@@ -60,7 +62,7 @@ export default function HomePage() {
         "Simply select a doctor from our network, choose an available time slot, and confirm your booking.",
     },
   ];
-  // Update testimonials2 structure
+
   const testimonials2 = {
     main: [
       {
@@ -97,8 +99,6 @@ export default function HomePage() {
         content: `"The pediatric-specific features have been invaluable for managing childhood vaccinations and growth tracking."`,
       },
     ],
-    // Add other secondary testimonials as needed
-
     stats: [
       { number: "98%", label: "Satisfaction Rate" },
       { number: "4.9/5", label: "Average Rating" },
@@ -126,6 +126,11 @@ export default function HomePage() {
     setAutoSlide(false);
     setTimeout(() => setAutoSlide(true), 10000);
   };
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   return (
     <div className="home-main-container">
       <nav className="home-navbar">
@@ -135,32 +140,54 @@ export default function HomePage() {
             <span className="home-logo-text">MedLens</span>
           </div>
 
-          <div className="home-nav-buttons">
+          <button
+            className="mobile-menu-button"
+            onClick={toggleMenu}
+            aria-label="Toggle mobile menu"
+          >
+            <Menu className="mobile-menu-icon" />
+          </button>
+
+          <div
+            className={`home-nav-buttons ${
+              isMenuOpen ? "mobile-menu-open" : ""
+            }`}
+          >
             {["Services", "About Us"].map((item) => (
               <button
                 key={item}
                 className="home-nav-button"
-                onClick={() =>
+                onClick={() => {
                   navigate(
                     item === "About Us" ? "/aboutuspage" : "/servicespage"
-                  )
-                }
+                  );
+                  setIsMenuOpen(false);
+                }}
               >
                 {item}
                 <span className="nav-button-underline"></span>
               </button>
             ))}
+            <button
+              className="home-contact-btn"
+              onClick={() => {
+                navigate("/login");
+                setIsMenuOpen(false);
+              }}
+            >
+              <span>Login</span>
+              <svg className="login-icon" viewBox="0 0 24 24">
+                <path d="M20 12l-6.4 6.4-1.4-1.4 3.6-3.6H4v-2h12.8l-3.6-3.6 1.4-1.4L20 12z" />
+              </svg>
+            </button>
+            <button
+              className="mobile-close-button"
+              onClick={toggleMenu}
+              aria-label="Close mobile menu"
+            >
+              <X className="mobile-close-icon" />
+            </button>
           </div>
-
-          <button
-            className="home-contact-btn"
-            onClick={() => navigate("/login")}
-          >
-            <span>Login</span>
-            <svg className="login-icon" viewBox="0 0 24 24">
-              <path d="M20 12l-6.4 6.4-1.4-1.4 3.6-3.6H4v-2h12.8l-3.6-3.6 1.4-1.4L20 12z" />
-            </svg>
-          </button>
         </div>
       </nav>
 
