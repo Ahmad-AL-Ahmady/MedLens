@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import {
@@ -10,9 +10,12 @@ import {
   BadgeCheck,
   Edit,
   Trash2,
+  MapPin,
+  User,
 } from "lucide-react";
 import Swal from "sweetalert2";
 import "../Styles/DoctorProfile.css";
+import LocationPicker from "../Pages/LocationPicker";
 
 const DoctorProfile = () => {
   const { id } = useParams();
@@ -33,13 +36,17 @@ const DoctorProfile = () => {
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(5);
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
     city: "",
     state: "",
     country: "",
     fees: "",
     experienceYears: 0,
     avatar: "",
+    location: null,
     availability: {
       monday: { isAvailable: false, start: "", end: "" },
       tuesday: { isAvailable: false, start: "", end: "" },
@@ -52,6 +59,14 @@ const DoctorProfile = () => {
   });
   const token =
     localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
+  const [isViewingOwnProfile, setIsViewingOwnProfile] = useState(false);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
   const fetchDoctorProfile = async () => {
     try {
       Swal.fire({
@@ -65,7 +80,7 @@ const DoctorProfile = () => {
         },
       });
 
-      let apiUrl = id
+      const apiUrl = id
         ? `http://localhost:4000/api/doctors/${id}`
         : "http://localhost:4000/api/doctors/profile";
 
@@ -113,12 +128,15 @@ const DoctorProfile = () => {
         setDoctor(data.data);
         setProfile(data.data.profile);
         setFormData({
+          firstName: data.data.firstName || "",
+          lastName: data.data.lastName || "",
           city: data.data.profile?.city || "",
           state: data.data.profile?.state || "",
           country: data.data.profile?.country || "",
           fees: data.data.profile?.fees || "",
           experienceYears: data.data.profile?.experienceYears || "",
           avatar: data.data.avatar || null,
+          location: data.data.location || null,
           ...formData,
           availability: data.data.profile?.availability,
         });
@@ -154,6 +172,13 @@ const DoctorProfile = () => {
     // Get current user ID from token
     const tokenPayload = JSON.parse(atob(token.split(".")[1]));
     setCurrentUserId(tokenPayload.id);
+
+    // Check if viewing own profile
+    if (!id) {
+      setIsViewingOwnProfile(true);
+    } else {
+      setIsViewingOwnProfile(id === tokenPayload.id);
+    }
 
     fetchDoctorProfile();
   }, [id]);
@@ -351,6 +376,34 @@ const DoctorProfile = () => {
     });
   };
 
+  const handleLocationSelect = async (location) => {
+    try {
+      const lat = location.coordinates[1];
+      const lng = location.coordinates[0];
+
+      // Reverse geocoding using OpenStreetMap Nominatim API
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+      );
+      const data = await response.json();
+
+      setFormData({
+        ...formData,
+        location: {
+          ...location,
+          formattedAddress: data.display_name,
+        },
+      });
+    } catch (error) {
+      console.error("Error getting location details:", error);
+      // Fallback to coordinates if geocoding fails
+      setFormData({
+        ...formData,
+        location,
+      });
+    }
+  };
+
   const editHandleSubmit = async (e) => {
     e.preventDefault();
     // THIS IS THE FIXED LINE:
@@ -378,11 +431,14 @@ const DoctorProfile = () => {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
+            firstName: formData.firstName,
+            lastName: formData.lastName,
             city: formData.city,
             state: formData.state,
             country: formData.country,
             fees: formData.fees,
             experienceYears: formData.experienceYears,
+            location: formData.location,
           }),
         }
       );
@@ -565,8 +621,92 @@ const DoctorProfile = () => {
     });
   };
 
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      Swal.fire({
+        icon: "error",
+        title: "Password Mismatch",
+        text: "New password and confirm password do not match",
+        confirmButtonColor: "#3b82f6",
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        "http://localhost:4000/api/users/updatePassword",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            passwordCurrent: passwordData.currentPassword,
+            password: passwordData.newPassword,
+            passwordConfirm: passwordData.confirmPassword,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "Password updated successfully",
+          confirmButtonColor: "#3b82f6",
+        });
+        setShowPasswordForm(false);
+        setPasswordData({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: data.message || "Failed to update password",
+          confirmButtonColor: "#3b82f6",
+        });
+      }
+    } catch (error) {
+      console.error("Error updating password:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Something went wrong while updating your password",
+        confirmButtonColor: "#3b82f6",
+      });
+    }
+  };
+
   if (error) return <p style={{ color: "red" }}>{error}</p>;
   if (!doctor) return null;
+
+  // Get initial position for location picker if available
+  const getInitialPosition = () => {
+    if (
+      doctor.location?.coordinates &&
+      doctor.location.coordinates.length === 2
+    ) {
+      // GeoJSON format is [longitude, latitude], but Leaflet uses [latitude, longitude]
+      return [doctor.location.coordinates[1], doctor.location.coordinates[0]];
+    }
+    return [30.0444, 31.2357]; // Default position (Cairo)
+  };
 
   return (
     <div className="doctor-profile-container">
@@ -576,119 +716,214 @@ const DoctorProfile = () => {
             onSubmit={editHandleSubmit}
             className="edit-doctor-profile-form"
           >
+            <button
+              type="button"
+              className="close-form-btn"
+              onClick={() => setShowEditForm(false)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+
             <h2>Update Your Profile</h2>
-            <div className="doctor-form-group">
-              <label> City </label>
-              <input
-                type="text"
-                name="city"
-                value={formData.city}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="doctor-form-group">
-              <label>State </label>
-              <input
-                type="text"
-                name="state"
-                value={formData.state}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="doctor-form-group">
-              <label>Country</label>
-              <input
-                type="text"
-                name="country"
-                value={formData.country}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="doctor-form-group">
-              <label>Fees</label>
-              <input
-                type="number"
-                name="fees"
-                value={formData.fees}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="doctor-form-group">
-              <label>Experience Years</label>
-              <input
-                type="number"
-                name="experienceYears"
-                value={formData.experienceYears}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="doctor-operating-hours-edit">
-              <h3>Working Hours</h3>
-              {Object.entries(formData.availability).map(([day, info]) => (
-                <div key={day} className="doctor-operating-hours-item">
-                  <label className="doctor-operating-hours-label">
-                    {day.charAt(0).toUpperCase() + day.slice(1)}:
-                  </label>
+
+            <div className="form-section">
+              <div className="form-section-title">
+                <User size={18} />
+                Personal Information
+              </div>
+              <div className="form-row">
+                <div className="doctor-form-group">
+                  <label>First Name</label>
                   <input
-                    type="checkbox"
-                    name="isAvailable"
-                    checked={info.isAvailable}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        availability: {
-                          ...formData.availability,
-                          [day]: {
-                            ...formData.availability[day],
-                            isAvailable: e.target.checked,
-                          },
-                        },
-                      })
-                    }
+                    type="text"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    placeholder="Enter your first name"
                   />
-                  {info.isAvailable && (
-                    <>
-                      <input
-                        type="time"
-                        value={info.start}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            availability: {
-                              ...formData.availability,
-                              [day]: {
-                                ...formData.availability[day],
-                                start: e.target.value,
-                              },
-                            },
-                          })
-                        }
-                      />
-                      <input
-                        type="time"
-                        value={info.end}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            availability: {
-                              ...formData.availability,
-                              [day]: {
-                                ...formData.availability[day],
-                                end: e.target.value,
-                              },
-                            },
-                          })
-                        }
-                      />
-                    </>
-                  )}
                 </div>
-              ))}
+                <div className="doctor-form-group">
+                  <label>Last Name</label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    placeholder="Enter your last name"
+                  />
+                </div>
+              </div>
             </div>
+
+            <div className="form-section">
+              <div className="form-section-title">
+                <MapPin size={18} />
+                Location Information
+              </div>
+              <div className="form-row location-picker-centered">
+                <div className="doctor-form-group full-width">
+                  <label>Location</label>
+                  <div className="location-picker-button">
+                    <button
+                      type="button"
+                      className="select-location-btn"
+                      onClick={() => setShowLocationPicker(true)}
+                    >
+                      <MapPin size={16} />
+                      {formData.location
+                        ? "Change Location"
+                        : "Select Location on Map"}
+                    </button>
+                    {formData.location && (
+                      <span className="location-selected">
+                        {formData.location.formattedAddress ||
+                          `Location selected: ${formData.location.coordinates[1].toFixed(
+                            4
+                          )}, ${formData.location.coordinates[0].toFixed(4)}`}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="form-section">
+              <div className="form-section-title">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                Professional Details
+              </div>
+              <div className="form-row">
+                <div className="doctor-form-group">
+                  <label>Consultation Fees</label>
+                  <input
+                    type="number"
+                    name="fees"
+                    value={formData.fees}
+                    onChange={handleChange}
+                    placeholder="Enter your fees"
+                  />
+                </div>
+                <div className="doctor-form-group">
+                  <label>Years of Experience</label>
+                  <input
+                    type="number"
+                    name="experienceYears"
+                    value={formData.experienceYears}
+                    onChange={handleChange}
+                    placeholder="Years of experience"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="form-section">
+              <div className="form-section-title">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                Working Hours
+              </div>
+              <div className="doctor-operating-hours-edit">
+                {Object.entries(formData.availability).map(([day, info]) => (
+                  <div key={day} className="doctor-operating-hours-item">
+                    <label className="doctor-operating-hours-label">
+                      {day.charAt(0).toUpperCase() + day.slice(1)}
+                    </label>
+                    <input
+                      type="checkbox"
+                      name="isAvailable"
+                      checked={info.isAvailable}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          availability: {
+                            ...formData.availability,
+                            [day]: {
+                              ...formData.availability[day],
+                              isAvailable: e.target.checked,
+                            },
+                          },
+                        })
+                      }
+                    />
+                    {info.isAvailable && (
+                      <div className="time-inputs">
+                        <input
+                          type="time"
+                          value={info.start}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              availability: {
+                                ...formData.availability,
+                                [day]: {
+                                  ...formData.availability[day],
+                                  start: e.target.value,
+                                },
+                              },
+                            })
+                          }
+                        />
+                        <span>to</span>
+                        <input
+                          type="time"
+                          value={info.end}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              availability: {
+                                ...formData.availability,
+                                [day]: {
+                                  ...formData.availability[day],
+                                  end: e.target.value,
+                                },
+                              },
+                            })
+                          }
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <div className="form-btns">
-              <button type="submit" className="save-btn">
-                Save Changes
-              </button>
               <button
                 type="button"
                 onClick={() => setShowEditForm(false)}
@@ -696,8 +931,19 @@ const DoctorProfile = () => {
               >
                 Cancel
               </button>
+              <button type="submit" className="save-btn">
+                Save Changes
+              </button>
             </div>
           </form>
+
+          {showLocationPicker && (
+            <LocationPicker
+              onSelect={handleLocationSelect}
+              onClose={() => setShowLocationPicker(false)}
+              initialPosition={getInitialPosition()}
+            />
+          )}
         </div>
       ) : (
         <>
@@ -716,7 +962,7 @@ const DoctorProfile = () => {
                   alt="Doctor"
                   className="doctor-profile-image"
                 />
-                {!id && (
+                {isViewingOwnProfile && (
                   <div className="camera-menu">
                     <button onClick={toggleMenu} className="camera-icon">
                       <img
@@ -805,9 +1051,9 @@ const DoctorProfile = () => {
                                     }`}
                                   >
                                     {info.isAvailable ? (
-                                      <span style={{ color: "#374151" }}>
-                                        {`${info.start} - ${info.end}`}
-                                      </span>
+                                      <span
+                                        style={{ color: "#374151" }}
+                                      >{`${info.start} - ${info.end}`}</span>
                                     ) : (
                                       "Closed"
                                     )}
@@ -895,19 +1141,48 @@ const DoctorProfile = () => {
                   )}
                 </div>
               </div>
-              {id ? (
+              {isViewingOwnProfile ? (
+                <div className="profile-action-buttons">
+                  <button
+                    className="edit-doctor-profile-button"
+                    onClick={() => setShowEditForm(true)}
+                  >
+                    <Edit size={15} color="white" /> Edit Profile
+                  </button>
+                  <button
+                    className="update-password-button"
+                    onClick={() => setShowPasswordForm(true)}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="15"
+                      height="15"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <rect
+                        x="3"
+                        y="11"
+                        width="18"
+                        height="11"
+                        rx="2"
+                        ry="2"
+                      ></rect>
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    Update Password
+                  </button>
+                </div>
+              ) : (
                 <button
                   className="add-appointment-btn"
                   onClick={() => setShowModal(true)}
                 >
                   <FaRegCalendarAlt /> Add Appointment
-                </button>
-              ) : (
-                <button
-                  className="edit-doctor-profile-button"
-                  onClick={() => setShowEditForm(true)}
-                >
-                  <Edit size={15} color="white" /> Edit Profile
                 </button>
               )}
             </div>
@@ -953,7 +1228,7 @@ const DoctorProfile = () => {
           <div className="doctor-profile-reviews">
             <div className="doctor-profile-review-header">
               <h2>Patient Reviews</h2>
-              {id && (
+              {!isViewingOwnProfile && (
                 <button
                   className="add-review-button"
                   onClick={() => setShowReviewForm(true)}
@@ -989,7 +1264,7 @@ const DoctorProfile = () => {
                           type="number"
                           value={rating}
                           onChange={(e) =>
-                            setRating(parseFloat(e.target.value))
+                            setRating(Number.parseFloat(e.target.value))
                           }
                           step="0.1"
                           min="1"
@@ -1054,6 +1329,113 @@ const DoctorProfile = () => {
               <p>No reviews yet.</p>
             )}
           </div>
+
+          {showPasswordForm && (
+            <div className="edit-doctor-profile-form-overlay">
+              <form
+                onSubmit={handlePasswordSubmit}
+                className="edit-doctor-profile-form"
+              >
+                <button
+                  type="button"
+                  className="close-form-btn"
+                  onClick={() => setShowPasswordForm(false)}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+
+                <h2>Update Password</h2>
+
+                <div className="form-section">
+                  <div className="form-section-title">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <rect
+                        x="3"
+                        y="11"
+                        width="18"
+                        height="11"
+                        rx="2"
+                        ry="2"
+                      ></rect>
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    Password Details
+                  </div>
+                  <div className="form-row">
+                    <div className="doctor-form-group">
+                      <label>Current Password</label>
+                      <input
+                        type="password"
+                        name="currentPassword"
+                        value={passwordData.currentPassword}
+                        onChange={handlePasswordChange}
+                        placeholder="Enter current password"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="form-row">
+                    <div className="doctor-form-group">
+                      <label>New Password</label>
+                      <input
+                        type="password"
+                        name="newPassword"
+                        value={passwordData.newPassword}
+                        onChange={handlePasswordChange}
+                        placeholder="Enter new password"
+                        required
+                      />
+                    </div>
+                    <div className="doctor-form-group">
+                      <label>Confirm New Password</label>
+                      <input
+                        type="password"
+                        name="confirmPassword"
+                        value={passwordData.confirmPassword}
+                        onChange={handlePasswordChange}
+                        placeholder="Confirm new password"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="form-btns">
+                  <button
+                    type="button"
+                    onClick={() => setShowPasswordForm(false)}
+                    className="cancel-btn"
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" className="save-btn">
+                    Update Password
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
         </>
       )}
     </div>

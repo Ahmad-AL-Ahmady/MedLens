@@ -1,13 +1,15 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import {
   Mail,
   Calendar,
   User,
-  Activity,
   Stethoscope,
   ClipboardList,
   ScanBarcode,
   Edit,
+  Lock,
 } from "lucide-react";
 import Swal from "sweetalert2";
 import "../Styles/PatientProfile.css";
@@ -25,8 +27,13 @@ export default function PatientProfile() {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
-    gender: "",
     age: "",
+  });
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
 
   const token =
@@ -51,7 +58,6 @@ export default function PatientProfile() {
         setFormData({
           firstName: data.data.firstName || "",
           lastName: data.data.lastName || "",
-          gender: data.data.gender || "",
           age: data.data.age || "",
         });
       } else {
@@ -82,6 +88,45 @@ export default function PatientProfile() {
     } catch (error) {
       console.error("Error fetching scans:", error);
       throw error; // Let the caller handle the error
+    }
+  };
+
+  const handleUpdatePassword = async (currentPassword, newPassword) => {
+    try {
+      const response = await fetch(
+        "http://localhost:4000/api/users/updatePassword",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            passwordCurrent: currentPassword,
+            password: newPassword,
+            passwordConfirm: newPassword,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Swal.fire({
+          icon: "success",
+          title: "Password Updated!",
+          text: "Your password has been successfully updated.",
+        });
+      } else {
+        throw new Error(data.message || "Failed to update password");
+      }
+    } catch (error) {
+      console.error("Password update error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Password Update Failed",
+        text: error.message || "Something went wrong. Please try again later.",
+      });
     }
   };
 
@@ -141,12 +186,7 @@ export default function PatientProfile() {
       return;
     }
 
-    if (
-      !formData.firstName ||
-      !formData.lastName ||
-      !formData.gender ||
-      !formData.age
-    ) {
+    if (!formData.firstName || !formData.lastName || !formData.age) {
       Swal.fire({
         icon: "warning",
         title: "Missing Info",
@@ -261,6 +301,78 @@ export default function PatientProfile() {
     }
   };
 
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      Swal.fire({
+        icon: "error",
+        title: "Password Mismatch",
+        text: "New password and confirm password do not match",
+        confirmButtonColor: "#3b82f6",
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        "http://localhost:4000/api/users/updatePassword",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            passwordCurrent: passwordData.currentPassword,
+            password: passwordData.newPassword,
+            passwordConfirm: passwordData.confirmPassword,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "Password updated successfully",
+          confirmButtonColor: "#3b82f6",
+        });
+        setShowPasswordForm(false);
+        setPasswordData({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: data.message || "Failed to update password",
+          confirmButtonColor: "#3b82f6",
+        });
+      }
+    } catch (error) {
+      console.error("Error updating password:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Something went wrong while updating your password",
+        confirmButtonColor: "#3b82f6",
+      });
+    }
+  };
+
   if (loading) return null; // Swal handles loading
   if (error) return null; // Swal handles errors
   if (!patientData) return null; // Swal handles no data
@@ -268,66 +380,89 @@ export default function PatientProfile() {
   return (
     <div className="patient-profile-container">
       {showEditForm ? (
-        <div className="edit-patient-form-background">
-          <div className="edit-patient-form-wrapperr">
-            <form onSubmit={handleSubmit} className="edit-patient-profile-form">
-              <h2>Update Your Profile</h2>
-              <div>
-                <label>First Name</label>
-                <input
-                  type="text"
-                  name="firstName"
-                  placeholder="First Name"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                />
+        <div className="edit-doctor-profile-form-overlay">
+          <form onSubmit={handleSubmit} className="edit-doctor-profile-form">
+            <button
+              type="button"
+              className="close-form-btn"
+              onClick={() => setShowEditForm(false)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+
+            <h2>Update Your Profile</h2>
+
+            <div className="form-section">
+              <div className="form-section-title">
+                <User size={18} />
+                Personal Information
               </div>
-              <div>
-                <label>Last Name</label>
-                <input
-                  type="text"
-                  name="lastName"
-                  placeholder="Last Name"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                />
+              <div className="form-row">
+                <div className="doctor-form-group">
+                  <label>First Name</label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    placeholder="Enter your first name"
+                  />
+                </div>
+                <div className="doctor-form-group">
+                  <label>Last Name</label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    placeholder="Enter your last name"
+                  />
+                </div>
               </div>
-              <div>
-                <label>Gender</label>
-                <select
-                  name="gender"
-                  value={formData.gender}
-                  onChange={handleChange}
-                >
-                  <option value="">Select</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                </select>
+              <div className="form-row">
+                <div className="doctor-form-group">
+                  <label>Age</label>
+                  <input
+                    type="number"
+                    name="age"
+                    value={formData.age}
+                    onChange={handleChange}
+                    placeholder="Enter your age"
+                  />
+                </div>
               </div>
-              <div>
-                <label>Age</label>
-                <input
-                  type="number"
-                  name="age"
-                  placeholder="Age"
-                  value={formData.age}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="form-patient-profile-buttons">
-                <button type="submit">Save Changes</button>
-                <button type="button" onClick={() => setShowEditForm(false)}>
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
+            </div>
+
+            <div className="form-btns">
+              <button
+                type="button"
+                onClick={() => setShowEditForm(false)}
+                className="cancel-btn"
+              >
+                Cancel
+              </button>
+              <button type="submit" className="save-btn">
+                Save Changes
+              </button>
+            </div>
+          </form>
         </div>
       ) : (
         <div className="patient-profile">
           {/* Personal Data */}
-          <div className="patient-profile-edit-icon">
-            <div className="patient-profile-header">
+          <div className="patient-profile-header">
+            <div className="patient-header-top">
               <div className="patient-profile-image-container">
                 <img
                   src={
@@ -337,7 +472,7 @@ export default function PatientProfile() {
                         }`
                       : "http://localhost:4000/public/uploads/users/default.jpg"
                   }
-                  alt=" Patient"
+                  alt="Patient"
                   className="patient-profile-image"
                 />
                 {!id && (
@@ -382,7 +517,7 @@ export default function PatientProfile() {
               <div className="patient-profile-info">
                 <h1>{`${patientData.firstName} ${patientData.lastName}`}</h1>
                 <p className="email">
-                  <Mail size={16} color="#1f61a8" />
+                  <Mail size={16} color="#1e56cf" />
                   {patientData.email}
                 </p>
                 <div className="patient-extra-info">
@@ -391,11 +526,13 @@ export default function PatientProfile() {
                     {patientData.age} years
                   </p>
                   <p>
-                    <User size={15} color="#505050" /> {patientData.gender}
+                    <User size={15} color="#505050" />{" "}
+                    {patientData.gender.charAt(0).toUpperCase() +
+                      patientData.gender.slice(1)}
                   </p>
                 </div>
               </div>
-              <div className="patient-profile-edit-btn">
+              <div className="profile-buttons">
                 <button
                   onClick={() => setShowEditForm(true)}
                   className="edit-patient-profile-button"
@@ -403,57 +540,60 @@ export default function PatientProfile() {
                   <Edit size={15} color="white" />
                   Edit Profile
                 </button>
+                <button
+                  onClick={() => setShowPasswordForm(true)}
+                  className="edit-patient-profile-button update-password-btn"
+                >
+                  <Lock size={15} color="white" />
+                  Update Password
+                </button>
               </div>
             </div>
-          </div>
 
-          {/* Summary Cards */}
-          <div className="patient-profile-summary-cards">
-            <div className="patient-profile-card">
-              <Stethoscope size={16} color="#1f61a8" />
-              <h3>{patientData.visits || 0}</h3>
-              <p>Visits</p>
-            </div>
-            <div className="patient-profile-card">
-              <Calendar size={16} color="green" />
-              <h3>
-                {patientData.profile.createdAt
-                  ? (() => {
-                      const now = new Date();
-                      const createdDate = new Date(
-                        patientData.profile.createdAt
-                      );
-                      const years =
-                        now.getFullYear() - createdDate.getFullYear();
-                      const months = now.getMonth() - createdDate.getMonth();
+            {/* Summary Cards */}
+            <div className="patient-profile-summary-cards">
+              <div className="patient-profile-card">
+                <Stethoscope size={16} color="#1f61a8" />
+                <h3>{appointments.length}</h3>
+                <p>Visits</p>
+              </div>
+              <div className="patient-profile-card">
+                <Calendar size={16} color="#1f61a8" />
+                <h3>
+                  {patientData.profile.createdAt
+                    ? (() => {
+                        const now = new Date();
+                        const createdDate = new Date(
+                          patientData.profile.createdAt
+                        );
+                        const years =
+                          now.getFullYear() - createdDate.getFullYear();
+                        const months = now.getMonth() - createdDate.getMonth();
 
-                      if (years > 0) {
-                        return years === 1
-                          ? "Joined 1 year ago"
-                          : `Joined ${years} years ago`;
-                      } else if (months > 0) {
-                        return months === 1
-                          ? "Joined 1 month ago"
-                          : `Joined ${months} months ago`;
-                      } else {
-                        return "Joined less than a month ago";
-                      }
-                    })()
-                  : "N/A"}
-              </h3>
-              <p>Patient Since</p>
-            </div>
-            <div className="patient-profile-card">
-              <ClipboardList size={16} color="#1f61a8" />
-              <h3>{patientData.reports || 0}</h3>
-              <p>Reports</p>
+                        if (years > 0) {
+                          return years === 1 ? "1 year" : `${years} years`;
+                        } else if (months > 0) {
+                          return months === 1 ? "1 month" : `${months} months`;
+                        } else {
+                          return "< 1 month";
+                        }
+                      })()
+                    : "N/A"}
+                </h3>
+                <p>Patient Since</p>
+              </div>
+              <div className="patient-profile-card">
+                <ClipboardList size={16} color="#1f61a8" />
+                <h3>{scans.length}</h3>
+                <p>Reports</p>
+              </div>
             </div>
           </div>
 
           {/* Past Scans */}
           <div className="patient-profile-scan-section">
             <h2>
-              <ScanBarcode size={15} color="#1f61a8" />
+              <ScanBarcode size={20} color="#1e40af" />
               Scans
             </h2>
             <table className="patient-profile-data-table">
@@ -489,7 +629,7 @@ export default function PatientProfile() {
           {/* Past Appointments */}
           <div className="patient-profile-scan-section">
             <h2>
-              <Calendar size={15} color="#1f61a8" />
+              <Calendar size={20} color="#1e40af" />
               Appointments
             </h2>
             <table className="patient-profile-data-table">
@@ -523,6 +663,112 @@ export default function PatientProfile() {
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+      {showPasswordForm && (
+        <div className="edit-doctor-profile-form-overlay">
+          <form
+            onSubmit={handlePasswordSubmit}
+            className="edit-doctor-profile-form"
+          >
+            <button
+              type="button"
+              className="close-form-btn"
+              onClick={() => setShowPasswordForm(false)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+
+            <h2>Update Password</h2>
+
+            <div className="form-section">
+              <div className="form-section-title">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect
+                    x="3"
+                    y="11"
+                    width="18"
+                    height="11"
+                    rx="2"
+                    ry="2"
+                  ></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                Password Details
+              </div>
+              <div className="form-row">
+                <div className="doctor-form-group">
+                  <label>Current Password</label>
+                  <input
+                    type="password"
+                    name="currentPassword"
+                    value={passwordData.currentPassword}
+                    onChange={handlePasswordChange}
+                    placeholder="Enter current password"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="doctor-form-group">
+                  <label>New Password</label>
+                  <input
+                    type="password"
+                    name="newPassword"
+                    value={passwordData.newPassword}
+                    onChange={handlePasswordChange}
+                    placeholder="Enter new password"
+                    required
+                  />
+                </div>
+                <div className="doctor-form-group">
+                  <label>Confirm New Password</label>
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    value={passwordData.confirmPassword}
+                    onChange={handlePasswordChange}
+                    placeholder="Confirm new password"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="form-btns">
+              <button
+                type="button"
+                onClick={() => setShowPasswordForm(false)}
+                className="cancel-btn"
+              >
+                Cancel
+              </button>
+              <button type="submit" className="save-btn">
+                Update Password
+              </button>
+            </div>
+          </form>
         </div>
       )}
     </div>
