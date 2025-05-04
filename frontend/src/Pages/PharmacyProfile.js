@@ -406,7 +406,9 @@ const PharmacyProfile = () => {
           body: JSON.stringify({
             firstName: formData.firstName,
             lastName: formData.lastName,
-            phoneNumber: formData.phoneNumber,
+            phoneNumber: formData.phoneNumber
+              ? `+20${formData.phoneNumber}`
+              : "",
             location: formData.location,
           }),
         }
@@ -886,10 +888,7 @@ const PharmacyProfile = () => {
                   <p className="doctor-profile-email">
                     <Phone size={16} color="#1e56cf" />
                     {profile?.phoneNumber ? (
-                      <>
-                        <span className="country-code-display">+20</span>
-                        {profile.phoneNumber}
-                      </>
+                      <>{profile.phoneNumber}</>
                     ) : (
                       "No phone number"
                     )}

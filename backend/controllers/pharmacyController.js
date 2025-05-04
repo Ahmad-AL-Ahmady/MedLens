@@ -187,6 +187,8 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
 
   // Define allowed fields for profile update
   const allowedFields = [
+    "firstName",
+    "lastName",
     "phoneNumber",
     "operatingHours",
     "locationName",
@@ -210,6 +212,18 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
     filteredBody,
     { new: true, runValidators: true }
   );
+
+  // Update user's firstName and lastName if provided
+  if (req.body.firstName || req.body.lastName) {
+    await User.findByIdAndUpdate(
+      user._id,
+      {
+        firstName: req.body.firstName || user.firstName,
+        lastName: req.body.lastName || user.lastName,
+      },
+      { new: true, runValidators: true }
+    );
+  }
 
   // Get updated user
   const updatedUser = await User.findById(user._id);
