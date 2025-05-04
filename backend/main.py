@@ -20,6 +20,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+<<<<<<< HEAD
 # تحميل نموذج GGML/GGUF باستخدام ctransformers
 MODEL_PATH = "ggml-model-Q8_0.gguf"  # تأكد من وجود المسار الصحيح للملف
 llm = AutoModelForCausalLM.from_pretrained(
@@ -28,6 +29,13 @@ llm = AutoModelForCausalLM.from_pretrained(
     context_length=2048,  # حجم نافذة السياق (مماثل لـ n_ctx)
     threads=4  # عدد الخيوط للمعالجة - قم بضبطه وفقًا لجهازك
 )
+=======
+# تحميل النموذج من HuggingFace
+# المسار إلى النموذج المحفوظ محليًا
+model_name = "Models_ai\\flan-t5-large"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+>>>>>>> 538e6f709bc8b311db03bc3fdb1e604e3c6caccf
 
 
 # تحميل النماذج المحلية (مثال لنماذج تصنيف الأشعة السينية)

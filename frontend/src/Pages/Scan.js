@@ -23,58 +23,28 @@ export default function ScanPage() {
     },
     {
       bodyPart: "Eye",
-<<<<<<< HEAD
       description: "Helps diagnose eye diseases, detect foreign bodies, and eye injuries",
-      aiAccuracy: "98%"
+      aiAccuracy: "91%"
     },
     {
       bodyPart: "Brain",
       description: "Helps identify tumors, hemorrhages, and structural abnormalities",
-      aiAccuracy: "95%"
+      aiAccuracy: "92%"
     },
     {
       bodyPart: "Bones",
       description: "Detects fractures, dislocations, arthritis, and bone diseases",
-      aiAccuracy: "95%"
+      aiAccuracy: "97%"
     },
     {
       bodyPart: "Lung",
       description: "Used to detect tuberculosis, infections, and chronic lung diseases",
-      aiAccuracy: "95%"
+      aiAccuracy: "93%"
     },
     {
       bodyPart: "Kidney",
       description: "Helps diagnose kidney stones, structural abnormalities, and kidney diseases",
-      aiAccuracy: "99%"
-=======
-      description:
-        "Helps diagnose eye diseases, detect foreign bodies, and eye injuries",
-      aiAccuracy: "91%",
-    },
-    {
-      bodyPart: "Brain",
-      description:
-        "Helps identify tumors, hemorrhages, and structural abnormalities",
-      aiAccuracy: "92%",
-    },
-    {
-      bodyPart: "Bones",
-      description:
-        "Detects fractures, dislocations, arthritis, and bone diseases",
-      aiAccuracy: "97%",
-    },
-    {
-      bodyPart: "Lung",
-      description:
-        "Used to detect tuberculosis, infections, and chronic lung diseases",
-      aiAccuracy: "93%",
-    },
-    {
-      bodyPart: "Kidney",
-      description:
-        "Helps diagnose kidney stones, structural abnormalities, and kidney diseases",
-      aiAccuracy: "90%",
->>>>>>> 538e6f709bc8b311db03bc3fdb1e604e3c6caccf
+      aiAccuracy: "90%"
     },
     {
       bodyPart: "Nail",
