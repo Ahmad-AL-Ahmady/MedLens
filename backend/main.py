@@ -21,7 +21,7 @@ app.add_middleware(
 )
 
 # تحميل نموذج GGML/GGUF باستخدام ctransformers
-MODEL_PATH = "ggml-model-Q8_0.gguf"  # تأكد من وجود المسار الصحيح للملف
+MODEL_PATH = "Models_ai\\ggml-model-Q8_0.gguf"  # تأكد من وجود المسار الصحيح للملف
 llm = AutoModelForCausalLM.from_pretrained(
     MODEL_PATH,
     model_type="llama",  # تحديد نوع النموذج (llama, gpt2, gpt-j, etc.)
