@@ -17,43 +17,50 @@ export default function ScanPage() {
   const xrayTypes = [
     {
       bodyPart: "Chest",
-      description: "Used to detect pneumonia, lung cancer, heart conditions, and pulmonary disorders",
-      aiAccuracy: "95%"
+      description:
+        "Used to detect pneumonia, lung cancer, heart conditions, and pulmonary disorders",
+      aiAccuracy: "95%",
     },
     {
       bodyPart: "Eye",
-      description: "Helps diagnose eye diseases, detect foreign bodies, and eye injuries",
-      aiAccuracy: "91%"
+      description:
+        "Helps diagnose eye diseases, detect foreign bodies, and eye injuries",
+      aiAccuracy: "91%",
     },
     {
       bodyPart: "Brain",
-      description: "Helps identify tumors, hemorrhages, and structural abnormalities",
-      aiAccuracy: "92%"
+      description:
+        "Helps identify tumors, hemorrhages, and structural abnormalities",
+      aiAccuracy: "92%",
     },
     {
       bodyPart: "Bones",
-      description: "Detects fractures, dislocations, arthritis, and bone diseases",
-      aiAccuracy: "97%"
+      description:
+        "Detects fractures, dislocations, arthritis, and bone diseases",
+      aiAccuracy: "97%",
     },
     {
       bodyPart: "Lung",
-      description: "Used to detect tuberculosis, infections, and chronic lung diseases",
-      aiAccuracy: "93%"
+      description:
+        "Used to detect tuberculosis, infections, and chronic lung diseases",
+      aiAccuracy: "93%",
     },
     {
       bodyPart: "Kidney",
-      description: "Helps diagnose kidney stones, structural abnormalities, and kidney diseases",
-      aiAccuracy: "90%"
+      description:
+        "Helps diagnose kidney stones, structural abnormalities, and kidney diseases",
+      aiAccuracy: "90%",
     },
     {
       bodyPart: "Nail",
       description: "Helps identify nail infections, tumors, and deformities",
-      aiAccuracy: "89%"
+      aiAccuracy: "89%",
     },
     {
       bodyPart: "Skin",
-      description: "Aids in detecting skin cancer, infections, and other dermatological conditions",
-      aiAccuracy: "92%"
+      description:
+        "Aids in detecting skin cancer, infections, and other dermatological conditions",
+      aiAccuracy: "92%",
     },
   ];
 
@@ -75,26 +82,92 @@ export default function ScanPage() {
     }
   };
 
+  // Updated handleScan function for Scan.js
   const handleScan = async () => {
     if (!selectedFile) return;
 
     setIsScanning(true);
     const formData = new FormData();
     formData.append("file", selectedFile);
-    formData.append("bodyPart", bodyArea); // Add the selected body part to the form data
+    formData.append("bodyPart", bodyArea);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/predict/", {
+      // First, send to AI service for analysis
+      const aiResponse = await fetch("http://127.0.0.1:8000/predict/", {
         method: "POST",
         body: formData,
       });
 
-      const data = await response.json();
-      setScanResult(data.classification_result || "Unknown"); // Default to "Unknown" if no result is returned
-      setConfidence(data.confidence_score || "N/A");
+      const aiData = await aiResponse.json();
+      setScanResult(aiData.classification_result || "Unknown");
+      setConfidence(aiData.confidence_score || 0); // Set to 0 instead of null to avoid prop type error
+
+      // Now save to your main application database
+      const token =
+        localStorage.getItem("authToken") ||
+        sessionStorage.getItem("authToken");
+
+      if (!token) {
+        console.warn("User not authenticated. Scan not saved to profile.");
+        return;
+      }
+
+      // Step 1: Create the scan record
+      const createScanResponse = await fetch(
+        "http://localhost:4000/api/medical-scans",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            bodyPart: bodyArea,
+            description: `AI Analysis: ${
+              aiData.classification_result || "Unknown"
+            }`,
+          }),
+          credentials: "include",
+        }
+      );
+
+      const scanData = await createScanResponse.json();
+
+      if (scanData.status === "success" && scanData.data.uploadUrl) {
+        // Step 2: Upload the image for this scan record
+        const imageFormData = new FormData();
+        imageFormData.append("image", selectedFile);
+
+        // Fix the URL by using the full absolute URL
+        const uploadUrl = `http://localhost:4000${scanData.data.uploadUrl}`;
+        console.log("Uploading image to:", uploadUrl);
+
+        const uploadImageResponse = await fetch(uploadUrl, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: imageFormData,
+          credentials: "include",
+        });
+
+        if (uploadImageResponse.ok) {
+          const finalData = await uploadImageResponse.json();
+          console.log("Scan saved successfully:", finalData);
+        } else {
+          console.error(
+            "Failed to upload image:",
+            await uploadImageResponse.text()
+          );
+        }
+      } else {
+        console.error("Failed to create scan record:", scanData);
+      }
     } catch (error) {
-      setScanResult("Failed to connect to the server.");
-      setConfidence(null);
+      console.error("Error during scan process:", error);
+      // Ensure confidence is not null to avoid prop type error
+      setScanResult("Failed to process or save the scan.");
+      setConfidence(0); // Set to 0 instead of null
     } finally {
       setIsScanning(false);
     }
@@ -115,14 +188,15 @@ export default function ScanPage() {
             <ChevronDown className="chevron-icon" />
           )}
         </div>
-        
+
         {isInfoExpanded && (
           <div className="info-content">
             <p className="info-description">
-              Our advanced AI system analyzes various types of X-ray images with high accuracy. 
-              Select the appropriate body part for the most accurate results.
+              Our advanced AI system analyzes various types of X-ray images with
+              high accuracy. Select the appropriate body part for the most
+              accurate results.
             </p>
-            
+
             <div className="info-ai-capabilities">
               <h3 className="capabilities-title">AI Analysis Capabilities:</h3>
               <ul className="capabilities-list">
@@ -132,7 +206,7 @@ export default function ScanPage() {
                 <li>Support for multiple body areas and medical conditions</li>
               </ul>
             </div>
-            
+
             <div className="xray-types-cards">
               <h3 className="cards-title">X-Ray Types by Body Part</h3>
               <div className="cards-container">
@@ -229,7 +303,7 @@ export default function ScanPage() {
         <MedicalReport
           imageUrl={previewUrl}
           scanResult={scanResult}
-          confidence={confidence}
+          confidence={confidence || 0} // Ensure confidence is never null
           date={new Date().toLocaleDateString()}
         />
       )}

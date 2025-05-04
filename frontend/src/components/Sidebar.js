@@ -8,6 +8,7 @@ import {
   Pill,
   ScanEye,
   LogOut,
+  Menu,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -16,8 +17,25 @@ import Final from "../Images/Final.png";
 
 export default function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [userRole, setUserRole] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+      if (window.innerWidth > 768) {
+        setIsExpanded(true);
+      } else {
+        setIsExpanded(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    handleResize(); // Initial check
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const getRoleFromStorage = () => {
@@ -112,56 +130,80 @@ export default function Sidebar() {
     : [];
 
   return (
-    <aside className={`sidebar ${isExpanded ? "expanded" : "collapsed"}`}>
-      {/* Header */}
-      <div className="sidebar-header">
-        {isExpanded && (
+    <>
+      {isMobile && (
+        <button
+          className="mobile-menu-button"
+          onClick={() => setIsExpanded(!isExpanded)}
+          aria-label="Toggle menu"
+        >
+          <Menu className="icon" />
+        </button>
+      )}
+      <aside
+        className={`sidebar ${isExpanded ? "expanded" : "collapsed"} ${
+          isMobile ? "mobile" : ""
+        }`}
+        style={
+          isMobile
+            ? {
+                transform: isExpanded ? "translateX(0)" : "translateX(-100%)",
+                transition: "transform 0.3s ease",
+              }
+            : {}
+        }
+      >
+        {/* Header */}
+        <div className="sidebar-header">
           <div className="logo-container">
             <img src={Final} alt="MedLens Logo" className="info-logo" />
             <span className="logo-text">MedLenes</span>
+            {!isMobile && (
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="toggle-button"
+                aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
+              >
+                {isExpanded ? (
+                  <ChevronLeft className="icon" />
+                ) : (
+                  <ChevronRight className="icon" />
+                )}
+              </button>
+            )}
           </div>
-        )}
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="toggle-button"
-          aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
-        >
-          {isExpanded ? (
-            <ChevronLeft className="icon" />
-          ) : (
-            <ChevronRight className="icon" />
-          )}
-        </button>
-      </div>
+        </div>
 
-      {/* Navigation */}
-      <nav className="nav-container">
-        {filteredMenuItems.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            className={({ isActive }) =>
-              `nav-item ${isActive ? "active" : ""} ${
-                isExpanded ? "expanded" : "collapsed"
-              }`
-            }
+        {/* Navigation */}
+        <nav className="nav-container">
+          {filteredMenuItems.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className={({ isActive }) =>
+                `nav-item ${isActive ? "active" : ""} ${
+                  isExpanded ? "expanded" : "collapsed"
+                }`
+              }
+              onClick={() => isMobile && setIsExpanded(false)}
+            >
+              <item.icon className="nav-icon" />
+              {isExpanded && <span className="nav-label">{item.label}</span>}
+            </NavLink>
+          ))}
+
+          {/* Logout Button */}
+          <button
+            onClick={handleLogout}
+            className={`nav-item logout-button ${
+              isExpanded ? "expanded" : "collapsed"
+            }`}
           >
-            <item.icon className="nav-icon" />
-            {isExpanded && <span className="nav-label">{item.label}</span>}
-          </NavLink>
-        ))}
-
-        {/* Logout Button */}
-        <button
-          onClick={handleLogout}
-          className={`nav-item logout-button ${
-            isExpanded ? "expanded" : "collapsed"
-          }`}
-        >
-          <LogOut className="nav-icon" />
-          {isExpanded && <span className="nav-label">Logout</span>}
-        </button>
-      </nav>
-    </aside>
+            <LogOut className="nav-icon" />
+            {isExpanded && <span className="nav-label">Logout</span>}
+          </button>
+        </nav>
+      </aside>
+    </>
   );
 }

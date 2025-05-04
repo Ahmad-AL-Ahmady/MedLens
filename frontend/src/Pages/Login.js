@@ -1,25 +1,23 @@
 import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { Link, useNavigate } from "react-router-dom";
-import Swal from "sweetalert2"; // Import SweetAlert2 for professional alerts
+import Swal from "sweetalert2";
 import InfoSection from "../components/InfoSection";
+import Bluelogo from "../assets/images/Bluelogo.png"; // Added the missing import
 import "../Styles/Login.css";
 
 function LoginForm() {
-  // State management for form inputs and UI
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Handle form submission for login
   async function handleSubmit(e) {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // Make API request to login endpoint
       const response = await fetch("http://localhost:4000/api/users/login", {
         method: "POST",
         headers: {
@@ -28,14 +26,12 @@ function LoginForm() {
         body: JSON.stringify({ email, password }),
       });
 
-      // Check if the response is OK before parsing as JSON
       if (!response.ok) {
         if (response.status === 401) {
           throw new Error("Invalid email or password");
         } else if (response.status === 404) {
           throw new Error("User not found");
         } else {
-          // Try to parse the response as JSON to get the error message
           const data = await response.json().catch(() => {
             throw new Error("Server error: Unable to process the request");
           });
@@ -43,24 +39,20 @@ function LoginForm() {
         }
       }
 
-      // Parse the response as JSON, handle JSON parsing errors
       const data = await response.json().catch((error) => {
         throw new Error("Server error: Invalid response format");
       });
 
       console.log("API Response:", data);
 
-      // Verify user and userType exist in the response
       if (!data.data?.user || !data.data.user.userType) {
         throw new Error("User role not found in response");
       }
 
-      // Store token and role in localStorage or sessionStorage based on rememberMe
       const storage = rememberMe ? localStorage : sessionStorage;
       storage.setItem("authToken", data.token);
       storage.setItem("userRole", data.data.user.userType);
 
-      // Navigate based on user role
       const userRole = data.data.user.userType;
       console.log("User role:", userRole);
 
@@ -75,7 +67,6 @@ function LoginForm() {
         throw new Error("Unknown user role: " + userRole);
       }
 
-      // Show success alert on successful login
       Swal.fire({
         icon: "success",
         title: "Login Successful",
@@ -84,7 +75,6 @@ function LoginForm() {
         showConfirmButton: false,
       });
     } catch (error) {
-      // Display professional alerts based on error type
       let title = "Error";
       let text = error.message || "An unexpected error occurred";
 
@@ -115,7 +105,6 @@ function LoginForm() {
           "Received an invalid response from the server. Please try again later.";
       }
 
-      // Show error alert using SweetAlert2
       Swal.fire({
         icon: "error",
         title: title,
@@ -130,16 +119,24 @@ function LoginForm() {
     }
   }
 
-  // Handle Google login redirection
   const handleGoogleLogin = () => {
     navigate("/signup-google");
   };
 
-  // JSX for the login form UI
   return (
     <div className="login-container">
       <div className="login-left">
         <div className="login-form">
+          <div className="mobile-logo-container">
+            <div className="home-logo">
+              <img
+                src={Bluelogo}
+                alt="MedLens Logo"
+                className="home-logo-img"
+              />
+              <span className=" home-logo-text-login">MedLens</span>
+            </div>
+          </div>
           <h1 className="login-title">Login</h1>
           <p className="login-subtitle">
             Access your MedLens healthcare account
