@@ -1,18 +1,31 @@
-import React from "react";
-import { Outlet } from "react-router-dom"; // Import Outlet
+import React, { useState } from "react";
+import { Outlet } from "react-router-dom";
 import Navbar from "./NavbarInside";
 import Sidebar from "./Sidebar";
 import "../Styles/Layout.css";
 
 export default function Layout() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
+
   return (
     <div className="layout-container">
-      <Sidebar />
-      <div className="main-content">
-        <Navbar />
+      <Sidebar
+        isSidebarOpen={isSidebarOpen}
+        setIsSidebarOpen={setIsSidebarOpen}
+        setIsSidebarExpanded={setIsSidebarExpanded}
+      />
+      <div
+        className={`main-content ${
+          isSidebarExpanded ? "expanded" : "collapsed"
+        }`}
+      >
+        <Navbar
+          toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+          isSidebarExpanded={isSidebarExpanded}
+        />
         <main className="main-wrapper">
-          <Outlet />{" "}
-          {/* This is where child components (dashboard, scan, etc.) will be rendered */}
+          <Outlet />
         </main>
       </div>
     </div>

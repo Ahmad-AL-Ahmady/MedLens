@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  Users,
   LayoutDashboard,
   ChevronRight,
   ChevronLeft,
@@ -8,14 +7,17 @@ import {
   Pill,
   ScanEye,
   LogOut,
-  Menu,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import "../Styles/Sidebar.css";
 import Final from "../Images/Final.png";
 
-export default function Sidebar() {
+export default function Sidebar({
+  isSidebarOpen,
+  setIsSidebarOpen,
+  setIsSidebarExpanded,
+}) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [userRole, setUserRole] = useState(null);
@@ -23,27 +25,31 @@ export default function Sidebar() {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-      if (window.innerWidth > 768) {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      if (!mobile) {
         setIsExpanded(true);
       } else {
-        setIsExpanded(false);
+        setIsExpanded(isSidebarOpen);
       }
     };
 
     window.addEventListener("resize", handleResize);
-    handleResize(); // Initial check
-
+    handleResize();
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [isSidebarOpen]);
+
+  useEffect(() => {
+    setIsSidebarExpanded(isExpanded);
+  }, [isExpanded, setIsSidebarExpanded]);
 
   useEffect(() => {
     const getRoleFromStorage = () => {
-      const roleFromLocal = localStorage.getItem("userRole");
-      const roleFromSession = sessionStorage.getItem("userRole");
-      const role = roleFromLocal || roleFromSession || null;
-      console.log("Current user role from storage:", role);
-      return role;
+      return (
+        localStorage.getItem("userRole") ||
+        sessionStorage.getItem("userRole") ||
+        null
+      );
     };
 
     setUserRole(getRoleFromStorage());
@@ -55,23 +61,8 @@ export default function Sidebar() {
     };
 
     window.addEventListener("storage", handleStorageChange);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
-
-  useEffect(() => {
-    // Update main content class based on sidebar state
-    const mainContent = document.querySelector(".main-content");
-    if (mainContent) {
-      if (isExpanded) {
-        mainContent.classList.add("expanded");
-      } else {
-        mainContent.classList.remove("expanded");
-      }
-    }
-  }, [isExpanded]);
 
   const getDashboardPath = () => {
     if (userRole === "Patient") return "/patient-dashboard";
@@ -130,80 +121,64 @@ export default function Sidebar() {
     : [];
 
   return (
-    <>
-      {isMobile && (
-        <button
-          className="mobile-menu-button-sidebar"
-          onClick={() => setIsExpanded(!isExpanded)}
-          aria-label="Toggle menu"
+    <aside
+      className={`sidebar ${isExpanded ? "expanded" : "collapsed"} ${
+        isMobile ? "mobile" : ""
+      }`}
+      style={
+        isMobile
+          ? { transform: isExpanded ? "translateX(0)" : "translateX(-100%)" }
+          : {}
+      }
+    >
+      <div className="sidebar-header">
+        <div
+          className="logo-container"
+          onMouseEnter={() => !isMobile && setIsExpanded(true)}
         >
-          <Menu className="icon" />
-        </button>
-      )}
-      <aside
-        className={`sidebar ${isExpanded ? "expanded" : "collapsed"} ${
-          isMobile ? "mobile" : ""
-        }`}
-        style={
-          isMobile
-            ? {
-                transform: isExpanded ? "translateX(0)" : "translateX(-100%)",
-                transition: "transform 0.3s ease",
-              }
-            : {}
-        }
-      >
-        {/* Header */}
-        <div className="sidebar-header">
-          <div className="logo-container">
-            <img src={Final} alt="MedLens Logo" className="info-logo" />
-            <span className="logo-text">MedLenes</span>
-            {!isMobile && (
-              <button
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="toggle-button"
-                aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
-              >
-                {isExpanded ? (
-                  <ChevronLeft className="icon" />
-                ) : (
-                  <ChevronRight className="icon" />
-                )}
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Navigation */}
-        <nav className="nav-container">
-          {filteredMenuItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) =>
-                `nav-item ${isActive ? "active" : ""} ${
-                  isExpanded ? "expanded" : "collapsed"
-                }`
-              }
-              onClick={() => isMobile && setIsExpanded(false)}
+          <img src={Final} alt="MedLens Logo" className="info-logo" />
+          <span className="logo-text">MedLens</span>
+          {!isMobile && (
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="toggle-button"
+              aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
             >
-              <item.icon className="nav-icon" />
-              {isExpanded && <span className="nav-label">{item.label}</span>}
-            </NavLink>
-          ))}
-
-          {/* Logout Button */}
-          <button
-            onClick={handleLogout}
-            className={`nav-item logout-button ${
-              isExpanded ? "expanded" : "collapsed"
-            }`}
+              {isExpanded ? (
+                <ChevronLeft className="icon" />
+              ) : (
+                <ChevronRight className="icon" />
+              )}
+            </button>
+          )}
+        </div>
+      </div>
+      <nav className="nav-container">
+        {filteredMenuItems.map((item) => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            className={({ isActive }) =>
+              `nav-item ${isActive ? "active" : ""} ${
+                isExpanded ? "expanded" : "collapsed"
+              }`
+            }
+            onClick={() => isMobile && setIsSidebarOpen(false)}
           >
-            <LogOut className="nav-icon" />
-            {isExpanded && <span className="nav-label">Logout</span>}
-          </button>
-        </nav>
-      </aside>
-    </>
+            <item.icon className="nav-icon" />
+            {isExpanded && <span className="nav-label">{item.label}</span>}
+          </NavLink>
+        ))}
+        <button
+          onClick={handleLogout}
+          className={`nav-item logout-button ${
+            isExpanded ? "expanded" : "collapsed"
+          }`}
+        >
+          <LogOut className="nav-icon" />
+          {isExpanded && <span className="nav-label">Logout</span>}
+        </button>
+      </nav>
+    </aside>
   );
 }
