@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Bell, Settings } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../Styles/Navbar.css";
 
-export default function Navbar() {
+export default function Navbar({ toggleSidebar, isSidebarExpanded }) {
   const location = useLocation();
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const token =
@@ -30,7 +31,6 @@ export default function Navbar() {
         return res.json();
       })
       .then((data) => {
-        // console.log("Profile data:", data);
         if (data.status === "success") {
           setUser(data.data);
         }
@@ -40,9 +40,11 @@ export default function Navbar() {
         setError(error.message);
       });
   }, []);
-  //console.log("Token stored:", localStorage.getItem("token"));
-  //console.log("Token :", sessionStorage.getItem("token"));
-  //console.log("User:", user);
+
+  const handleMobileMenuToggle = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+    toggleSidebar();
+  };
 
   const getPageTitle = (path) => {
     switch (path) {
@@ -66,11 +68,19 @@ export default function Navbar() {
         return "Dashboard";
     }
   };
+
   const navigate = useNavigate();
 
   return (
     <header className="navbar-header">
       <div className="navbar-container">
+        <button 
+          className="mobile-menu-button" 
+          onClick={handleMobileMenuToggle}
+          aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+        >
+          {isMobileMenuOpen ? <X className="icon" /> : <Menu className="icon" />}
+        </button>
         <h1 className="navbar-title">{getPageTitle(location.pathname)}</h1>
         <div className="navbar-actions">
           <div className="navbar-avatar">
