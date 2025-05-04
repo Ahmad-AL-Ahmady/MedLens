@@ -115,12 +115,12 @@
 }
 
 .services-get-started-button {
-  background: linear-gradient(90deg, var(--secondary-color) 0%, #fbbf24 100%);
+  background: linear-gradient(90deg, var(--primary-light) 0% ,var(--primary-color) 100%);
   color: #fff;
 }
 
 .services-get-started-button:hover {
-  background: linear-gradient(90deg, #d97706 0%, #f59e0b 100%);
+  background: linear-gradient(90deg,  #1e40af 100%, #0b9bf5 0%);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }

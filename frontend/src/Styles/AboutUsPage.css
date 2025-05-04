@@ -99,27 +99,23 @@
 }
 
 .aboutus-home-button {
-  background: linear-gradient(
-    90deg,
-    var(--primary-color) 0%,
-    var(--primary-light) 100%
-  );
+  background: linear-gradient(90deg, var(--primary-color) 0% ,var(--primary-light) 100%);
   color: #fff;
 }
 
 .aboutus-home-button:hover {
-  background: linear-gradient(90deg, #1e40af 0%, #2563eb 100%);
+  background: linear-gradient(90deg, #1e40af 100%, #3976f9 0%);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
 
 .aboutus-get-started-button {
-  background: linear-gradient(90deg, var(--secondary-color) 0%, #fbbf24 100%);
+  background: linear-gradient(90deg, var(--primary-light) 0% ,var(--primary-color) 100% );
   color: #fff;
 }
 
 .aboutus-get-started-button:hover {
-  background: linear-gradient(90deg, #d97706 0%, #f59e0b 100%);
+  background: linear-gradient(90deg, #1e40af 100%, #0b9bf5 0%);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
