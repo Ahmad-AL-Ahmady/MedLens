@@ -483,6 +483,12 @@ export default function PatientProfile() {
           title: "Success!",
           text: "Password updated successfully",
           confirmButtonColor: "#3b82f6",
+        }).then(() => {
+          // Clear tokens from storage
+          localStorage.removeItem("authToken");
+          sessionStorage.removeItem("authToken");
+          // Redirect to login page
+          window.location.href = "/login";
         });
         setShowPasswordForm(false);
         setPasswordData({
