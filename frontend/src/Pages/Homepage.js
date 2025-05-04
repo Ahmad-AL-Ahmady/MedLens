@@ -553,20 +553,20 @@ export default function HomePage() {
             <div className="home-footer-section">
               <h3 className="home-footer-heading">Quick Links</h3>
               <ul className="home-footer-list">
-                {["About Us", "Services"].map((link) => (
-                  <li key={link}>
+                {["About Us", "Services"].map((item) => (
+                  <li key={item}>
                     <button
+                      key={item}
                       className="home-footer-link"
-                      onClick={() =>
+                      onClick={() => {
                         navigate(
-                          `/${link
-                            .toLowerCase()
-                            .replace(" & ", "-")
-                            .replace(" ", "-")}`
-                        )
-                      }
+                          item === "About Us" ? "/aboutuspage" : "/servicespage"
+                        );
+                        setIsMenuOpen(false);
+                      }}
                     >
-                      {link}
+                      {item}
+                      <span className="nav-button-underline"></span>
                     </button>
                   </li>
                 ))}
