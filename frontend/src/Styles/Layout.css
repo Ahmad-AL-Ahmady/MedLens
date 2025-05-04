@@ -20,7 +20,8 @@
 }
 
 /* Ensure layout and navbar move together */
-.layout-container .sidebar:hover ~ .main-content {
+.layout-container .sidebar:hover ~ .main-content,
+.layout-container .sidebar.expanded ~ .main-content {
   width: calc(100% - 16rem);
   margin-left: 16rem;
 }
@@ -40,7 +41,8 @@
     width: 100%;
   }
 
-  .layout-container .sidebar:hover ~ .main-content {
+  .layout-container .sidebar:hover ~ .main-content,
+  .layout-container .sidebar.expanded ~ .main-content {
     width: 100%;
     margin-left: 0;
   }
@@ -56,7 +58,8 @@
     margin-left: 5rem;
   }
 
-  .sidebar:hover ~ .main-content {
+  .layout-container .sidebar:hover ~ .main-content,
+  .layout-container .sidebar.expanded ~ .main-content {
     width: calc(100% - 14rem);
     margin-left: 14rem;
   }
@@ -68,7 +71,8 @@
     margin-left: 5rem;
   }
 
-  .sidebar:hover ~ .main-content {
+  .layout-container .sidebar:hover ~ .main-content,
+  .layout-container .sidebar.expanded ~ .main-content {
     width: calc(100% - 16rem);
     margin-left: 16rem;
   }
@@ -80,7 +84,8 @@
     margin-left: 6rem;
   }
 
-  .sidebar:hover ~ .main-content {
+  .layout-container .sidebar:hover ~ .main-content,
+  .layout-container .sidebar.expanded ~ .main-content {
     width: calc(100% - 18rem);
     margin-left: 18rem;
   }

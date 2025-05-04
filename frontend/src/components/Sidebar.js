@@ -7,6 +7,7 @@ import {
   Pill,
   ScanEye,
   LogOut,
+  X,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -122,9 +123,9 @@ export default function Sidebar({
 
   return (
     <aside
-      className={`sidebar ${isExpanded ? "expanded" : "collapsed"} ${
-        isMobile ? "mobile" : ""
-      }`}
+      className={`sidebar ${
+        isExpanded ? "sidebar-expanded" : "sidebar-collapsed"
+      } ${isMobile ? "sidebar-mobile" : ""}`}
       style={
         isMobile
           ? { transform: isExpanded ? "translateX(0)" : "translateX(-100%)" }
@@ -133,50 +134,48 @@ export default function Sidebar({
     >
       <div className="sidebar-header">
         <div
-          className="logo-container"
+          className="sidebar-logo-container"
           onMouseEnter={() => !isMobile && setIsExpanded(true)}
         >
-          <img src={Final} alt="MedLens Logo" className="info-logo" />
-          <span className="logo-text">MedLens</span>
-          {!isMobile && (
-            <button
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="toggle-button"
-              aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
-            >
-              {isExpanded ? (
-                <ChevronLeft className="icon" />
-              ) : (
-                <ChevronRight className="icon" />
-              )}
-            </button>
-          )}
+          <img src={Final} alt="MedLens Logo" className="sidebar-info-logo" />
+          <span className="sidebar-logo-text">MedLens</span>
         </div>
+        {isMobile && isExpanded && (
+          <button
+            onClick={() => setIsSidebarOpen(false)}
+            className="sidebar-close-button"
+            aria-label="Close sidebar"
+          >
+            <X className="sidebar-icon" />
+          </button>
+        )}
       </div>
-      <nav className="nav-container">
+      <nav className="sidebar-nav-container">
         {filteredMenuItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
-              `nav-item ${isActive ? "active" : ""} ${
-                isExpanded ? "expanded" : "collapsed"
+              `sidebar-nav-item ${isActive ? "sidebar-active" : ""} ${
+                isExpanded ? "sidebar-expanded" : "sidebar-collapsed"
               }`
             }
             onClick={() => isMobile && setIsSidebarOpen(false)}
           >
-            <item.icon className="nav-icon" />
-            {isExpanded && <span className="nav-label">{item.label}</span>}
+            <item.icon className="sidebar-nav-icon" />
+            {isExpanded && (
+              <span className="sidebar-nav-label">{item.label}</span>
+            )}
           </NavLink>
         ))}
         <button
           onClick={handleLogout}
-          className={`nav-item logout-button ${
-            isExpanded ? "expanded" : "collapsed"
+          className={`sidebar-nav-item sidebar-logout-button ${
+            isExpanded ? "sidebar-expanded" : "sidebar-collapsed"
           }`}
         >
-          <LogOut className="nav-icon" />
-          {isExpanded && <span className="nav-label">Logout</span>}
+          <LogOut className="sidebar-nav-icon" />
+          {isExpanded && <span className="sidebar-nav-label">Logout</span>}
         </button>
       </nav>
     </aside>

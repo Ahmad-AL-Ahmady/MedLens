@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
-import Navbar from "./NavbarInside";
 import Sidebar from "./Sidebar";
 import "../Styles/Layout.css";
+import Navbar from "./NavbarInside";
 
 export default function Layout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -22,6 +22,7 @@ export default function Layout() {
       >
         <Navbar
           toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+          isSidebarOpen={isSidebarOpen}
           isSidebarExpanded={isSidebarExpanded}
         />
         <main className="main-wrapper">
