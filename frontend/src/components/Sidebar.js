@@ -133,7 +133,7 @@ export default function Sidebar() {
     <>
       {isMobile && (
         <button
-          className="mobile-menu-button"
+          className="mobile-menu-button-sidebar"
           onClick={() => setIsExpanded(!isExpanded)}
           aria-label="Toggle menu"
         >

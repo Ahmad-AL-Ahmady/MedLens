@@ -381,7 +381,7 @@ body {
   }
 
   /* Mobile Menu Button */
-  .mobile-menu-button {
+  .mobile-menu-button-sidebar {
     position: fixed;
     top: 1rem;
     left: 1rem;
@@ -401,12 +401,12 @@ body {
     opacity: 1;
   }
 
-  .mobile-menu-button:hover {
+  .mobile-menu-button-sidebar {
     background: #f8fafc;
     transform: scale(1.05);
   }
 
-  .mobile-menu-button .icon {
+  .mobile-menu-button-sidebar .icon {
     width: 24px;
     height: 24px;
     color: #64748b;
@@ -419,7 +419,7 @@ body {
 
 /* Hide mobile menu button on desktop */
 @media (min-width: 769px) {
-  .mobile-menu-button {
+  .mobile-menu-button-sidebar {
     display: none;
   }
 }
@@ -462,7 +462,7 @@ body {
 }
 
 /* Mobile Menu Button */
-.mobile-menu-button {
+.mobile-menu-button-sidebar {
   position: fixed;
   top: 1rem;
   left: 1rem;
@@ -482,12 +482,12 @@ body {
   opacity: 1;
 }
 
-.mobile-menu-button:hover {
+.mobile-menu-button-sidebar:hover {
   background: #f8fafc;
   transform: scale(1.05);
 }
 
-.mobile-menu-button .icon {
+.mobile-menu-button-sidebar .icon {
   width: 24px;
   height: 24px;
   color: #64748b;
@@ -525,7 +525,7 @@ body {
   }
 
   /* Ensure the mobile menu button is visible */
-  .mobile-menu-button {
+  .mobile-menu-button-sidebar {
     display: block;
     visibility: visible;
     opacity: 1;
@@ -534,7 +534,7 @@ body {
 
 /* Hide mobile menu button on desktop */
 @media (min-width: 769px) {
-  .mobile-menu-button {
+  .mobile-menu-button-sidebar {
     display: none;
   }
 }
