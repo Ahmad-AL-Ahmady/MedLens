@@ -133,6 +133,7 @@ dist
 *.h5
 .venv
 Models_ai/
+__pycache__/
 
 # # Upload directories
 # backend/public/uploads/*

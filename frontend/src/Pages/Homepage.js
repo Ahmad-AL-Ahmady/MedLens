@@ -579,7 +579,7 @@ export default function HomePage() {
               <ul className="home-footer-list">
                 <li className="home-contact-item">
                   <Mail size={20} />
-                  <span>contact@medcal.com</span>
+                  <span>contact@medlens.com</span>
                 </li>
               </ul>
             </div>
@@ -590,7 +590,7 @@ export default function HomePage() {
         <div className="home-footer-bottom">
           <div className="home-footer-bottom-content">
             <div className="home-footer-copyright">
-              © 2025 MedCal. All rights reserved.
+              © 2025 MedLens. All rights reserved.
             </div>
           </div>
         </div>

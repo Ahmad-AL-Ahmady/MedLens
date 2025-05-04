@@ -287,13 +287,13 @@ export default function DoctorPage() {
           <option value="50">50 km</option>
         </select>
 
-        <div className="signup-location-container">
+        <div className="doctor-page-location-container">
           <button
             type="button"
-            className="signup-location-button"
+            className="doctor-page-location-button"
             onClick={() => setShowMap(!showMap)}
           >
-            <CiLocationOn className="signup-location-icon" />
+            <CiLocationOn className="doctor-page-location-icon" />
             {location ? "Location Selected" : "Select Location"}
           </button>
         </div>
