@@ -2,11 +2,11 @@
 @import url("https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap");
 
 body {
-  font-family: "inter", sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 .sidebar {
-  background-color: #ffff;
+  background-color: #fff;
   border-right: 1px solid #e2e8f0;
   min-height: 100vh;
   padding: 1.5rem 1rem;
@@ -53,13 +53,8 @@ body {
   padding: 0 0.75rem;
   margin-bottom: 1.5rem;
   justify-content: space-between;
-}
-
-.info-logo {
-  max-width: 50px;
-  max-height: 50px;
-  object-fit: contain;
-  margin-right: 10px;
+  position: relative;
+  width: 100%;
 }
 
 .logo-container {
@@ -68,26 +63,104 @@ body {
   justify-content: center;
   gap: 3px;
   margin-bottom: 0.75rem;
+  position: relative;
 }
 
 .info-logo {
-  width: 50px;
+  width: 40px;
   height: auto;
+  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .logo-text {
-  font-size: 1.75rem;
-  letter-spacing: -0.025em;
-  font-weight: 700;
-
-  color: #2563eb;
+  font-size: 1.85rem;
+  letter-spacing: -0.03em;
+  font-weight: 800;
+  color: transparent;
   font-family: "Cairo", sans-serif;
   display: inline-block;
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #1e40af 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  text-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: left center;
+  animation: logoGlow 4s ease-in-out infinite;
+}
+
+@keyframes logoGlow {
+  0%,
+  100% {
+    background-position: 0% 50%;
+    text-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
+  }
+  50% {
+    background-position: 100% 50%;
+    text-shadow: 0 4px 16px rgba(37, 99, 235, 0.25);
+  }
+}
+
+.logo-text::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #2563eb 0%, #3b82f6 50%, #1e40af 100%);
+  transform: scaleX(0.8);
+  transform-origin: center;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.6;
+}
+
+.logo-text:hover {
+  transform: scale(1.02);
+  animation-play-state: paused;
+}
+
+.logo-text:hover::after {
+  transform: scaleX(1);
+  opacity: 0.9;
+}
+
+.sidebar.collapsed .logo-text {
+  opacity: 0;
+  transform: scale(0.8);
+  animation: none;
+}
+
+.sidebar.expanded .logo-text {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+  .logo-text {
+    font-size: 1.5rem;
+    text-shadow: 0 2px 6px rgba(37, 99, 235, 0.1);
+  }
+
+  .logo-text::after {
+    bottom: -3px;
+    height: 1.5px;
+  }
+}
+
+.sidebar.collapsed .logo-text {
+  opacity: 0;
+  font-size: 0;
+}
+
+.sidebar.expanded .logo-text {
+  opacity: 1;
+  font-size: 1.75rem;
 }
 
 .toggle-button {
   padding: 0.625rem;
-  margin-bottom: 0.5rem;
   border-radius: 9999px;
   border: none;
   background: transparent;
@@ -96,11 +169,44 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  opacity: 0; /* Hidden by default in collapsed state */
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
 }
 
+/* In collapsed state, show toggle button on hover */
+.sidebar.collapsed .logo-container:hover .toggle-button {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* In collapsed state, position the toggle button absolutely */
+.sidebar.collapsed .toggle-button {
+  position: absolute;
+  right: 0;
+  transform: translateX(100%); /* Start off to the right */
+}
+
+/* In expanded state, always show toggle button with enhanced placement */
+.sidebar.expanded .toggle-button {
+  opacity: 1;
+  transform: translateX(0);
+  position: relative;
+  margin-left: 0.5rem;
+  background: #eff6ff; /* Subtle background to make it stand out */
+  border: 1px solid #e2e8f0; /* Light border for definition */
+  padding: 0.5rem; /* Slightly tighter padding for better fit */
+}
+
+/* Hover effect for toggle button */
 .toggle-button:hover {
   background-color: #f8fafc;
-  transform: rotate(5deg);
+  transform: rotate(5deg) translateX(0);
+}
+
+/* Adjust hover effect in expanded state to maintain background */
+.sidebar.expanded .toggle-button:hover {
+  background-color: #dfebff; /* Slightly darker shade on hover */
+  transform: rotate(5deg) translateX(0);
 }
 
 .toggle-button .icon {
@@ -192,7 +298,6 @@ body {
   margin-bottom: 1rem;
 }
 
-/* Ensure hover states work for logout button */
 .logout-button:hover {
   background-color: #f8fafc !important;
   transform: translateX(2px) !important;
@@ -208,7 +313,6 @@ body {
     opacity: 0;
     transform: translateX(-10px);
   }
-
   to {
     opacity: 1;
     transform: translateX(0);
@@ -218,10 +322,6 @@ body {
 .nav-label {
   animation: fadeIn 0.2s ease-out;
 }
-
-/* Existing styles remain the same */
-
-/* Add these media queries at the end */
 
 /* Medium screens (tablets) */
 @media (max-width: 1024px) {
@@ -248,7 +348,6 @@ body {
     transform: translateX(-100%);
     transition: transform 0.3s ease;
     width: 16rem !important;
-    /* Force expanded width for mobile */
     z-index: 1000;
     box-shadow: 4px 0 15px -3px rgba(0, 0, 0, 0.1);
   }
@@ -266,6 +365,15 @@ body {
     right: -50px;
     background-color: white;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    opacity: 1; /* Always visible on mobile */
+    transform: translateX(0);
+    border: none; /* Remove border on mobile */
+    padding: 0.625rem; /* Reset padding */
+  }
+
+  .sidebar.collapsed .logo-container:hover .toggle-button {
+    opacity: 1;
+    transform: translateX(0);
   }
 
   .nav-item {
@@ -302,5 +410,10 @@ body {
   .toggle-button:hover {
     background-color: transparent;
     transform: none;
+  }
+
+  .sidebar.collapsed .logo-container:hover .toggle-button {
+    opacity: 1;
+    transform: translateX(0);
   }
 }

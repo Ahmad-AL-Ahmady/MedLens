@@ -115,23 +115,21 @@ export default function Sidebar() {
     <aside className={`sidebar ${isExpanded ? "expanded" : "collapsed"}`}>
       {/* Header */}
       <div className="sidebar-header">
-        {isExpanded && (
-          <div className="logo-container">
-            <img src={Final} alt="MedLens Logo" className="info-logo" />
-            <span className="logo-text">MedLenes</span>
-          </div>
-        )}
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="toggle-button"
-          aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
-        >
-          {isExpanded ? (
-            <ChevronLeft className="icon" />
-          ) : (
-            <ChevronRight className="icon" />
-          )}
-        </button>
+        <div className="logo-container">
+          <img src={Final} alt="MedLens Logo" className="info-logo" />
+          <span className="logo-text">MedLenes</span>
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="toggle-button"
+            aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
+          >
+            {isExpanded ? (
+              <ChevronLeft className="icon" />
+            ) : (
+              <ChevronRight className="icon" />
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Navigation */}
