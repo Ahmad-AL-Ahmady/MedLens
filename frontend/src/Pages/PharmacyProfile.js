@@ -3,15 +3,12 @@ import { useParams } from "react-router-dom";
 import {
   Mail,
   Phone,
-  ThumbsUp,
-  Star,
   Calendar,
   Edit,
   Trash2,
   MapPin,
   User,
   ScanBarcode,
-  Stethoscope,
   ClipboardList,
   Pill,
 } from "lucide-react";
@@ -896,15 +893,15 @@ const PharmacyProfile = () => {
                 </div>
               </div>
               {isViewingOwnProfile ? (
-                <div className="profile-action-buttons">
+                <div className="pharmacy-profile-action-buttons">
                   <button
-                    className="edit-doctor-profile-button"
+                    className="edit-pharmacy-profile-button"
                     onClick={() => setShowEditForm(true)}
                   >
                     <Edit size={15} color="white" /> Edit Profile
                   </button>
                   <button
-                    className="update-password-button"
+                    className="pharmacy-profile-update-password-button"
                     onClick={() => setShowPasswordForm(true)}
                   >
                     <svg
@@ -935,13 +932,13 @@ const PharmacyProfile = () => {
             </div>
 
             {/* Replace the stats cards section */}
-            <div className="patient-profile-summary-cards">
-              <div className="patient-profile-card">
+            <div className="pharmacy-profile-summary-cards">
+              <div className="pharmacy-profile-card">
                 <Pill size={16} color="#1f61a8" />
                 <h3>{inventory.length}</h3>
                 <p>Medications</p>
               </div>
-              <div className="patient-profile-card">
+              <div className="pharmacy-profile-card">
                 <Calendar size={16} color="#1f61a8" />
                 <h3>
                   {profile?.createdAt
@@ -964,7 +961,7 @@ const PharmacyProfile = () => {
                 </h3>
                 <p>Pharmacy Since</p>
               </div>
-              <div className="patient-profile-card">
+              <div className="pharmacy-profile-card">
                 <ClipboardList size={16} color="#1f61a8" />
                 <h3>{scans.length}</h3>
                 <p>Reports</p>
@@ -984,13 +981,13 @@ const PharmacyProfile = () => {
             ></iframe>
           </div>
 
-          {/* Reviews Section */}
-          <div className="patient-profile-scan-section">
+          {/* Scan Section */}
+          <div className="pharmacy-profile-scan-section">
             <h2>
               <ScanBarcode size={20} color="#1e40af" />
               Scans
             </h2>
-            <table className="patient-profile-data-table">
+            <table className="pharmacy-profile-data-table">
               <thead>
                 <tr>
                   <th>Preview</th>
@@ -1010,7 +1007,7 @@ const PharmacyProfile = () => {
                           <img
                             src={`http://localhost:4000${scan.images[0]}`}
                             alt="Scan preview"
-                            className="scan-preview-image"
+                            className="pharmacy-profile-scan-preview-image"
                           />
                         ) : (
                           "No image"
@@ -1031,11 +1028,11 @@ const PharmacyProfile = () => {
                             : "N/A")}
                       </td>
                       <td>{scan.bodyPart || "N/A"}</td>
-                      <td className="confidence-cell">
+                      <td className="pharmacy-profile-confidence-cell">
                         {scan.aiAnalysis &&
                         typeof scan.aiAnalysis.confidence_score === "number" ? (
                           <span
-                            className={`confidence-value ${
+                            className={`pharmacy-profile-confidence-value ${
                               scan.aiAnalysis.confidence_score >= 90
                                 ? "high-confidence"
                                 : scan.aiAnalysis.confidence_score >= 70
@@ -1051,7 +1048,7 @@ const PharmacyProfile = () => {
                       </td>
                       <td>
                         <button
-                          className="delete-appointment-button"
+                          className="pharmacy-profile-delete-appointment-button"
                           onClick={() => handleDeleteScan(scan._id)}
                           title="Delete Scan"
                         >

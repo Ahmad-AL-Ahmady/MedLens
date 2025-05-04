@@ -477,7 +477,8 @@
   width: max-content;
   min-width: 320px;
   max-width: 90vw;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -552,7 +553,7 @@
 }
 
 /* Special styling for Sunday (last day) */
-.operating-hours-grid>div:last-child {
+.operating-hours-grid > div:last-child {
   grid-column: 1 / -1;
   width: 50%;
   margin: 0 auto;
@@ -1069,7 +1070,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 0;
   padding: 20px;
   box-sizing: border-box;
 }
@@ -1115,7 +1116,7 @@
 }
 
 /* Special styling for Sunday (last day) */
-.operating-hours-grid>div:last-child {
+.operating-hours-grid > div:last-child {
   grid-column: 1 / -1;
   width: 50%;
   margin: 0 auto;
@@ -1132,6 +1133,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 20px;
 }
 
 .operating-hours-item:hover {
@@ -1484,6 +1486,86 @@
   color: #1f61a8;
 }
 
+/* Readonly input styles */
+.readonly-input {
+  background-color: #f3f4f6;
+  color: #374151;
+  cursor: not-allowed;
+  border: 1px solid #e5e7eb;
+  opacity: 0.8;
+}
+
+.readonly-input:focus {
+  border-color: #e5e7eb;
+  box-shadow: none;
+  outline: none;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .doctor-profile-container {
+    margin: 15px;
+    padding: 15px;
+  }
+
+  .doctor-header-top {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .doctor-profile-info {
+    align-items: center;
+    text-align: center;
+  }
+
+  .doctor-profile-stats {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .doctor-profile-card {
+    padding: 15px;
+  }
+
+  .doctor-profile-card span {
+    font-size: 20px;
+  }
+
+  .review-modal {
+    width: 90%;
+    padding: 20px;
+  }
+
+  .operating-hours-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .doctor-profile-name {
+    font-size: 24px;
+  }
+
+  .doctor-profile-usertype {
+    font-size: 14px;
+  }
+
+  .review-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .reviewer-info {
+    flex-direction: column;
+    align-items: center;
+  }
+  .doctor-profile-stats {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+}
 /* Only apply column layout on very small screens */
 @media (max-width: 400px) {
   .availability-modal-buttons {
@@ -1497,7 +1579,6 @@
   }
 }
 
-/* Responsive styles */
 @media (max-width: 768px) {
   .availability-modal {
     width: 95%;
@@ -1526,7 +1607,7 @@
   }
 
   /* Adjust Sunday card on mobile */
-  .operating-hours-grid>div:last-child {
+  .operating-hours-grid > div:last-child {
     width: 100%;
   }
 
@@ -1555,19 +1636,4 @@
     padding: 6px;
     font-size: 12px;
   }
-}
-
-/* Readonly input styles */
-.readonly-input {
-  background-color: #f3f4f6;
-  color: #374151;
-  cursor: not-allowed;
-  border: 1px solid #e5e7eb;
-  opacity: 0.8;
-}
-
-.readonly-input:focus {
-  border-color: #e5e7eb;
-  box-shadow: none;
-  outline: none;
 }
