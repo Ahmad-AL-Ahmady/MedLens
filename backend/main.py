@@ -7,7 +7,7 @@ import io
 import os
 import uvicorn
 from keras.models import load_model
-from ctransformers import AutoModelForCausalLM  # تغيير المكتبة من llama_cpp إلى ctransformers
+from ctransformers import AutoModelForCausalLM
 
 # إعداد FastAPI
 app = FastAPI()
@@ -153,10 +153,10 @@ def generate_response(prompt: str):
         top_p=0.95,
         stop=["Human:", "User:"]  # تحديد الكلمات التي تنهي الرد
     )
-    
+
     # تنظيف الاستجابة من أي توجيهات غير مرغوبة
     cleaned_response = response.strip()
-    
+
     # إزالة أي توجيهات مثل "Use appropriate language level..."
     unwanted_phrases = [
         "Use appropriate language level for an adult audience.",
@@ -165,17 +165,17 @@ def generate_response(prompt: str):
         "Provide sources",
         "adult audience"
     ]
-    
+
     for phrase in unwanted_phrases:
         if cleaned_response.startswith(phrase):
             cleaned_response = cleaned_response[len(phrase):].strip()
-    
+
     # إزالة أي تنسيقات رمزية غير مرغوبة
     if cleaned_response.startswith("<"):
         # محاولة حذف أي وسوم XML أو HTML في بداية الاستجابة
         import re
         cleaned_response = re.sub(r"^<[^>]+>", "", cleaned_response).strip()
-    
+
     return cleaned_response
 
 
@@ -254,11 +254,12 @@ async def predict(file: UploadFile = File(...), bodyPart: str = Form("Chest")):
                 confidence_score = 0.0
 
             diagnosis.update(classification_result, confidence_score, bodyPart)
-            
+
             # توليد المعلومات الطبية بشكل تلقائي بعد التشخيص
             if classification_result.lower() != "normal" and classification_result.lower() != "normal anatomy":
                 # فقط إذا كان هناك تشخيص لمرض أو حالة غير طبيعية
-                diagnosis.medical_info = get_medical_info(diagnosis.get_full_description())
+                diagnosis.medical_info = get_medical_info(
+                    diagnosis.get_full_description())
         else:
             classification_result = "Not a valid X-ray image"
             confidence_score = primary_confidence
@@ -270,11 +271,11 @@ async def predict(file: UploadFile = File(...), bodyPart: str = Form("Chest")):
             "confidence_score": round(confidence_score * 100, 2),
             "body_part": diagnosis.body_part,
         }
-        
+
         # إضافة المعلومات الطبية للاستجابة إذا كانت متاحة
         if diagnosis.medical_info:
             response_data["medical_info"] = diagnosis.medical_info
-            
+
         return response_data
 
     except Exception as e:
@@ -323,7 +324,8 @@ async def chat(request: ChatRequest):
 
     if is_info_request:
         disease_name = (
-            request.message.replace("Provide information and treatments for", "")
+            request.message.replace(
+                "Provide information and treatments for", "")
             .replace("Provide information for", "")
             .strip()
         )
@@ -347,7 +349,6 @@ async def chat(request: ChatRequest):
 
     response = generate_response(prompt)
     return {"response": response}
-
 
 
 # تشغيل السيرفر

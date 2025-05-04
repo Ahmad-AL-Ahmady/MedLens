@@ -356,15 +356,29 @@ export default function PatientProfile() {
 
         if (response.ok) {
           const data = await response.json();
-          // console.log("Avatar updated successfully!", data);
-          alert("Avatar updated successfully!");
-          setSelectedImage(URL.createObjectURL(file));
-          await fetchProfile();
+          Swal.fire({
+            icon: "success",
+            title: "Success!",
+            text: "Avatar updated successfully",
+            timer: 1500,
+            showConfirmButton: false,
+          }).then(() => {
+            window.location.reload();
+          });
         } else {
-          console.error("Failed to update avatar");
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Failed to update avatar",
+          });
         }
       } catch (error) {
         console.error("Error:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Something went wrong while updating your avatar",
+        });
       }
     }
   };
@@ -374,7 +388,16 @@ export default function PatientProfile() {
   };
 
   const handleDeleteAvatar = async () => {
-    if (window.confirm("Do you want to delete your avatar?")) {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to delete your avatar?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, keep it",
+    });
+
+    if (result.isConfirmed) {
       try {
         const response = await fetch(
           "http://localhost:4000/api/users/deleteAvatar",
@@ -387,13 +410,29 @@ export default function PatientProfile() {
         );
 
         if (response.ok) {
-          alert("Avatar deleted successfully!");
-          setSelectedImage(null);
+          Swal.fire({
+            icon: "success",
+            title: "Success!",
+            text: "Avatar deleted successfully",
+            timer: 1500,
+            showConfirmButton: false,
+          }).then(() => {
+            window.location.reload();
+          });
         } else {
-          console.error("Failed to delete avatar");
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Failed to delete avatar",
+          });
         }
       } catch (error) {
         console.error("Error while deleting avatar:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Something went wrong while deleting your avatar",
+        });
       }
     }
   };
