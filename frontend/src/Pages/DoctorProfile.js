@@ -545,7 +545,9 @@ const DoctorProfile = () => {
       try {
         data = await res.json();
       } catch (jsonError) {
-        throw new Error("Can't add multiple reviews for the same entity.");
+        throw new Error(
+          "Can't add multiple reviews for the same entity. Or this user is unauthorized to add reviews."
+        );
       }
 
       if (!res.ok) {
