@@ -6,8 +6,8 @@ import numpy as np
 import io
 import os
 import uvicorn
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from keras.models import load_model
+from ctransformers import AutoModelForCausalLM  # تغيير المكتبة من llama_cpp إلى ctransformers
 
 # إعداد FastAPI
 app = FastAPI()
@@ -20,11 +20,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# تحميل النموذج من HuggingFace
-# المسار إلى النموذج المحفوظ محليًا
-model_name = "C:\\Users\\user\\Documents\\GitHub\\HealthVision\\flan-t5-large"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+# تحميل نموذج GGML/GGUF باستخدام ctransformers
+MODEL_PATH = "ggml-model-Q8_0.gguf"  # تأكد من وجود المسار الصحيح للملف
+llm = AutoModelForCausalLM.from_pretrained(
+    MODEL_PATH,
+    model_type="llama",  # تحديد نوع النموذج (llama, gpt2, gpt-j, etc.)
+    context_length=2048,  # حجم نافذة السياق (مماثل لـ n_ctx)
+    threads=4  # عدد الخيوط للمعالجة - قم بضبطه وفقًا لجهازك
+)
 
 
 # تحميل النماذج المحلية (مثال لنماذج تصنيف الأشعة السينية)
@@ -120,11 +123,14 @@ class DiagnosisInfo:
         self.classification_result = "Unknown"
         self.confidence_score = 0.0
         self.body_part = "Unknown"
+        self.medical_info = ""  # إضافة حقل لتخزين المعلومات الطبية
 
     def update(self, classification, confidence, body_part="Unknown"):
         self.classification_result = classification
         self.confidence_score = confidence
         self.body_part = body_part
+        # تفريغ المعلومات الطبية عند تحديث التشخيص
+        self.medical_info = ""
 
     def get_full_description(self):
         return (
@@ -137,13 +143,51 @@ class DiagnosisInfo:
 diagnosis = DiagnosisInfo()
 
 
-# دالة لتوليد الاستجابة من النموذج
+# دالة لتوليد الاستجابة من نموذج ctransformers
 def generate_response(prompt: str):
-    inputs = tokenizer(prompt, return_tensors="pt",
-                       padding=True, truncation=True)
-    outputs = model.generate(**inputs, max_length=500)
-    response = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    return response
+    # إعداد معلمات التوليد
+    response = llm(
+        prompt,
+        max_new_tokens=512,
+        temperature=0.7,
+        top_p=0.95,
+        stop=["Human:", "User:"]  # تحديد الكلمات التي تنهي الرد
+    )
+    
+    # تنظيف الاستجابة من أي توجيهات غير مرغوبة
+    cleaned_response = response.strip()
+    
+    # إزالة أي توجيهات مثل "Use appropriate language level..."
+    unwanted_phrases = [
+        "Use appropriate language level for an adult audience.",
+        "Provide sources to support the information provided in the response.",
+        "Use appropriate language level",
+        "Provide sources",
+        "adult audience"
+    ]
+    
+    for phrase in unwanted_phrases:
+        if cleaned_response.startswith(phrase):
+            cleaned_response = cleaned_response[len(phrase):].strip()
+    
+    # إزالة أي تنسيقات رمزية غير مرغوبة
+    if cleaned_response.startswith("<"):
+        # محاولة حذف أي وسوم XML أو HTML في بداية الاستجابة
+        import re
+        cleaned_response = re.sub(r"^<[^>]+>", "", cleaned_response).strip()
+    
+    return cleaned_response
+
+
+# دالة جديدة للحصول على المعلومات الطبية تلقائيًا بعد التشخيص
+def get_medical_info(condition_name):
+    prompt = (
+        f"Provide medical information about {condition_name}. "
+        f"Include: Description, Causes, Symptoms, Treatments. "
+        f"End with 3-5 practical advice points for patients as bullet points. "
+        f"Be accurate and concise."
+    )
+    return generate_response(prompt)
 
 
 # API للتنبؤ باستخدام نموذج الصور
@@ -203,23 +247,35 @@ async def predict(file: UploadFile = File(...), bodyPart: str = Form("Chest")):
             elif model_key == "brain":
                 model_pred = brain_model.predict(processed_img)
                 result_idx = np.argmax(model_pred[0])
-                classification_result = CLASS_NAMES["lung"][result_idx]
+                classification_result = CLASS_NAMES["brain"][result_idx]
                 confidence_score = float(np.max(model_pred[0]))
             else:
                 classification_result = "Unknown body part"
                 confidence_score = 0.0
 
             diagnosis.update(classification_result, confidence_score, bodyPart)
+            
+            # توليد المعلومات الطبية بشكل تلقائي بعد التشخيص
+            if classification_result.lower() != "normal" and classification_result.lower() != "normal anatomy":
+                # فقط إذا كان هناك تشخيص لمرض أو حالة غير طبيعية
+                diagnosis.medical_info = get_medical_info(diagnosis.get_full_description())
         else:
             classification_result = "Not a valid X-ray image"
             confidence_score = primary_confidence
             diagnosis.update(classification_result, confidence_score)
+            diagnosis.medical_info = ""
 
-        return {
+        response_data = {
             "classification_result": diagnosis.get_full_description(),
             "confidence_score": round(confidence_score * 100, 2),
             "body_part": diagnosis.body_part,
         }
+        
+        # إضافة المعلومات الطبية للاستجابة إذا كانت متاحة
+        if diagnosis.medical_info:
+            response_data["medical_info"] = diagnosis.medical_info
+            
+        return response_data
 
     except Exception as e:
         return {"error": str(e)}
@@ -230,22 +286,44 @@ class ChatRequest(BaseModel):
     message: str
 
 
-# API للمحادثة مع النموذج بناءً على التشخيص
 @app.post("/chat")
 async def chat(request: ChatRequest):
     global diagnosis
 
-    if diagnosis.classification_result == "No abnormalities detected":
+    # ✅ رسالة ترحيب تلقائية عند استقبال start أو hello أو hi أو السلام عليكم
+    if request.message.strip().lower() in ["start", "hello", "hi", "ابدأ", "مرحبا", "السلام عليكم"]:
+        return {
+            "response": "👋 Hello and welcome! I'm here to help answer your questions. Just ask away! 😊"
+        }
+
+    # التحقق من صلاحية صورة الأشعة
+    if diagnosis.classification_result == "No abnormalities detected" or diagnosis.classification_result == "Not a valid x-ray image":
         return {
             "response": "🚨 The image you uploaded is not a valid x-ray. Please upload a medical x-ray so I can provide an accurate medical analysis."
         }
 
-    is_info_request = request.message.startswith("Provide information")
+    # إذا المستخدم طلب معلومات طبية فقط
+    if request.message.strip().lower() == "provide medical information about it":
+        disease_name = diagnosis.get_full_description()
+        if not diagnosis.medical_info:
+            prompt = (
+                f"Provide medical information about {disease_name}. "
+                f"Include: Description, Causes, Symptoms, Treatments. "
+                f"End with 3-5 practical advice points for patients as bullet points. "
+                f"Be accurate and concise."
+            )
+            response = generate_response(prompt)
+            diagnosis.medical_info = response
+        else:
+            response = diagnosis.medical_info
+        return {"response": response}
+
+    # لو طلب معلومات محددة
+    is_info_request = request.message.lower().startswith("provide information")
 
     if is_info_request:
         disease_name = (
-            request.message.replace(
-                "Provide information and treatments for", "")
+            request.message.replace("Provide information and treatments for", "")
             .replace("Provide information for", "")
             .strip()
         )
@@ -254,24 +332,22 @@ async def chat(request: ChatRequest):
             disease_name = diagnosis.get_full_description()
 
         prompt = (
-            f"You are a medical assistant. Provide a detailed explanation about {disease_name}, "
-            f"including its causes, symptoms, and available treatments. "
-            f"At the end, provide a bullet-point list of 3-5 practical advice points or simple steps that patients "
-            f"should follow. Format your response with clear sections for Description, Causes, Symptoms, Treatments, "
-            f"and 'Advice for Patients' (as bullet points with • symbol). Be concise but informative."
+            f"Provide medical information about {disease_name}. "
+            f"Include: Description, Causes, Symptoms, Treatments. "
+            f"End with 3-5 practical advice points for patients as bullet points. "
+            f"Be accurate and concise."
         )
     else:
         prompt = (
-            f"You are a medical assistant. The patient has been diagnosed with {diagnosis.get_full_description()} "
+            f"Context: The patient has been diagnosed with {diagnosis.get_full_description()} "
             f"(Confidence: {diagnosis.confidence_score:.2f}%).\n"
-            f"Answer the following question concisely and professionally:\n"
             f"Question: {request.message}\n"
-            "Answer (do not repeat the question in your answer):"
+            "Answer:"
         )
 
-    # استخدام النموذج لتوليد الرد
     response = generate_response(prompt)
     return {"response": response}
+
 
 
 # تشغيل السيرفر

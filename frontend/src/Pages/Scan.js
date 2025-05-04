@@ -23,27 +23,27 @@ export default function ScanPage() {
     {
       bodyPart: "Eye",
       description: "Helps diagnose eye diseases, detect foreign bodies, and eye injuries",
-      aiAccuracy: "91%"
+      aiAccuracy: "98%"
     },
     {
       bodyPart: "Brain",
       description: "Helps identify tumors, hemorrhages, and structural abnormalities",
-      aiAccuracy: "92%"
+      aiAccuracy: "95%"
     },
     {
       bodyPart: "Bones",
       description: "Detects fractures, dislocations, arthritis, and bone diseases",
-      aiAccuracy: "97%"
+      aiAccuracy: "95%"
     },
     {
       bodyPart: "Lung",
       description: "Used to detect tuberculosis, infections, and chronic lung diseases",
-      aiAccuracy: "93%"
+      aiAccuracy: "95%"
     },
     {
       bodyPart: "Kidney",
       description: "Helps diagnose kidney stones, structural abnormalities, and kidney diseases",
-      aiAccuracy: "90%"
+      aiAccuracy: "99%"
     },
     {
       bodyPart: "Nail",
