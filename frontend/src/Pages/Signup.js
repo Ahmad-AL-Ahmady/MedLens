@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2"; // Import SweetAlert2 for professional alerts
 import InfoSection from "../components/InfoSection";
 import LocationPicker from "./LocationPicker";
+import Bluelogo from "../assets/images/Bluelogo.png"; // Already imported
 import "../Styles/Signup.css";
 
 function SignUpForm() {
@@ -248,6 +249,16 @@ function SignUpForm() {
     <div className="signup-container">
       <div className="signup-form-container">
         <div className="signup-form-content">
+          <div className="mobile-logo-container">
+            <div className="home-logo">
+              <img
+                src={Bluelogo}
+                alt="MedLens Logo"
+                className="home-logo-img"
+              />
+              <span className="home-logo-text-signup">MedLens</span>
+            </div>
+          </div>
           <div>
             <h1 className="signup-form-title">Create Account</h1>
             <p className="signup-form-subtitle">

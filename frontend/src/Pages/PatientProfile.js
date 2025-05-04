@@ -180,6 +180,53 @@ export default function PatientProfile() {
     }
   };
 
+  const handleDeleteScan = async (scanId) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to delete this scan?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, keep it",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const response = await fetch(
+          `http://localhost:4000/api/medical-scans/${scanId}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to delete scan");
+        }
+
+        // Update scans list
+        const updatedScans = scans.filter((scan) => scan._id !== scanId);
+        setScans(updatedScans);
+
+        Swal.fire({
+          icon: "success",
+          title: "Deleted!",
+          text: "The scan has been deleted.",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Oops!",
+          text: "Something went wrong while deleting the scan. Please try again.",
+        });
+      }
+    }
+  };
+
   useEffect(() => {
     if (!token) {
       Swal.fire({
@@ -649,27 +696,76 @@ export default function PatientProfile() {
             <table className="patient-profile-data-table">
               <thead>
                 <tr>
+                  <th>Preview</th>
                   <th>Date</th>
                   <th>Type</th>
                   <th>Body Part</th>
-                  <th>Status</th>
+                  <th>Confidence</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {scans.length > 0 ? (
                   scans.map((scan) => (
-                    <tr key={scan.id}>
-                      <td>{scan?.date || "N/A"}</td>
-                      <td>{scan?.type || "N/A"}</td>
-                      <td>{scan?.bodyPart || "N/A"}</td>
-                      <td className="patient-profile-status">
-                        {scan?.status || "N/A"}
+                    <tr key={scan._id}>
+                      <td>
+                        {scan.images && scan.images.length > 0 ? (
+                          <img
+                            src={`http://localhost:4000${scan.images[0]}`}
+                            alt="Scan preview"
+                            className="scan-preview-image"
+                          />
+                        ) : (
+                          "No image"
+                        )}
+                      </td>
+                      <td>
+                        {scan.scanDate
+                          ? new Date(scan.scanDate).toLocaleDateString()
+                          : "N/A"}
+                      </td>
+                      <td>
+                        {scan.aiAnalysis?.classification_result ||
+                          (scan.description &&
+                          scan.description.includes("AI Analysis:")
+                            ? scan.description
+                                .replace("AI Analysis:", "")
+                                .trim()
+                            : "N/A")}
+                      </td>
+                      <td>{scan.bodyPart || "N/A"}</td>
+                      <td className="confidence-cell">
+                        {scan.aiAnalysis &&
+                        typeof scan.aiAnalysis.confidence_score === "number" ? (
+                          <span
+                            className={`confidence-value ${
+                              scan.aiAnalysis.confidence_score >= 90
+                                ? "high-confidence"
+                                : scan.aiAnalysis.confidence_score >= 70
+                                ? "medium-confidence"
+                                : "low-confidence"
+                            }`}
+                          >
+                            {scan.aiAnalysis.confidence_score}%
+                          </span>
+                        ) : (
+                          "N/A"
+                        )}
+                      </td>
+                      <td>
+                        <button
+                          className="delete-appointment-button"
+                          onClick={() => handleDeleteScan(scan._id)}
+                          title="Delete Scan"
+                        >
+                          <Trash2 size={18} />
+                        </button>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="4">No scans found for this patient.</td>
+                    <td colSpan="6">No scans found for this patient.</td>
                   </tr>
                 )}
               </tbody>

@@ -3,6 +3,7 @@ const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const fs = require("fs").promises;
+const fsSync = require("fs");
 const path = require("path");
 const axios = require("axios");
 const FormData = require("form-data");
@@ -129,7 +130,7 @@ exports.uploadScanImage = catchAsync(async (req, res, next) => {
     return next(new AppError("Medical scan not found", 404));
   }
 
-  // Check authorization - only the creator can upload images
+  // Check authorization
   if (scan.uploadedBy.toString() !== req.user.id) {
     return next(
       new AppError("You are not authorized to modify this scan", 403)
@@ -144,7 +145,9 @@ exports.uploadScanImage = catchAsync(async (req, res, next) => {
   try {
     // Prepare form data for AI service
     const formData = new FormData();
-    formData.append("file", fs.createReadStream(req.file.path));
+
+    // Use fsSync.createReadStream instead of fs.createReadStream
+    formData.append("file", fsSync.createReadStream(req.file.path));
     formData.append("bodyPart", scan.bodyPart);
 
     // Send request to AI service
@@ -155,24 +158,45 @@ exports.uploadScanImage = catchAsync(async (req, res, next) => {
     });
 
     const aiResult = response.data;
+    console.log("AI Analysis Result:", JSON.stringify(aiResult)); // Debug log
 
     // Save file info to scan record
     const imageUrl = `/public/uploads/scans/${req.file.filename}`;
 
-    // Update scan with image URL and AI analysis
+    // Update scan with image URL
     scan.images = scan.images || [];
     scan.images.push(imageUrl);
-    scan.aiAnalysis = {
-      classification_result: aiResult.classification_result,
-      confidence_score: aiResult.confidence_score,
-      body_part: aiResult.body_part,
+
+    // Create a new aiAnalysis object
+    const analysisData = {
+      classification_result: aiResult.classification_result || "Unknown",
+      confidence_score: aiResult.confidence_score || 0,
+      body_part: aiResult.body_part || scan.bodyPart,
       processingDate: new Date(),
     };
 
+    // Set the aiAnalysis field with the new object
+    scan.aiAnalysis = analysisData;
+
+    console.log("Saving scan with analysis:", JSON.stringify(scan.aiAnalysis));
+
+    // Update the description to include the classification result
+    if (aiResult.classification_result) {
+      scan.description = `AI Analysis: ${aiResult.classification_result}`;
+    }
+
+    // Save the updated scan document
     await scan.save();
 
-    // Clean up the temporary file
-    await fs.unlink(req.file.path);
+    // Clean up temporary file with error handling - don't use setTimeout as it's causing issues
+    // Just skip the file deletion for now to avoid issues
+    /*
+    try {
+      await fs.unlink(req.file.path);
+    } catch (unlinkError) {
+      console.warn(`Warning: Could not delete temporary file: ${unlinkError.message}`);
+    }
+    */
 
     res.status(200).json({
       status: "success",
@@ -181,9 +205,13 @@ exports.uploadScanImage = catchAsync(async (req, res, next) => {
       },
     });
   } catch (error) {
-    // Clean up the temporary file in case of error
-    await fs.unlink(req.file.path);
-    return next(new AppError("Failed to process image with AI service", 500));
+    console.error("Error processing scan with AI:", error);
+    return next(
+      new AppError(
+        `Failed to process image with AI service: ${error.message}`,
+        500
+      )
+    );
   }
 });
 
