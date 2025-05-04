@@ -29,7 +29,7 @@ export default function Sidebar({
       const mobile = window.innerWidth <= 768;
       setIsMobile(mobile);
       if (!mobile) {
-        setIsExpanded(true);
+        setIsExpanded(false); // Collapsed by default on desktop
       } else {
         setIsExpanded(isSidebarOpen);
       }
@@ -131,12 +131,11 @@ export default function Sidebar({
           ? { transform: isExpanded ? "translateX(0)" : "translateX(-100%)" }
           : {}
       }
+      onMouseEnter={() => !isMobile && setIsExpanded(true)}
+      onMouseLeave={() => !isMobile && setIsExpanded(false)}
     >
       <div className="sidebar-header">
-        <div
-          className="sidebar-logo-container"
-          onMouseEnter={() => !isMobile && setIsExpanded(true)}
-        >
+        <div className="sidebar-logo-container">
           <img src={Final} alt="MedLens Logo" className="sidebar-info-logo" />
           <span className="sidebar-logo-text">MedLens</span>
         </div>

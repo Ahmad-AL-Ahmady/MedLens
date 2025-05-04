@@ -17,7 +17,7 @@ body {
   left: 0;
   top: 0;
   bottom: 0;
-  z-index: 999;
+  z-index: 999; /* Sidebar z-index */
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -78,6 +78,16 @@ body {
   padding: 0.5rem;
   border-radius: 0.75rem;
   transition: all 0.2s ease;
+  min-width: 135px; /* Add minimum width to maintain logo visibility */
+}
+
+.sidebar-collapsed .sidebar-logo-container {
+  justify-content: center;
+  gap: 0; /* Explicitly center when collapsed */
+}
+
+.sidebar-expanded .sidebar-logo-container {
+  justify-content: flex-start; /* Align left when expanded */
 }
 
 .sidebar-logo-container:hover {
@@ -88,6 +98,18 @@ body {
   width: 40px;
   height: auto;
   transition: all 0.3s ease;
+  opacity: 1; /* Ensure logo image is always visible */
+  visibility: visible; /* Ensure visibility */
+}
+
+.sidebar-collapsed .sidebar-info-logo {
+  opacity: 1; /* Explicitly ensure logo is visible when collapsed */
+  visibility: visible;
+}
+
+.sidebar-expanded .sidebar-info-logo {
+  opacity: 1; /* Ensure logo remains visible when expanded */
+  visibility: visible;
 }
 
 .sidebar-logo-container:hover .sidebar-info-logo {
@@ -121,7 +143,7 @@ body {
   opacity: 0;
   transform: scale(0.8);
   will-change: transform, opacity;
-  -webkit-text-stroke: 1px transparent; /* Improves text rendering in WebKit */
+  -webkit-text-stroke: 1px transparent;
 }
 
 @keyframes sidebar-logoGlow {
@@ -157,14 +179,14 @@ body {
     var(--tertiary-blue) 100%
   );
   transform: scaleX(0.8);
-  transform-origin: left; /* More natural expansion direction */
+  transform-origin: left;
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
   opacity: 0.6;
-  filter: brightness(1.2); /* Enhances gradient visibility */
+  filter: brightness(1.2);
 }
 
 .sidebar-logo-text:hover {
-  transform: scale(1.02) translateZ(0); /* Add translateZ for GPU acceleration */
+  transform: scale(1.02) translateZ(0);
   animation-play-state: paused;
   cursor: pointer;
 }
@@ -172,10 +194,9 @@ body {
 .sidebar-logo-text:hover::after {
   transform: scaleX(1);
   opacity: 0.9;
-  background-size: 150% 100%; /* Enhance gradient movement on hover */
+  background-size: 150% 100%;
 }
 
-/* Accessibility: Reduce motion for sensitive users */
 @media (prefers-reduced-motion: reduce) {
   .sidebar-logo-text {
     animation: logoEntrance 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
@@ -215,7 +236,6 @@ body {
   will-change: transform;
 }
 
-/* SVG specific styling */
 .sidebar-icon svg {
   width: 100%;
   height: 100%;
@@ -224,7 +244,6 @@ body {
   pointer-events: none;
 }
 
-/* Hover & Active States */
 .sidebar-icon:hover {
   color: var(--icon-hover);
   transform: scale(1.05);
@@ -234,14 +253,12 @@ body {
   transform: scale(0.95);
 }
 
-/* Focus State for Accessibility */
 .sidebar-icon:focus-visible {
   outline: 2px solid #3b82f6;
   outline-offset: 2px;
   border-radius: 4px;
 }
 
-/* Reduced Motion Adaptation */
 @media (prefers-reduced-motion: reduce) {
   .sidebar-icon {
     transition: color 0.2s var(--transition-timing);
@@ -253,15 +270,15 @@ body {
   }
 }
 
-/* Optional: Add if icons should have active state when parent is active */
 .sidebar-item.active .sidebar-icon {
   color: #2563eb;
   transform: scale(1.1);
 }
+
 .sidebar-nav-item {
   display: flex;
   align-items: center;
-  justify-content: center; /* Center icons when collapsed */
+  justify-content: center;
   padding: 0.75rem 1.5rem;
   width: 100%;
   border: none;
@@ -277,9 +294,11 @@ body {
   overflow: hidden;
   will-change: transform, background-color;
 }
+
 .sidebar-expanded .sidebar-nav-item {
-  justify-content: flex-start; /* Align items to the left when expanded */
+  justify-content: flex-start;
 }
+
 .sidebar-nav-item:hover {
   background-color: #f8fafc;
   transform: translateX(4px);
@@ -401,9 +420,9 @@ body {
 .sidebar-active::before {
   will-change: transform, opacity;
 }
-/* Close Button Styles */
+
 .sidebar-close-button {
-  display: none; /* Hidden by default */
+  display: none;
   padding: 0.5rem;
   border: none;
   background: transparent;
@@ -432,7 +451,7 @@ body {
     width: 16rem !important;
     transform: translateX(-100%);
     transition: transform 0.3s ease;
-    z-index: 998; /* Below navbar */
+    z-index: 998;
   }
 
   .sidebar-expanded {
@@ -440,7 +459,7 @@ body {
   }
 
   .sidebar-expanded .sidebar-close-button {
-    display: flex; /* Show close button only when expanded on mobile */
+    display: flex;
   }
 
   .sidebar-logo-text {
@@ -449,6 +468,19 @@ body {
 
   .sidebar-nav-item {
     padding: 1rem;
+  }
+
+  .sidebar-logo-container {
+    justify-content: flex-start; /* Align left on mobile when expanded */
+  }
+
+  .sidebar-collapsed .sidebar-logo-container {
+    justify-content: center; /* Center on mobile when collapsed */
+  }
+
+  .sidebar-info-logo {
+    opacity: 1; /* Ensure logo is visible on mobile */
+    visibility: visible;
   }
 }
 
@@ -468,4 +500,25 @@ body {
   gap: 0.375rem;
   padding: 0 0.5rem;
   align-items: center;
+}
+
+main {
+  position: relative;
+  z-index: 1001; /* Higher than sidebar to overlay */
+  margin-left: 5rem; /* Match collapsed sidebar width */
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-expanded + main {
+  margin-left: 16rem; /* Match expanded sidebar width */
+}
+
+@media (max-width: 768px) {
+  main {
+    margin-left: 0; /* No margin on mobile */
+  }
+
+  .sidebar-expanded + main {
+    margin-left: 0; /* No margin when sidebar is expanded on mobile */
+  }
 }
