@@ -755,7 +755,6 @@
     font-size: 12px;
     flex-wrap: wrap;
     max-width: 190px;
-    margin-left: 19px;
   }
 
   .modal-content {
@@ -765,7 +764,6 @@
 
   .modal-content h2 {
     font-size: 11px;
-
     margin-bottom: 5px;
   }
 

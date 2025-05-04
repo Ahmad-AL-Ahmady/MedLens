@@ -1502,6 +1502,26 @@
 }
 
 /* Responsive Styles */
+@media (min-width: 992px) and (max-width: 1199px) {
+  .profile-action-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .edit-doctor-profile-button {
+    margin-bottom: 0;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  .profile-action-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .edit-doctor-profile-button {
+    margin-bottom: 0;
+  }
+}
+
 @media (max-width: 768px) {
   .doctor-profile-container {
     margin: 15px;
@@ -1531,7 +1551,19 @@
   .doctor-profile-card span {
     font-size: 20px;
   }
+  .availability-modal {
+    width: 95%;
+    padding: 15px;
+  }
 
+  .time-slots-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+
+  .time-slot-button {
+    padding: 8px;
+    font-size: 13px;
+  }
   .review-modal {
     width: 90%;
     padding: 20px;
@@ -1539,6 +1571,14 @@
 
   .operating-hours-grid {
     grid-template-columns: 1fr;
+  }
+
+  .profile-action-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .edit-doctor-profile-button {
+    margin-bottom: 0;
   }
 }
 
@@ -1565,6 +1605,15 @@
     display: flex !important;
     flex-direction: column !important;
   }
+
+  .time-slots-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+
+  .time-slot-button {
+    padding: 6px;
+    font-size: 12px;
+  }
 }
 /* Only apply column layout on very small screens */
 @media (max-width: 400px) {
@@ -1576,22 +1625,6 @@
   .cancel-button,
   .book-appointment-button {
     width: 100%;
-  }
-}
-
-@media (max-width: 768px) {
-  .availability-modal {
-    width: 95%;
-    padding: 15px;
-  }
-
-  .time-slots-grid {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  }
-
-  .time-slot-button {
-    padding: 8px;
-    font-size: 13px;
   }
 }
 
@@ -1624,16 +1657,5 @@
     font-size: 13px;
     padding: 6px 10px;
     min-width: 100px;
-  }
-}
-
-@media (max-width: 480px) {
-  .time-slots-grid {
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  }
-
-  .time-slot-button {
-    padding: 6px;
-    font-size: 12px;
   }
 }
