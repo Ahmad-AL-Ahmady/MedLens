@@ -652,18 +652,45 @@ export default function PatientProfile() {
                   <th>Date</th>
                   <th>Type</th>
                   <th>Body Part</th>
-                  <th>Status</th>
+                  <th>Confidence</th>
                 </tr>
               </thead>
               <tbody>
                 {scans.length > 0 ? (
                   scans.map((scan) => (
-                    <tr key={scan.id}>
-                      <td>{scan?.date || "N/A"}</td>
-                      <td>{scan?.type || "N/A"}</td>
-                      <td>{scan?.bodyPart || "N/A"}</td>
-                      <td className="patient-profile-status">
-                        {scan?.status || "N/A"}
+                    <tr key={scan._id}>
+                      <td>
+                        {scan.scanDate
+                          ? new Date(scan.scanDate).toLocaleDateString()
+                          : "N/A"}
+                      </td>
+                      <td>
+                        {scan.aiAnalysis?.classification_result ||
+                          (scan.description &&
+                          scan.description.includes("AI Analysis:")
+                            ? scan.description
+                                .replace("AI Analysis:", "")
+                                .trim()
+                            : "N/A")}
+                      </td>
+                      <td>{scan.bodyPart || "N/A"}</td>
+                      <td className="confidence-cell">
+                        {scan.aiAnalysis &&
+                        typeof scan.aiAnalysis.confidence_score === "number" ? (
+                          <span
+                            className={`confidence-value ${
+                              scan.aiAnalysis.confidence_score >= 90
+                                ? "high-confidence"
+                                : scan.aiAnalysis.confidence_score >= 70
+                                ? "medium-confidence"
+                                : "low-confidence"
+                            }`}
+                          >
+                            {scan.aiAnalysis.confidence_score}%
+                          </span>
+                        ) : (
+                          "N/A"
+                        )}
                       </td>
                     </tr>
                   ))
