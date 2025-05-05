@@ -680,14 +680,14 @@ const DoctorProfile = () => {
         Swal.fire({
           icon: "success",
           title: "Success!",
-          text: "Password updated successfully",
+          text: "Password updated successfully. You will be redirected to login.",
           confirmButtonColor: "#3b82f6",
-        });
-        setShowPasswordForm(false);
-        setPasswordData({
-          currentPassword: "",
-          newPassword: "",
-          confirmPassword: "",
+        }).then(() => {
+          // Clear auth tokens
+          localStorage.removeItem("authToken");
+          sessionStorage.removeItem("authToken");
+          // Redirect to login page
+          window.location.href = "/login";
         });
       } else {
         Swal.fire({
