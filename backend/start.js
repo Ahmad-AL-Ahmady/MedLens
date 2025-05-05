@@ -19,7 +19,7 @@ function isPortInUse(port) {
 // Function to start the Python AI service
 function startPythonService() {
   console.log("Starting Python AI Service...");
-  const pythonProcess = spawn("python", ["main.py"], {
+  const pythonProcess = spawn("python", ["fast_api\\main.py"], {
     cwd: __dirname,
     stdio: "inherit",
   });
