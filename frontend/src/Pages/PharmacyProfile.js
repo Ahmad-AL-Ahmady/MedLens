@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, memo } from "react";
 import { useParams } from "react-router-dom";
 import {
   Mail,
@@ -13,8 +13,290 @@ import {
   Pill,
 } from "lucide-react";
 import Swal from "sweetalert2";
+import { createPortal } from "react-dom";
 import "../Styles/PharmacyProfile.css";
 import LocationPicker from "../Pages/LocationPicker";
+
+// Memoize modal components to prevent unnecessary re-renders
+const EditProfileModal = memo(
+  ({
+    formData,
+    handleChange,
+    handleSubmit,
+    setShowEditForm,
+    setShowLocationPicker,
+    showLocationPicker,
+    modalRoot,
+    getInitialPosition,
+    handleLocationSelect,
+  }) => (
+    <div
+      className="edit-pharmacy-profile-form-overlay"
+      role="dialog"
+      aria-modal="true"
+      onClick={() => setShowEditForm(false)}
+    >
+      <form
+        onSubmit={handleSubmit}
+        className="edit-pharmacy-profile-form"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          type="button"
+          className="close-form-btn"
+          onClick={() => setShowEditForm(false)}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+
+        <h2>Update Your Profile</h2>
+
+        <div className="form-section">
+          <div className="form-section-title">
+            <User size={18} />
+            Personal Information
+          </div>
+          <div className="form-row">
+            <div className="pharmacy-form-group">
+              <label>First Name</label>
+              <input
+                key="firstName"
+                type="text"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
+                placeholder="Enter your first name"
+              />
+            </div>
+            <div className="pharmacy-form-group">
+              <label>Last Name</label>
+              <input
+                key="lastName"
+                type="text"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
+                placeholder="Enter your last name"
+              />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="pharmacy-form-group">
+              <label>Phone Number</label>
+              <div className="phone-input-container">
+                <span className="country-code">+20</span>
+                <input
+                  key="phoneNumber"
+                  type="text"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                  placeholder="Enter your phone number"
+                  maxLength="10"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="form-section">
+          <div className="form-section-title">
+            <MapPin size={18} />
+            Location Information
+          </div>
+          <div className="form-row location-picker-centered">
+            <div className="pharmacy-form-group full-width">
+              <label>Location</label>
+              <div className="location-picker-button">
+                <button
+                  type="button"
+                  className="select-location-btn"
+                  onClick={() => setShowLocationPicker(true)}
+                >
+                  <MapPin size={16} />
+                  {formData.location
+                    ? "Change Location"
+                    : "Select Location on Map"}
+                </button>
+                {formData.location && (
+                  <span className="location-selected">
+                    {formData.location.formattedAddress ||
+                      `Location: ${formData.location.coordinates[1].toFixed(
+                        4
+                      )}, ${formData.location.coordinates[0].toFixed(4)}`}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="form-btns">
+          <button
+            type="button"
+            onClick={() => setShowEditForm(false)}
+            className="cancel-btn"
+          >
+            Cancel
+          </button>
+          <button type="submit" className="save-btn">
+            Save Changes
+          </button>
+        </div>
+      </form>
+
+      {showLocationPicker &&
+        modalRoot &&
+        createPortal(
+          <div
+            className="edit-pharmacy-profile-form-overlay"
+            role="dialog"
+            aria-modal="true"
+            onClick={() => setShowLocationPicker(false)}
+          >
+            <div
+              className="location-picker-container"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <LocationPicker
+                onSelect={handleLocationSelect}
+                onClose={() => setShowLocationPicker(false)}
+                initialPosition={getInitialPosition()}
+              />
+            </div>
+          </div>,
+          modalRoot
+        )}
+    </div>
+  )
+);
+
+const UpdatePasswordModal = memo(
+  ({
+    passwordData,
+    handlePasswordChange,
+    handlePasswordSubmit,
+    setShowPasswordForm,
+  }) => (
+    <div
+      className="edit-pharmacy-profile-form-overlay"
+      role="dialog"
+      aria-modal="true"
+      onClick={() => setShowPasswordForm(false)}
+    >
+      <form
+        onSubmit={handlePasswordSubmit}
+        className="edit-pharmacy-profile-form"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          type="button"
+          className="close-form-btn"
+          onClick={() => setShowPasswordForm(false)}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+
+        <h2>Update Password</h2>
+
+        <div className="form-section">
+          <div className="form-section-title">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            Password Details
+          </div>
+          <div className="form-row">
+            <div className="pharmacy-form-group">
+              <label>Current Password</label>
+              <input
+                key="currentPassword"
+                type="password"
+                name="currentPassword"
+                value={passwordData.currentPassword}
+                onChange={handlePasswordChange}
+                placeholder="Enter current password"
+                required
+              />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="pharmacy-form-group">
+              <label>New Password</label>
+              <input
+                key="newPassword"
+                type="password"
+                name="newPassword"
+                value={passwordData.newPassword}
+                onChange={handlePasswordChange}
+                placeholder="Enter new password"
+                required
+              />
+            </div>
+            <div className="pharmacy-form-group">
+              <label>Confirm New Password</label>
+              <input
+                key="confirmPassword"
+                type="password"
+                name="confirmPassword"
+                value={passwordData.confirmPassword}
+                onChange={handlePasswordChange}
+                placeholder="Confirm new password"
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="form-btns">
+          <button
+            type="button"
+            onClick={() => setShowPasswordForm(false)}
+            className="cancel-btn"
+          >
+            Cancel
+          </button>
+          <button type="submit" className="save-btn">
+            Update Password
+          </button>
+        </div>
+      </form>
+    </div>
+  )
+);
 
 const PharmacyProfile = () => {
   const { id } = useParams();
@@ -46,10 +328,26 @@ const PharmacyProfile = () => {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(5);
+  const [modalRoot, setModalRoot] = useState(null);
 
   const token =
     localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
 
+  // Dynamically create modal-root container
+  useEffect(() => {
+    const modalRootDiv = document.createElement("div");
+    modalRootDiv.setAttribute("id", "modal-root");
+    document.body.appendChild(modalRootDiv);
+    setModalRoot(modalRootDiv);
+
+    return () => {
+      if (document.body.contains(modalRootDiv)) {
+        document.body.removeChild(modalRootDiv);
+      }
+    };
+  }, []);
+
+  // Fetch pharmacy profile
   const fetchPharmacyProfile = async () => {
     try {
       Swal.fire({
@@ -84,7 +382,7 @@ const PharmacyProfile = () => {
         setFormData({
           firstName: data.data.firstName || "",
           lastName: data.data.lastName || "",
-          phoneNumber: data.data.profile?.phoneNumber || "",
+          phoneNumber: data.data.profile?.phoneNumber?.replace("+20", "") || "",
           avatar: data.data.avatar || null,
           location: data.data.location || null,
         });
@@ -106,6 +404,7 @@ const PharmacyProfile = () => {
     }
   };
 
+  // Fetch scans
   const fetchScans = async () => {
     try {
       const response = await fetch("http://localhost:4000/api/medical-scans", {
@@ -124,10 +423,11 @@ const PharmacyProfile = () => {
       }
     } catch (error) {
       console.error("Error fetching scans:", error);
-      throw error;
+      setScans([]);
     }
   };
 
+  // Fetch inventory
   const fetchInventory = async () => {
     try {
       const response = await fetch(
@@ -148,14 +448,12 @@ const PharmacyProfile = () => {
       }
     } catch (error) {
       console.error("Error fetching inventory:", error);
-      throw error;
+      setInventory([]);
     }
   };
 
+  // Initial data fetch
   useEffect(() => {
-    const token =
-      localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
-
     if (!token) {
       console.error("No token found");
       setError("No token found");
@@ -163,11 +461,9 @@ const PharmacyProfile = () => {
       return;
     }
 
-    // Get current user ID from token
     const tokenPayload = JSON.parse(atob(token.split(".")[1]));
     setCurrentUserId(tokenPayload.id);
 
-    // Check if viewing own profile
     if (!id) {
       setIsViewingOwnProfile(true);
     } else {
@@ -190,55 +486,51 @@ const PharmacyProfile = () => {
     };
 
     fetchData();
-  }, [id]);
+  }, [id, token]);
 
+  // Handle form input changes
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "avatar") {
-      setFormData({ ...formData, avatar: files[0] });
+      setFormData((prev) => ({ ...prev, avatar: files[0] }));
     } else if (name === "phoneNumber") {
-      // Remove any non-digit characters except the initial +20
       const cleanedValue = value.replace(/[^\d]/g, "");
-      // Ensure the phone number starts with +20 and limit to 10 digits after that
       const formattedValue =
         cleanedValue.length > 0 ? cleanedValue.slice(0, 10) : "";
-      setFormData({ ...formData, phoneNumber: formattedValue });
+      setFormData((prev) => ({ ...prev, phoneNumber: formattedValue }));
     } else {
-      setFormData({ ...formData, [name]: value });
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
+  // Handle location selection
   const handleLocationSelect = async (location) => {
     try {
       const lat = location.coordinates[1];
       const lng = location.coordinates[0];
 
-      // Reverse geocoding using OpenStreetMap Nominatim API
       const response = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
       );
       const data = await response.json();
 
-      setFormData({
-        ...formData,
+      setFormData((prev) => ({
+        ...prev,
         location: {
           ...location,
           formattedAddress: data.display_name,
         },
-      });
+      }));
     } catch (error) {
       console.error("Error getting location details:", error);
-      // Fallback to coordinates if geocoding fails
-      setFormData({
-        ...formData,
-        location,
-      });
+      setFormData((prev) => ({ ...prev, location }));
     }
+    setShowLocationPicker(false);
   };
 
+  // Handle photo upload
   const handlePhotoChange = async (e) => {
     const file = e.target.files[0];
-
     if (file) {
       const formData = new FormData();
       formData.append("avatar", file);
@@ -267,14 +559,12 @@ const PharmacyProfile = () => {
         );
 
         if (response.ok) {
-          const data = await response.json();
           Swal.fire({
             icon: "success",
             title: "Success!",
             text: "Avatar updated successfully!",
             confirmButtonColor: "#3b82f6",
           }).then(() => {
-            // Refresh the page after successful upload
             window.location.reload();
           });
         } else {
@@ -297,10 +587,12 @@ const PharmacyProfile = () => {
     }
   };
 
+  // Toggle camera menu
   const toggleMenu = () => {
     setMenuOpen((prev) => !prev);
   };
 
+  // Handle avatar deletion
   const handleDeleteAvatar = async () => {
     Swal.fire({
       title: "Are you sure?",
@@ -341,7 +633,6 @@ const PharmacyProfile = () => {
               text: "Avatar deleted successfully!",
               confirmButtonColor: "#3b82f6",
             }).then(() => {
-              // Refresh the page after successful deletion
               window.location.reload();
             });
           } else {
@@ -365,10 +656,9 @@ const PharmacyProfile = () => {
     });
   };
 
+  // Handle profile update submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Validate phone number length
     if (formData.phoneNumber && formData.phoneNumber.length !== 10) {
       Swal.fire({
         icon: "error",
@@ -379,7 +669,6 @@ const PharmacyProfile = () => {
       return;
     }
 
-    // Loading state
     Swal.fire({
       title: "Updating profile...",
       text: "Please wait while we update your profile",
@@ -412,7 +701,6 @@ const PharmacyProfile = () => {
       );
 
       const data = await response.json();
-
       if (response.ok) {
         Swal.fire({
           icon: "success",
@@ -441,9 +729,9 @@ const PharmacyProfile = () => {
     }
   };
 
+  // Handle review submission
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
-
     try {
       const res = await fetch("http://localhost:4000/api/reviews", {
         method: "POST",
@@ -459,13 +747,7 @@ const PharmacyProfile = () => {
         }),
       });
 
-      let data;
-      try {
-        data = await res.json();
-      } catch (jsonError) {
-        throw new Error("Can't add multiple reviews for the same entity.");
-      }
-
+      const data = await res.json();
       if (!res.ok) {
         throw new Error(data.message || "Something went wrong");
       }
@@ -480,8 +762,6 @@ const PharmacyProfile = () => {
       setShowReviewForm(false);
       setComment("");
       setRating(5);
-
-      // Fetch updated pharmacy profile to get new stats and reviews
       await fetchPharmacyProfile();
     } catch (error) {
       Swal.fire({
@@ -489,14 +769,15 @@ const PharmacyProfile = () => {
         title: "Review Submission Failed",
         text:
           error.message === "You have already reviewed this pharmacy"
-            ? "You have already submitted a review for this pharmacy. You can edit or delete your existing review."
+            ? "You have already submitted a review for this pharmacy."
             : error.message ||
-              "Something went wrong while submitting your review. Please try again.",
+              "Something went wrong while submitting your review.",
         confirmButtonColor: "#3b82f6",
       });
     }
   };
 
+  // Handle review deletion
   const handleDeleteReview = async (reviewId) => {
     Swal.fire({
       title: "Are you sure?",
@@ -524,7 +805,6 @@ const PharmacyProfile = () => {
             throw new Error(errorData.message || "Something went wrong");
           }
 
-          // Update the profile state to remove the deleted review
           setProfile((prev) => ({
             ...prev,
             reviews: prev.reviews.filter((review) => review._id !== reviewId),
@@ -536,8 +816,6 @@ const PharmacyProfile = () => {
             text: "Your review has been deleted successfully.",
             confirmButtonColor: "#3b82f6",
           });
-
-          // Fetch updated pharmacy profile to get new stats
           await fetchPharmacyProfile();
         } catch (error) {
           console.error("Error deleting review:", error.message);
@@ -552,6 +830,7 @@ const PharmacyProfile = () => {
     });
   };
 
+  // Handle password input changes
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
     setPasswordData((prev) => ({
@@ -560,9 +839,9 @@ const PharmacyProfile = () => {
     }));
   };
 
+  // Handle password update submission
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
-
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       Swal.fire({
         icon: "error",
@@ -591,7 +870,6 @@ const PharmacyProfile = () => {
       );
 
       const data = await response.json();
-
       if (response.ok) {
         Swal.fire({
           icon: "success",
@@ -599,10 +877,8 @@ const PharmacyProfile = () => {
           text: "Password updated successfully",
           confirmButtonColor: "#3b82f6",
         }).then(() => {
-          // Clear tokens from storage
           localStorage.removeItem("authToken");
           sessionStorage.removeItem("authToken");
-          // Redirect to login page
           window.location.href = "/login";
         });
         setShowPasswordForm(false);
@@ -630,21 +906,21 @@ const PharmacyProfile = () => {
     }
   };
 
-  // Get initial position for location picker if available
+  // Get initial position for location picker
   const getInitialPosition = () => {
     if (
       pharmacy?.location?.coordinates &&
       pharmacy.location.coordinates.length === 2
     ) {
-      // GeoJSON format is [longitude, latitude], but Leaflet uses [latitude, longitude]
       return [
         pharmacy.location.coordinates[1],
         pharmacy.location.coordinates[0],
       ];
     }
-    return [30.0444, 31.2357]; // Default position (Cairo)
+    return [30.0444, 31.2357]; // Default to Cairo
   };
 
+  // Handle scan deletion
   const handleDeleteScan = async (scanId) => {
     const result = await Swal.fire({
       title: "Are you sure?",
@@ -671,10 +947,7 @@ const PharmacyProfile = () => {
           throw new Error("Failed to delete scan");
         }
 
-        // Update scans list
-        const updatedScans = scans.filter((scan) => scan._id !== scanId);
-        setScans(updatedScans);
-
+        setScans((prev) => prev.filter((scan) => scan._id !== scanId));
         Swal.fire({
           icon: "success",
           title: "Deleted!",
@@ -686,213 +959,90 @@ const PharmacyProfile = () => {
         Swal.fire({
           icon: "error",
           title: "Oops!",
-          text: "Something went wrong while deleting the scan. Please try again.",
+          text: "Something went wrong while deleting the scan.",
         });
       }
     }
   };
 
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (error) return <p style={errorStyle}>{error}</p>;
   if (!pharmacy) return null;
 
   return (
-    <div className="doctor-profile-container">
-      {showEditForm ? (
-        <div className="edit-doctor-profile-form-overlay">
-          <form onSubmit={handleSubmit} className="edit-doctor-profile-form">
-            <button
-              type="button"
-              className="close-form-btn"
-              onClick={() => setShowEditForm(false)}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
-
-            <h2>Update Your Profile</h2>
-
-            <div className="form-section">
-              <div className="form-section-title">
-                <User size={18} />
-                Personal Information
-              </div>
-              <div className="form-row">
-                <div className="doctor-form-group">
-                  <label>First Name</label>
-                  <input
-                    type="text"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleChange}
-                    placeholder="Enter your first name"
+    <div className="pharmacy-profile-container">
+      <div className="pharmacy-profile-header">
+        <div className="pharmacy-header-top">
+          <div className="pharmacy-profile-image-container">
+            <div className="pharmacy-profile-image-wrapper">
+              <img
+                src={
+                  selectedImage || pharmacy.avatar
+                    ? `http://localhost:4000/public/uploads/users/${
+                        selectedImage || pharmacy.avatar
+                      }`
+                    : "http://localhost:4000/public/uploads/users/default.jpg"
+                }
+                alt="Pharmacy"
+                className="pharmacy-profile-image"
+              />
+              {isViewingOwnProfile && (
+                <div className="pharmacy-camera-icon" onClick={toggleMenu}>
+                  <img
+                    src="https://img.icons8.com/ios-filled/50/000000/camera.png"
+                    alt="Edit"
                   />
                 </div>
-                <div className="doctor-form-group">
-                  <label>Last Name</label>
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    placeholder="Enter your last name"
-                  />
-                </div>
-              </div>
-              <div className="form-row">
-                <div className="doctor-form-group">
-                  <label>Phone Number</label>
-                  <div className="phone-input-container">
-                    <span className="country-code">+20</span>
-                    <input
-                      type="text"
-                      name="phoneNumber"
-                      value={formData.phoneNumber}
-                      onChange={handleChange}
-                      placeholder="Enter your phone number"
-                      maxLength="10"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="form-section">
-              <div className="form-section-title">
-                <MapPin size={18} />
-                Location Information
-              </div>
-              <div className="form-row location-picker-centered">
-                <div className="doctor-form-group full-width">
-                  <label>Location</label>
-                  <div className="location-picker-button">
+              )}
+              {menuOpen && isViewingOwnProfile && (
+                <>
+                  <div className="overlay" onClick={toggleMenu}></div>
+                  <div className="pharmacy-camera-options">
                     <button
-                      type="button"
-                      className="select-location-btn"
-                      onClick={() => setShowLocationPicker(true)}
+                      onClick={() =>
+                        document.getElementById("upload-photo").click()
+                      }
                     >
-                      <MapPin size={16} />
-                      {formData.location
-                        ? "Change Location"
-                        : "Select Location on Map"}
+                      Upload
                     </button>
-                    {formData.location && (
-                      <span className="location-selected">
-                        {formData.location.formattedAddress ||
-                          `Location selected: ${formData.location.coordinates[1].toFixed(
-                            4
-                          )}, ${formData.location.coordinates[0].toFixed(4)}`}
-                      </span>
-                    )}
+                    <button onClick={handleDeleteAvatar}>Delete</button>
                   </div>
-                </div>
-              </div>
+                </>
+              )}
+              <input
+                type="file"
+                id="upload-photo"
+                accept="image/*"
+                capture="user"
+                style={{ display: "none" }}
+                onChange={handlePhotoChange}
+              />
             </div>
-
-            <div className="form-btns">
-              <button
-                type="button"
-                onClick={() => setShowEditForm(false)}
-                className="cancel-btn"
-              >
-                Cancel
-              </button>
-              <button type="submit" className="save-btn">
-                Save Changes
-              </button>
-            </div>
-          </form>
-
-          {showLocationPicker && (
-            <LocationPicker
-              onSelect={handleLocationSelect}
-              onClose={() => setShowLocationPicker(false)}
-              initialPosition={getInitialPosition()}
-            />
-          )}
-        </div>
-      ) : (
-        <>
-          {/* Pharmacy info */}
-          <div className="doctor-profile-header">
-            <div className="doctor-header-top">
-              <div className="profile-image-container">
-                <img
-                  src={
-                    selectedImage || pharmacy.avatar
-                      ? `http://localhost:4000/public/uploads/users/${
-                          selectedImage || pharmacy.avatar
-                        }`
-                      : "http://localhost:4000/public/uploads/users/default.jpg"
-                  }
-                  alt="Pharmacy"
-                  className="doctor-profile-image"
-                />
-                {isViewingOwnProfile && (
-                  <div className="camera-menu">
-                    <button onClick={toggleMenu} className="camera-icon">
-                      <img
-                        src="https://img.icons8.com/ios-filled/50/000000/camera.png"
-                        alt="Edit"
-                      />
-                    </button>
-
-                    {menuOpen && (
-                      <>
-                        <div className="overlay" onClick={toggleMenu}></div>
-                        <div className="camera-options">
-                          <button
-                            onClick={() =>
-                              document.getElementById("upload-photo").click()
-                            }
-                          >
-                            Upload
-                          </button>
-                          <button onClick={handleDeleteAvatar}>Delete</button>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                )}
-
-                <input
-                  type="file"
-                  id="upload-photo"
-                  accept="image/*"
-                  capture="user"
-                  style={{ display: "none" }}
-                  onChange={(e) => handlePhotoChange(e)}
-                />
-              </div>
-              <div className="doctor-profile-info">
-                <h1 className="doctor-profile-name">
+          </div>
+          <div className="pharmacy-profile-info">
+            <div className="pharmacy-profile-info-row">
+              <div className="pharmacy-profile-info-text">
+                <h1 className="pharmacy-profile-name">
                   {pharmacy.firstName} {pharmacy.lastName}
                 </h1>
-                <p className="doctor-profile-usertype">Pharmacy</p>
-                <div className="doctor-profile-details">
-                  <p className="doctor-profile-email">
+                <p className="pharmacy-profile-usertype">Pharmacy</p>
+                <div className="pharmacy-profile-details">
+                  <p className="pharmacy-profile-email">
                     <Mail size={16} color="#1e56cf" /> {pharmacy.email}
                   </p>
-                  <p className="doctor-profile-email">
+                  <p className="pharmacy-profile-email">
                     <Phone size={16} color="#1e56cf" />
                     {profile?.phoneNumber ? (
-                      <>{profile.phoneNumber}</>
+                      <>
+                        <span className="country-code-display">+20</span>
+                        {profile.phoneNumber.replace("+20", "")}
+                      </>
                     ) : (
                       "No phone number"
                     )}
                   </p>
                 </div>
               </div>
-              {isViewingOwnProfile ? (
+              {isViewingOwnProfile && (
                 <div className="pharmacy-profile-action-buttons">
                   <button
                     className="edit-pharmacy-profile-button"
@@ -915,267 +1065,179 @@ const PharmacyProfile = () => {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     >
-                      <rect
-                        x="3"
-                        y="11"
-                        width="18"
-                        height="11"
-                        rx="2"
-                        ry="2"
-                      ></rect>
-                      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                     </svg>
                     Update Password
                   </button>
                 </div>
-              ) : null}
-            </div>
-
-            {/* Replace the stats cards section */}
-            <div className="pharmacy-profile-summary-cards">
-              <div className="pharmacy-profile-card">
-                <Pill size={16} color="#1f61a8" />
-                <h3>{inventory.length}</h3>
-                <p>Medications</p>
-              </div>
-              <div className="pharmacy-profile-card">
-                <Calendar size={16} color="#1f61a8" />
-                <h3>
-                  {profile?.createdAt
-                    ? (() => {
-                        const now = new Date();
-                        const createdDate = new Date(profile.createdAt);
-                        const years =
-                          now.getFullYear() - createdDate.getFullYear();
-                        const months = now.getMonth() - createdDate.getMonth();
-
-                        if (years > 0) {
-                          return years === 1 ? "1 year" : `${years} years`;
-                        } else if (months > 0) {
-                          return months === 1 ? "1 month" : `${months} months`;
-                        } else {
-                          return "< 1 month";
-                        }
-                      })()
-                    : "N/A"}
-                </h3>
-                <p>Pharmacy Since</p>
-              </div>
-              <div className="pharmacy-profile-card">
-                <ClipboardList size={16} color="#1f61a8" />
-                <h3>{scans.length}</h3>
-                <p>Reports</p>
-              </div>
+              )}
             </div>
           </div>
-
-          {/* Map Section */}
-          <div className="doctor-profile-map">
-            <iframe
-              title="Pharmacy Location"
-              src={`https://www.google.com/maps?q=${pharmacy.location?.coordinates?.[1]},${pharmacy.location?.coordinates?.[0]}&output=embed`}
-              width="100%"
-              height="300"
-              allowFullScreen
-              loading="lazy"
-            ></iframe>
+        </div>
+        <div className="pharmacy-profile-summary-cards">
+          <div className="pharmacy-profile-card">
+            <Pill size={16} color="#1f61a8" />
+            <h3>{inventory.length}</h3>
+            <p>Medications</p>
           </div>
-
-          {/* Scan Section */}
-          <div className="pharmacy-profile-scan-section">
-            <h2>
-              <ScanBarcode size={20} color="#1e40af" />
-              Scans
-            </h2>
-            <table className="pharmacy-profile-data-table">
-              <thead>
-                <tr>
-                  <th>Preview</th>
-                  <th>Date</th>
-                  <th>Type</th>
-                  <th>Body Part</th>
-                  <th>Confidence</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {scans.length > 0 ? (
-                  scans.map((scan) => (
-                    <tr key={scan._id}>
-                      <td>
-                        {scan.images && scan.images.length > 0 ? (
-                          <img
-                            src={`http://localhost:4000${scan.images[0]}`}
-                            alt="Scan preview"
-                            className="pharmacy-profile-scan-preview-image"
-                          />
-                        ) : (
-                          "No image"
-                        )}
-                      </td>
-                      <td>
-                        {scan.scanDate
-                          ? new Date(scan.scanDate).toLocaleDateString()
-                          : "N/A"}
-                      </td>
-                      <td>
-                        {scan.aiAnalysis?.classification_result ||
-                          (scan.description &&
-                          scan.description.includes("AI Analysis:")
-                            ? scan.description
-                                .replace("AI Analysis:", "")
-                                .trim()
-                            : "N/A")}
-                      </td>
-                      <td>{scan.bodyPart || "N/A"}</td>
-                      <td className="pharmacy-profile-confidence-cell">
-                        {scan.aiAnalysis &&
-                        typeof scan.aiAnalysis.confidence_score === "number" ? (
-                          <span
-                            className={`pharmacy-profile-confidence-value ${
-                              scan.aiAnalysis.confidence_score >= 90
-                                ? "high-confidence"
-                                : scan.aiAnalysis.confidence_score >= 70
-                                ? "medium-confidence"
-                                : "low-confidence"
-                            }`}
-                          >
-                            {scan.aiAnalysis.confidence_score}%
-                          </span>
-                        ) : (
-                          "N/A"
-                        )}
-                      </td>
-                      <td>
-                        <button
-                          className="pharmacy-profile-delete-appointment-button"
-                          onClick={() => handleDeleteScan(scan._id)}
-                          title="Delete Scan"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="6">No scans found.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+          <div className="pharmacy-profile-card">
+            <Calendar size={16} color="#1f61a8" />
+            <h3>
+              {profile?.createdAt
+                ? (() => {
+                    const now = new Date();
+                    const createdDate = new Date(profile.createdAt);
+                    const years = now.getFullYear() - createdDate.getFullYear();
+                    const months = now.getMonth() - createdDate.getMonth();
+                    if (years > 0) {
+                      return years === 1 ? "1 year" : `${years} years`;
+                    } else if (months > 0) {
+                      return months === 1 ? "1 month" : `${months} months`;
+                    } else {
+                      return "< 1 month";
+                    }
+                  })()
+                : "N/A"}
+            </h3>
+            <p>Pharmacy Since</p>
           </div>
-
-          {showPasswordForm && (
-            <div className="edit-doctor-profile-form-overlay">
-              <form
-                onSubmit={handlePasswordSubmit}
-                className="edit-doctor-profile-form"
-              >
-                <button
-                  type="button"
-                  className="close-form-btn"
-                  onClick={() => setShowPasswordForm(false)}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
-                </button>
-
-                <h2>Update Password</h2>
-
-                <div className="form-section">
-                  <div className="form-section-title">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+          <div className="pharmacy-profile-card">
+            <ClipboardList size={16} color="#1f61a8" />
+            <h3>{scans.length}</h3>
+            <p>Reports</p>
+          </div>
+        </div>
+      </div>
+      <div className="pharmacy-profile-map">
+        <iframe
+          title="Pharmacy Location"
+          src={`https://www.google.com/maps?q=${
+            pharmacy.location?.coordinates?.[1] || 30.0444
+          },${pharmacy.location?.coordinates?.[0] || 31.2357}&output=embed`}
+          width="100%"
+          height="300"
+          allowFullScreen
+          loading="lazy"
+        />
+      </div>
+      <div className="pharmacy-profile-scan-section">
+        <h2>
+          <ScanBarcode size={20} color="#1e40af" />
+          Scans
+        </h2>
+        <table className="pharmacy-profile-data-table">
+          <thead>
+            <tr>
+              <th>Preview</th>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Body Part</th>
+              <th>Confidence</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {scans.length > 0 ? (
+              scans.map((scan) => (
+                <tr key={scan._id}>
+                  <td>
+                    {scan.images && scan.images.length > 0 ? (
+                      <img
+                        src={`http://localhost:4000${scan.images[0]}`}
+                        alt="Scan preview"
+                        className="pharmacy-profile-scan-preview-image"
+                      />
+                    ) : (
+                      "No image"
+                    )}
+                  </td>
+                  <td>
+                    {scan.scanDate
+                      ? new Date(scan.scanDate).toLocaleDateString()
+                      : "N/A"}
+                  </td>
+                  <td>
+                    {scan.aiAnalysis?.classification_result ||
+                      (scan.description &&
+                      scan.description.includes("AI Analysis:")
+                        ? scan.description.replace("AI Analysis:", "").trim()
+                        : "N/A")}
+                  </td>
+                  <td>{scan.bodyPart || "N/A"}</td>
+                  <td className="pharmacy-profile-confidence-cell">
+                    {scan.aiAnalysis &&
+                    typeof scan.aiAnalysis.confidence_score === "number" ? (
+                      <span
+                        className={`pharmacy-profile-confidence-value ${
+                          scan.aiAnalysis.confidence_score >= 90
+                            ? "high-confidence"
+                            : scan.aiAnalysis.confidence_score >= 70
+                            ? "medium-confidence"
+                            : "low-confidence"
+                        }`}
+                      >
+                        {scan.aiAnalysis.confidence_score}%
+                      </span>
+                    ) : (
+                      "N/A"
+                    )}
+                  </td>
+                  <td>
+                    <button
+                      className="pharmacy-profile-delete-appointment-button"
+                      onClick={() => handleDeleteScan(scan._id)}
+                      title="Delete Scan"
                     >
-                      <rect
-                        x="3"
-                        y="11"
-                        width="18"
-                        height="11"
-                        rx="2"
-                        ry="2"
-                      ></rect>
-                      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
-                    Password Details
-                  </div>
-                  <div className="form-row">
-                    <div className="doctor-form-group">
-                      <label>Current Password</label>
-                      <input
-                        type="password"
-                        name="currentPassword"
-                        value={passwordData.currentPassword}
-                        onChange={handlePasswordChange}
-                        placeholder="Enter current password"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="form-row">
-                    <div className="doctor-form-group">
-                      <label>New Password</label>
-                      <input
-                        type="password"
-                        name="newPassword"
-                        value={passwordData.newPassword}
-                        onChange={handlePasswordChange}
-                        placeholder="Enter new password"
-                        required
-                      />
-                    </div>
-                    <div className="doctor-form-group">
-                      <label>Confirm New Password</label>
-                      <input
-                        type="password"
-                        name="confirmPassword"
-                        value={passwordData.confirmPassword}
-                        onChange={handlePasswordChange}
-                        placeholder="Confirm new password"
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="form-btns">
-                  <button
-                    type="button"
-                    onClick={() => setShowPasswordForm(false)}
-                    className="cancel-btn"
-                  >
-                    Cancel
-                  </button>
-                  <button type="submit" className="save-btn">
-                    Update Password
-                  </button>
-                </div>
-              </form>
-            </div>
-          )}
-        </>
-      )}
+                      <Trash2 size={18} />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6">No scans found.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+      {showEditForm &&
+        modalRoot &&
+        createPortal(
+          <EditProfileModal
+            formData={formData}
+            handleChange={handleChange}
+            handleSubmit={handleSubmit}
+            setShowEditForm={setShowEditForm}
+            setShowLocationPicker={setShowLocationPicker}
+            showLocationPicker={showLocationPicker}
+            modalRoot={modalRoot}
+            getInitialPosition={getInitialPosition}
+            handleLocationSelect={handleLocationSelect}
+          />,
+          modalRoot
+        )}
+      {showPasswordForm &&
+        modalRoot &&
+        createPortal(
+          <UpdatePasswordModal
+            passwordData={passwordData}
+            handlePasswordChange={handlePasswordChange}
+            handlePasswordSubmit={handlePasswordSubmit}
+            setShowPasswordForm={setShowPasswordForm}
+          />,
+          modalRoot
+        )}
     </div>
   );
+};
+
+const errorStyle = {
+  color: "red",
+  textAlign: "center",
+  marginTop: "20px",
+  fontSize: "18px",
 };
 
 export default PharmacyProfile;
