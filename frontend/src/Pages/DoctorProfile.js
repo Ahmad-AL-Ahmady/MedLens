@@ -13,6 +13,7 @@ import {
   MapPin,
   User,
   Calendar,
+  ScanBarcode,
 } from "lucide-react";
 import Swal from "sweetalert2";
 import "../Styles/DoctorProfile.css";
@@ -77,6 +78,7 @@ const DoctorProfile = () => {
   });
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const cameraIconRef = useRef(null);
+  const [scans, setScans] = useState([]);
 
   const fetchDoctorProfile = async () => {
     try {
@@ -168,6 +170,28 @@ const DoctorProfile = () => {
     }
   };
 
+  const fetchScans = async () => {
+    try {
+      const response = await fetch("http://localhost:4000/api/medical-scans", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      const data = await response.json();
+      if (data.status === "success" && data.data?.scans) {
+        setScans(data.data.scans);
+      } else {
+        setScans([]);
+      }
+    } catch (error) {
+      console.error("Error fetching scans:", error);
+      throw error;
+    }
+  };
+
   useEffect(() => {
     const token =
       localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
@@ -188,7 +212,18 @@ const DoctorProfile = () => {
       setIsViewingOwnProfile(id === tokenPayload.id);
     }
 
-    fetchDoctorProfile();
+    const fetchData = async () => {
+      try {
+        await Promise.all([fetchDoctorProfile(), fetchScans()]);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, [id]);
 
   const handleSubmit = async (e) => {
@@ -798,6 +833,52 @@ const DoctorProfile = () => {
     return [30.0444, 31.2357]; // Default position (Cairo)
   };
 
+  const handleDeleteScan = async (scanId) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to delete this scan?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, keep it",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const response = await fetch(
+          `http://localhost:4000/api/medical-scans/${scanId}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to delete scan");
+        }
+
+        const updatedScans = scans.filter((scan) => scan._id !== scanId);
+        setScans(updatedScans);
+
+        Swal.fire({
+          icon: "success",
+          title: "Deleted!",
+          text: "The scan has been deleted.",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Oops!",
+          text: "Something went wrong while deleting the scan. Please try again.",
+        });
+      }
+    }
+  };
+
   if (error) return <p style={{ color: "red" }}>{error}</p>;
   if (!doctor) return null;
 
@@ -1013,6 +1094,91 @@ const DoctorProfile = () => {
           <p>No reviews yet.</p>
         )}
       </div>
+
+      {/* Scans Section - Only visible to the logged-in doctor */}
+      {isViewingOwnProfile && (
+        <div className="doctor-profile-scan-section">
+          <h2>
+            <ScanBarcode size={20} color="#1e40af" />
+            My Scans
+          </h2>
+          <table className="doctor-profile-data-table">
+            <thead>
+              <tr>
+                <th>Preview</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Body Part</th>
+                <th>Confidence</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {scans.length > 0 ? (
+                scans.map((scan) => (
+                  <tr key={scan._id}>
+                    <td>
+                      {scan.images && scan.images.length > 0 ? (
+                        <img
+                          src={`http://localhost:4000${scan.images[0]}`}
+                          alt="Scan preview"
+                          className="scan-preview-image"
+                        />
+                      ) : (
+                        "No image"
+                      )}
+                    </td>
+                    <td>
+                      {scan.scanDate
+                        ? new Date(scan.scanDate).toLocaleDateString()
+                        : "N/A"}
+                    </td>
+                    <td>
+                      {scan.aiAnalysis?.classification_result ||
+                        (scan.description &&
+                        scan.description.includes("AI Analysis:")
+                          ? scan.description.replace("AI Analysis:", "").trim()
+                          : "N/A")}
+                    </td>
+                    <td>{scan.bodyPart || "N/A"}</td>
+                    <td className="confidence-cell">
+                      {scan.aiAnalysis &&
+                      typeof scan.aiAnalysis.confidence_score === "number" ? (
+                        <span
+                          className={`confidence-value ${
+                            scan.aiAnalysis.confidence_score >= 90
+                              ? "high-confidence"
+                              : scan.aiAnalysis.confidence_score >= 70
+                              ? "medium-confidence"
+                              : "low-confidence"
+                          }`}
+                        >
+                          {scan.aiAnalysis.confidence_score}%
+                        </span>
+                      ) : (
+                        "N/A"
+                      )}
+                    </td>
+                    <td>
+                      <button
+                        className="delete-appointment-button"
+                        onClick={() => handleDeleteScan(scan._id)}
+                        title="Delete Scan"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6">No scans found.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Modals Rendered via Portals */}
       {showEditForm &&
