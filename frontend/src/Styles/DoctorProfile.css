@@ -105,34 +105,43 @@
   position: absolute;
   top: 100%;
   right: 0;
-  background-color: #ffffff;
+  background-color: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
-  padding: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  min-width: 120px;
+  max-width: 180px;
+  width: max-content;
+  padding: 0;
+  margin-top: 8px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
   z-index: 1000;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  min-width: 120px;
+  overflow: hidden;
 }
 
 .camera-options button {
-  padding: 8px 12px;
-  background-color: transparent;
-  color: #4b5563;
+  padding: 12px 20px;
+  background: none;
+  color: #1e40af;
   border: none;
-  border-radius: 4px;
-  font-size: 14px;
+  border-radius: 0;
+  font-size: 15px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.2s, color 0.2s;
   text-align: left;
   width: 100%;
 }
 
 .camera-options button:hover {
-  background-color: #f3f4f6;
+  background: #f3f4f6;
   color: #2563eb;
+}
+
+.camera-options button:active {
+  background: #e5e7eb;
+  color: #1e40af;
 }
 
 .doctor-profile-info {
@@ -265,6 +274,7 @@
   font-weight: 700;
   position: relative;
   padding-bottom: 15px;
+  letter-spacing: 0.5px;
 }
 
 .edit-doctor-profile-form h2::after {
@@ -279,21 +289,126 @@
   border-radius: 3px;
 }
 
-.form-section {
+/* Appointment Form Section */
+.edit-doctor-profile-form .form-section {
   background-color: #f8fafc;
-  border-radius: 12px;
-  padding: 20px;
+  border-radius: 14px;
+  padding: 28px 24px 20px 24px;
   border: 1px solid #e5e7eb;
+  margin-bottom: 0;
 }
 
-.form-section-title {
+.edit-doctor-profile-form .form-section-title {
   font-size: 18px;
   font-weight: 600;
-  color: #1e40af;
-  margin-bottom: 15px;
+  color: #2563eb;
+  margin-bottom: 18px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+}
+
+/* Time input improvements */
+.edit-doctor-profile-form input[type="time"] {
+  padding-right: 32px;
+  position: relative;
+  background-position: right 10px center;
+  background-size: 20px 20px;
+}
+
+.edit-doctor-profile-form input[type="time"]::-webkit-calendar-picker-indicator {
+  margin-left: 10px;
+}
+
+.edit-doctor-profile-form input[type="date"] {
+  padding-right: 32px;
+  background-position: right 10px center;
+  background-size: 20px 20px;
+}
+
+/* Readonly input styles for appointment form */
+.readonly-input {
+  background-color: #f3f4f6;
+  color: #374151;
+  cursor: not-allowed;
+  border: 1px solid #e5e7eb;
+  opacity: 0.9;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* Reason textarea improvements */
+.edit-doctor-profile-form textarea {
+  min-height: 90px;
+  font-size: 15px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  padding: 12px 14px;
+  background: #fff;
+  color: #374151;
+  transition: border 0.2s;
+}
+
+.edit-doctor-profile-form textarea:focus {
+  border-color: #3b82f6;
+  outline: none;
+}
+
+/* Button row improvements */
+.edit-doctor-profile-form .form-btns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.edit-doctor-profile-form .save-btn {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+  border-radius: 8px;
+  padding: 12px 32px;
+  border: none;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.edit-doctor-profile-form .save-btn:hover {
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.18);
+  transform: translateY(-2px);
+}
+
+.edit-doctor-profile-form .cancel-btn {
+  background: #f3f4f6;
+  color: #374151;
+  font-weight: 600;
+  font-size: 16px;
+  border-radius: 8px;
+  padding: 12px 32px;
+  border: none;
+  transition: background 0.2s, color 0.2s;
+}
+
+.edit-doctor-profile-form .cancel-btn:hover {
+  background: #e5e7eb;
+  color: #1e40af;
+}
+
+/* Space between time and icon for time input */
+.edit-doctor-profile-form input[type="time"]::-webkit-input-placeholder {
+  letter-spacing: 1px;
+}
+
+.edit-doctor-profile-form input[type="time"]::-moz-placeholder {
+  letter-spacing: 1px;
+}
+
+.edit-doctor-profile-form input[type="time"]:-ms-input-placeholder {
+  letter-spacing: 1px;
+}
+
+.edit-doctor-profile-form input[type="time"]::placeholder {
+  letter-spacing: 1px;
 }
 
 .form-row {
@@ -317,7 +432,6 @@
 
 .edit-doctor-profile-form input[type="text"],
 .edit-doctor-profile-form input[type="number"],
-.edit-doctor-profile-form input[type="time"],
 .edit-doctor-profile-form select {
   padding: 10px 14px;
   border: 1px solid #d1d5db;
@@ -329,7 +443,6 @@
 
 .edit-doctor-profile-form input[type="text"]:focus,
 .edit-doctor-profile-form input[type="number"]:focus,
-.edit-doctor-profile-form input[type="time"]:focus,
 .edit-doctor-profile-form select:focus {
   border-color: #3b82f6;
   outline: none;
