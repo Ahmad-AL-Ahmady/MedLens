@@ -1677,6 +1677,10 @@
   .book-appointment-button {
     width: 100%;
   }
+  .working-hours-modal-content{
+    top: 55% ;
+
+  }
 }
 
 @media (max-width: 640px) {
@@ -1710,3 +1714,5 @@
     min-width: 100px;
   }
 }
+
+  
