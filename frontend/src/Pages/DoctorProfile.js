@@ -425,6 +425,32 @@ const DoctorProfile = () => {
     });
 
     try {
+      // First update the user's name
+      const userRes = await fetch("http://localhost:4000/api/users/updateMe", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+        }),
+      });
+
+      const userData = await userRes.json();
+
+      if (!userRes.ok) {
+        Swal.fire({
+          icon: "error",
+          title: "Profile Update Failed",
+          text: userData.message || "Failed to update user information",
+          confirmButtonColor: "#3b82f6",
+        });
+        return;
+      }
+
+      // Then update the doctor's profile
       const profileRes = await fetch(
         "http://localhost:4000/api/doctors/profile",
         {
@@ -434,8 +460,6 @@ const DoctorProfile = () => {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            firstName: formData.firstName,
-            lastName: formData.lastName,
             city: formData.city,
             state: formData.state,
             country: formData.country,
@@ -843,7 +867,22 @@ const DoctorProfile = () => {
             <div className="profile-action-buttons">
               <button
                 className="edit-doctor-profile-button"
-                onClick={() => setShowEditForm(true)}
+                onClick={() => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    firstName: doctor?.firstName || "",
+                    lastName: doctor?.lastName || "",
+                    city: profile?.city || "",
+                    state: profile?.state || "",
+                    country: profile?.country || "",
+                    fees: profile?.fees || "",
+                    experienceYears: profile?.experienceYears || "",
+                    avatar: doctor?.avatar || null,
+                    location: doctor?.location || null,
+                    availability: profile?.availability || prev.availability,
+                  }));
+                  setShowEditForm(true);
+                }}
               >
                 <Edit size={15} color="white" /> Edit Profile
               </button>
