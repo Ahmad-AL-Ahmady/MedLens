@@ -1,4 +1,4 @@
-import React, { useEffect, useState, memo } from "react";
+import React, { useEffect, useState, memo, useRef } from "react";
 import { useParams } from "react-router-dom";
 import {
   Mail,
@@ -11,13 +11,14 @@ import {
   ScanBarcode,
   ClipboardList,
   Pill,
+  Star,
 } from "lucide-react";
 import Swal from "sweetalert2";
 import { createPortal } from "react-dom";
 import "../Styles/PharmacyProfile.css";
 import LocationPicker from "../Pages/LocationPicker";
 
-// Memoize modal components to prevent unnecessary re-renders
+// Memoized modal components
 const EditProfileModal = memo(
   ({
     formData,
@@ -45,6 +46,7 @@ const EditProfileModal = memo(
           type="button"
           className="close-form-btn"
           onClick={() => setShowEditForm(false)}
+          aria-label="Close form"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -69,8 +71,9 @@ const EditProfileModal = memo(
           </div>
           <div className="form-row">
             <div className="pharmacy-form-group">
-              <label>First Name</label>
+              <label htmlFor="firstName">First Name</label>
               <input
+                id="firstName"
                 key="firstName"
                 type="text"
                 name="firstName"
@@ -80,8 +83,9 @@ const EditProfileModal = memo(
               />
             </div>
             <div className="pharmacy-form-group">
-              <label>Last Name</label>
+              <label htmlFor="lastName">Last Name</label>
               <input
+                id="lastName"
                 key="lastName"
                 type="text"
                 name="lastName"
@@ -93,10 +97,11 @@ const EditProfileModal = memo(
           </div>
           <div className="form-row">
             <div className="pharmacy-form-group">
-              <label>Phone Number</label>
+              <label htmlFor="phoneNumber">Phone Number</label>
               <div className="phone-input-container">
                 <span className="country-code">+20</span>
                 <input
+                  id="phoneNumber"
                   key="phoneNumber"
                   type="text"
                   name="phoneNumber"
@@ -204,6 +209,7 @@ const UpdatePasswordModal = memo(
           type="button"
           className="close-form-btn"
           onClick={() => setShowPasswordForm(false)}
+          aria-label="Close form"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -241,8 +247,9 @@ const UpdatePasswordModal = memo(
           </div>
           <div className="form-row">
             <div className="pharmacy-form-group">
-              <label>Current Password</label>
+              <label htmlFor="currentPassword">Current Password</label>
               <input
+                id="currentPassword"
                 key="currentPassword"
                 type="password"
                 name="currentPassword"
@@ -255,8 +262,9 @@ const UpdatePasswordModal = memo(
           </div>
           <div className="form-row">
             <div className="pharmacy-form-group">
-              <label>New Password</label>
+              <label htmlFor="newPassword">New Password</label>
               <input
+                id="newPassword"
                 key="newPassword"
                 type="password"
                 name="newPassword"
@@ -267,8 +275,9 @@ const UpdatePasswordModal = memo(
               />
             </div>
             <div className="pharmacy-form-group">
-              <label>Confirm New Password</label>
+              <label htmlFor="confirmPassword">Confirm New Password</label>
               <input
+                id="confirmPassword"
                 key="confirmPassword"
                 type="password"
                 name="confirmPassword"
@@ -291,6 +300,103 @@ const UpdatePasswordModal = memo(
           </button>
           <button type="submit" className="save-btn">
             Update Password
+          </button>
+        </div>
+      </form>
+    </div>
+  )
+);
+
+const ReviewFormModal = memo(
+  ({
+    showReviewForm,
+    setShowReviewForm,
+    handleReviewSubmit,
+    comment,
+    setComment,
+    rating,
+    setRating,
+  }) => (
+    <div
+      className="edit-pharmacy-profile-form-overlay"
+      role="dialog"
+      aria-modal="true"
+      onClick={() => setShowReviewForm(false)}
+    >
+      <form
+        onSubmit={handleReviewSubmit}
+        className="edit-pharmacy-profile-form"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          type="button"
+          className="close-form-btn"
+          onClick={() => setShowReviewForm(false)}
+          aria-label="Close form"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+
+        <h2>Submit a Review</h2>
+
+        <div className="form-section">
+          <div className="form-section-title">
+            <Star size={18} />
+            Review Details
+          </div>
+          <div className="form-row">
+            <div className="pharmacy-form-group full-width">
+              <label htmlFor="rating">Rating</label>
+              <select
+                id="rating"
+                name="rating"
+                value={rating}
+                onChange={(e) => setRating(Number(e.target.value))}
+              >
+                {[1, 2, 3, 4, 5].map((value) => (
+                  <option key={value} value={value}>
+                    {value} Star{value > 1 ? "s" : ""}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="pharmacy-form-group full-width">
+              <label htmlFor="comment">Comment</label>
+              <textarea
+                id="comment"
+                name="comment"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Enter your review"
+                rows="4"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="form-btns">
+          <button
+            type="button"
+            onClick={() => setShowReviewForm(false)}
+            className="cancel-btn"
+          >
+            Cancel
+          </button>
+          <button type="submit" className="save-btn">
+            Submit Review
           </button>
         </div>
       </form>
@@ -329,23 +435,44 @@ const PharmacyProfile = () => {
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(5);
   const [modalRoot, setModalRoot] = useState(null);
+  const imageWrapperRef = useRef(null); // Ref to calculate menu position
 
   const token =
     localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
 
-  // Dynamically create modal-root container
+  // Initialize modal-root
   useEffect(() => {
-    const modalRootDiv = document.createElement("div");
-    modalRootDiv.setAttribute("id", "modal-root");
-    document.body.appendChild(modalRootDiv);
-    setModalRoot(modalRootDiv);
+    const modalRootDiv = document.getElementById("modal-root");
+    if (modalRootDiv) {
+      setModalRoot(modalRootDiv);
+    } else {
+      const newModalRootDiv = document.createElement("div");
+      newModalRootDiv.setAttribute("id", "modal-root");
+      document.body.appendChild(newModalRootDiv);
+      setModalRoot(newModalRootDiv);
+    }
 
     return () => {
-      if (document.body.contains(modalRootDiv)) {
+      if (
+        modalRootDiv &&
+        document.body.contains(modalRootDiv) &&
+        modalRootDiv !== document.getElementById("modal-root")
+      ) {
         document.body.removeChild(modalRootDiv);
       }
     };
   }, []);
+
+  // Close camera menu with Escape key
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === "Escape" && menuOpen) {
+        setMenuOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [menuOpen]);
 
   // Fetch pharmacy profile
   const fetchPharmacyProfile = async () => {
@@ -372,13 +499,15 @@ const PharmacyProfile = () => {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to fetch pharmacy profile");
+        throw new Error(
+          `Failed to fetch pharmacy profile: ${response.statusText}`
+        );
       }
 
       const data = await response.json();
       if (data.status === "success" && data.data) {
         setPharmacy(data.data);
-        setProfile(data.data.profile);
+        setProfile(data.data.profile || {});
         setFormData({
           firstName: data.data.firstName || "",
           lastName: data.data.lastName || "",
@@ -388,7 +517,7 @@ const PharmacyProfile = () => {
         });
         Swal.close();
       } else {
-        throw new Error("Failed to fetch pharmacy data");
+        throw new Error("Invalid pharmacy data received");
       }
     } catch (error) {
       console.error("Error fetching pharmacy profile:", error);
@@ -415,6 +544,10 @@ const PharmacyProfile = () => {
         credentials: "include",
       });
 
+      if (!response.ok) {
+        throw new Error("Failed to fetch scans");
+      }
+
       const data = await response.json();
       if (data.status === "success" && data.data?.scans) {
         setScans(data.data.scans);
@@ -440,6 +573,10 @@ const PharmacyProfile = () => {
         }
       );
 
+      if (!response.ok) {
+        throw new Error("Failed to fetch inventory");
+      }
+
       const data = await response.json();
       if (data.status === "success" && data.data?.inventory) {
         setInventory(data.data.inventory);
@@ -456,19 +593,23 @@ const PharmacyProfile = () => {
   useEffect(() => {
     if (!token) {
       console.error("No token found");
-      setError("No token found");
+      setError("Authentication required. Please log in.");
       setLoading(false);
       return;
     }
 
-    const tokenPayload = JSON.parse(atob(token.split(".")[1]));
-    setCurrentUserId(tokenPayload.id);
-
-    if (!id) {
-      setIsViewingOwnProfile(true);
-    } else {
-      setIsViewingOwnProfile(id === tokenPayload.id);
+    let tokenPayload;
+    try {
+      tokenPayload = JSON.parse(atob(token.split(".")[1]));
+    } catch (e) {
+      console.error("Invalid token format");
+      setError("Invalid authentication token");
+      setLoading(false);
+      return;
     }
+
+    setCurrentUserId(tokenPayload.id);
+    setIsViewingOwnProfile(!id || id === tokenPayload.id);
 
     const fetchData = async () => {
       try {
@@ -479,7 +620,7 @@ const PharmacyProfile = () => {
         ]);
       } catch (error) {
         console.error("Error fetching data:", error);
-        setError(error.message);
+        setError(error.message || "Failed to load data");
       } finally {
         setLoading(false);
       }
@@ -512,13 +653,16 @@ const PharmacyProfile = () => {
       const response = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
       );
+      if (!response.ok) {
+        throw new Error("Failed to fetch location details");
+      }
       const data = await response.json();
 
       setFormData((prev) => ({
         ...prev,
         location: {
           ...location,
-          formattedAddress: data.display_name,
+          formattedAddress: data.display_name || "Unknown location",
         },
       }));
     } catch (error) {
@@ -531,59 +675,55 @@ const PharmacyProfile = () => {
   // Handle photo upload
   const handlePhotoChange = async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const formData = new FormData();
-      formData.append("avatar", file);
+    if (!file) return;
 
-      try {
-        Swal.fire({
-          title: "Uploading...",
-          text: "Please wait while we upload your avatar",
-          allowOutsideClick: false,
-          allowEscapeKey: false,
-          showConfirmButton: false,
-          didOpen: () => {
-            Swal.showLoading();
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    try {
+      Swal.fire({
+        title: "Uploading...",
+        text: "Please wait while we upload your avatar",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      const response = await fetch(
+        "http://localhost:4000/api/users/updateAvatar",
+        {
+          method: "PATCH",
+          body: formData,
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-        });
-
-        const response = await fetch(
-          "http://localhost:4000/api/users/updateAvatar",
-          {
-            method: "PATCH",
-            body: formData,
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (response.ok) {
-          Swal.fire({
-            icon: "success",
-            title: "Success!",
-            text: "Avatar updated successfully!",
-            confirmButtonColor: "#3b82f6",
-          }).then(() => {
-            window.location.reload();
-          });
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "Failed to update avatar",
-            confirmButtonColor: "#3b82f6",
-          });
         }
-      } catch (error) {
-        console.error("Error:", error);
+      );
+
+      if (response.ok) {
         Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "An error occurred while updating avatar",
+          icon: "success",
+          title: "Success!",
+          text: "Avatar updated successfully!",
           confirmButtonColor: "#3b82f6",
+        }).then(() => {
+          window.location.reload();
         });
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to update avatar");
       }
+    } catch (error) {
+      console.error("Error uploading avatar:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "An error occurred while updating avatar",
+        confirmButtonColor: "#3b82f6",
+      });
     }
   };
 
@@ -594,7 +734,7 @@ const PharmacyProfile = () => {
 
   // Handle avatar deletion
   const handleDeleteAvatar = async () => {
-    Swal.fire({
+    const result = await Swal.fire({
       title: "Are you sure?",
       text: "Do you want to delete your avatar?",
       icon: "warning",
@@ -602,58 +742,54 @@ const PharmacyProfile = () => {
       confirmButtonColor: "#3b82f6",
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes, delete it!",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          Swal.fire({
-            title: "Deleting...",
-            text: "Please wait while we delete your avatar",
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-            showConfirmButton: false,
-            didOpen: () => {
-              Swal.showLoading();
-            },
-          });
-
-          const response = await fetch(
-            "http://localhost:4000/api/users/deleteAvatar",
-            {
-              method: "DELETE",
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-
-          if (response.ok) {
-            Swal.fire({
-              icon: "success",
-              title: "Success!",
-              text: "Avatar deleted successfully!",
-              confirmButtonColor: "#3b82f6",
-            }).then(() => {
-              window.location.reload();
-            });
-          } else {
-            Swal.fire({
-              icon: "error",
-              title: "Error",
-              text: "Failed to delete avatar",
-              confirmButtonColor: "#3b82f6",
-            });
-          }
-        } catch (error) {
-          console.error("Error while deleting avatar:", error);
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "An error occurred while deleting avatar",
-            confirmButtonColor: "#3b82f6",
-          });
-        }
-      }
     });
+
+    if (result.isConfirmed) {
+      try {
+        Swal.fire({
+          title: "Deleting...",
+          text: "Please wait while we delete your avatar",
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          showConfirmButton: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
+        const response = await fetch(
+          "http://localhost:4000/api/users/deleteAvatar",
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          Swal.fire({
+            icon: "success",
+            title: "Success!",
+            text: "Avatar deleted successfully!",
+            confirmButtonColor: "#3b82f6",
+          }).then(() => {
+            window.location.reload();
+          });
+        } else {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to delete avatar");
+        }
+      } catch (error) {
+        console.error("Error deleting avatar:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: error.message || "An error occurred while deleting avatar",
+          confirmButtonColor: "#3b82f6",
+        });
+      }
+    }
   };
 
   // Handle profile update submission
@@ -669,18 +805,18 @@ const PharmacyProfile = () => {
       return;
     }
 
-    Swal.fire({
-      title: "Updating profile...",
-      text: "Please wait while we update your profile",
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      showConfirmButton: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
-
     try {
+      Swal.fire({
+        title: "Updating profile...",
+        text: "Please wait while we update your profile",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
       const response = await fetch(
         "http://localhost:4000/api/pharmacies/profile",
         {
@@ -711,19 +847,15 @@ const PharmacyProfile = () => {
         await fetchPharmacyProfile();
         setShowEditForm(false);
       } else {
-        Swal.fire({
-          icon: "error",
-          title: "Update Failed",
-          text: data.message || "Failed to update profile",
-          confirmButtonColor: "#3b82f6",
-        });
+        throw new Error(data.message || "Failed to update profile");
       }
     } catch (error) {
       console.error("Error updating profile:", error);
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: "Something went wrong while updating your profile",
+        text:
+          error.message || "Something went wrong while updating your profile",
         confirmButtonColor: "#3b82f6",
       });
     }
@@ -733,7 +865,7 @@ const PharmacyProfile = () => {
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:4000/api/reviews", {
+      const response = await fetch("http://localhost:4000/api/reviews", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -747,8 +879,8 @@ const PharmacyProfile = () => {
         }),
       });
 
-      const data = await res.json();
-      if (!res.ok) {
+      const data = await response.json();
+      if (!response.ok) {
         throw new Error(data.message || "Something went wrong");
       }
 
@@ -779,55 +911,55 @@ const PharmacyProfile = () => {
 
   // Handle review deletion
   const handleDeleteReview = async (reviewId) => {
-    Swal.fire({
+    const result = await Swal.fire({
       title: "Are you sure?",
-      text: "Are you sure you want to delete this review?",
+      text: "Do you want to delete this review?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3b82f6",
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes, delete it!",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const res = await fetch(
-            `http://localhost:4000/api/reviews/${reviewId}`,
-            {
-              method: "DELETE",
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-
-          if (!res.ok) {
-            const errorData = await res.json();
-            throw new Error(errorData.message || "Something went wrong");
-          }
-
-          setProfile((prev) => ({
-            ...prev,
-            reviews: prev.reviews.filter((review) => review._id !== reviewId),
-          }));
-
-          Swal.fire({
-            icon: "success",
-            title: "Deleted!",
-            text: "Your review has been deleted successfully.",
-            confirmButtonColor: "#3b82f6",
-          });
-          await fetchPharmacyProfile();
-        } catch (error) {
-          console.error("Error deleting review:", error.message);
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "Failed to delete review. Please try again.",
-            confirmButtonColor: "#3b82f6",
-          });
-        }
-      }
     });
+
+    if (result.isConfirmed) {
+      try {
+        const response = await fetch(
+          `http://localhost:4000/api/reviews/${reviewId}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Something went wrong");
+        }
+
+        setProfile((prev) => ({
+          ...prev,
+          reviews: prev.reviews.filter((review) => review._id !== reviewId),
+        }));
+
+        Swal.fire({
+          icon: "success",
+          title: "Deleted!",
+          text: "Your review has been deleted successfully.",
+          confirmButtonColor: "#3b82f6",
+        });
+        await fetchPharmacyProfile();
+      } catch (error) {
+        console.error("Error deleting review:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: error.message || "Failed to delete review. Please try again.",
+          confirmButtonColor: "#3b82f6",
+        });
+      }
+    }
   };
 
   // Handle password input changes
@@ -888,19 +1020,15 @@ const PharmacyProfile = () => {
           confirmPassword: "",
         });
       } else {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: data.message || "Failed to update password",
-          confirmButtonColor: "#3b82f6",
-        });
+        throw new Error(data.message || "Failed to update password");
       }
     } catch (error) {
       console.error("Error updating password:", error);
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: "Something went wrong while updating your password",
+        text:
+          error.message || "Something went wrong while updating your password",
         confirmButtonColor: "#3b82f6",
       });
     }
@@ -927,6 +1055,8 @@ const PharmacyProfile = () => {
       text: "Do you want to delete this scan?",
       icon: "warning",
       showCancelButton: true,
+      confirmButtonColor: "#3b82f6",
+      cancelButtonColor: "#d33",
       confirmButtonText: "Yes, delete it!",
       cancelButtonText: "No, keep it",
     });
@@ -944,7 +1074,8 @@ const PharmacyProfile = () => {
         );
 
         if (!response.ok) {
-          throw new Error("Failed to delete scan");
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to delete scan");
         }
 
         setScans((prev) => prev.filter((scan) => scan._id !== scanId));
@@ -956,24 +1087,57 @@ const PharmacyProfile = () => {
           showConfirmButton: false,
         });
       } catch (error) {
+        console.error("Error deleting scan:", error);
         Swal.fire({
           icon: "error",
-          title: "Oops!",
-          text: "Something went wrong while deleting the scan.",
+          title: "Error",
+          text: error.message || "Something went wrong while deleting the scan",
+          confirmButtonColor: "#3b82f6",
         });
       }
     }
   };
 
-  if (error) return <p style={errorStyle}>{error}</p>;
-  if (!pharmacy) return null;
+  // Calculate camera options position
+  const getCameraOptionsPosition = () => {
+    if (imageWrapperRef.current) {
+      const rect = imageWrapperRef.current.getBoundingClientRect();
+      const menuWidth = 120; // Width of pharmacy-camera-options
+      const leftPos = rect.left + rect.width - menuWidth;
+      // Ensure menu stays within viewport
+      const adjustedLeft = Math.max(
+        10,
+        Math.min(leftPos, window.innerWidth - menuWidth - 10)
+      );
+      return {
+        top: rect.bottom + window.scrollY + 5,
+        left: adjustedLeft,
+      };
+    }
+    return { top: 0, left: 0 };
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <p style={errorStyle}>{error}</p>;
+  }
+
+  if (!pharmacy) {
+    return null;
+  }
 
   return (
     <div className="pharmacy-profile-container">
       <div className="pharmacy-profile-header">
         <div className="pharmacy-header-top">
           <div className="pharmacy-profile-image-container">
-            <div className="pharmacy-profile-image-wrapper">
+            <div
+              className="pharmacy-profile-image-wrapper"
+              ref={imageWrapperRef}
+            >
               <img
                 src={
                   selectedImage || pharmacy.avatar
@@ -982,31 +1146,23 @@ const PharmacyProfile = () => {
                       }`
                     : "http://localhost:4000/public/uploads/users/default.jpg"
                 }
-                alt="Pharmacy"
+                alt={`${pharmacy.firstName} ${pharmacy.lastName}'s profile`}
                 className="pharmacy-profile-image"
               />
               {isViewingOwnProfile && (
-                <div className="pharmacy-camera-icon" onClick={toggleMenu}>
+                <div
+                  className="pharmacy-camera-icon"
+                  onClick={toggleMenu}
+                  role="button"
+                  aria-label="Edit profile picture"
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === "Enter" && toggleMenu()}
+                >
                   <img
                     src="https://img.icons8.com/ios-filled/50/000000/camera.png"
-                    alt="Edit"
+                    alt="Edit profile picture"
                   />
                 </div>
-              )}
-              {menuOpen && isViewingOwnProfile && (
-                <>
-                  <div className="overlay" onClick={toggleMenu}></div>
-                  <div className="pharmacy-camera-options">
-                    <button
-                      onClick={() =>
-                        document.getElementById("upload-photo").click()
-                      }
-                    >
-                      Upload
-                    </button>
-                    <button onClick={handleDeleteAvatar}>Delete</button>
-                  </div>
-                </>
               )}
               <input
                 type="file"
@@ -1040,6 +1196,12 @@ const PharmacyProfile = () => {
                       "No phone number"
                     )}
                   </p>
+                  {pharmacy.location?.formattedAddress && (
+                    <p className="pharmacy-profile-email">
+                      <MapPin size={16} color="#1e56cf" />
+                      {pharmacy.location.formattedAddress}
+                    </p>
+                  )}
                 </div>
               </div>
               {isViewingOwnProfile && (
@@ -1109,6 +1271,7 @@ const PharmacyProfile = () => {
           </div>
         </div>
       </div>
+
       <div className="pharmacy-profile-map">
         <iframe
           title="Pharmacy Location"
@@ -1121,6 +1284,47 @@ const PharmacyProfile = () => {
           loading="lazy"
         />
       </div>
+
+      <div className="pharmacy-profile-reviews">
+        <h2>Reviews</h2>
+        {!isViewingOwnProfile && (
+          <button
+            className="select-location-btn"
+            onClick={() => setShowReviewForm(true)}
+            style={{ marginBottom: "15px" }}
+          >
+            <Star size={16} />
+            Write a Review
+          </button>
+        )}
+        {profile?.reviews?.length > 0 ? (
+          profile.reviews.map((review) => (
+            <div key={review._id} className="pharmacy-profile-review">
+              <strong>
+                {review.reviewer.firstName} {review.reviewer.lastName}
+              </strong>
+              <p className="pharmacy-profile-rating">
+                {Array.from({ length: review.rating }, (_, i) => (
+                  <Star key={i} size={14} color="#fad955" fill="#fad955" />
+                ))}
+              </p>
+              <p>{review.comment}</p>
+              {review.reviewer._id === currentUserId && (
+                <button
+                  className="pharmacy-profile-delete-appointment-button"
+                  onClick={() => handleDeleteReview(review._id)}
+                  title="Delete Review"
+                >
+                  <Trash2 size={18} />
+                </button>
+              )}
+            </div>
+          ))
+        ) : (
+          <p>No reviews yet.</p>
+        )}
+      </div>
+
       <div className="pharmacy-profile-scan-section">
         <h2>
           <ScanBarcode size={20} color="#1e40af" />
@@ -1188,6 +1392,7 @@ const PharmacyProfile = () => {
                       className="pharmacy-profile-delete-appointment-button"
                       onClick={() => handleDeleteScan(scan._id)}
                       title="Delete Scan"
+                      aria-label="Delete scan"
                     >
                       <Trash2 size={18} />
                     </button>
@@ -1202,6 +1407,57 @@ const PharmacyProfile = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Render camera options and overlay in modal-root using portal */}
+      {menuOpen && isViewingOwnProfile && modalRoot && (
+        <>
+          {createPortal(
+            <div
+              className="overlay"
+              onClick={toggleMenu}
+              onKeyDown={(e) => e.key === "Enter" && toggleMenu()}
+              role="button"
+              tabIndex={0}
+              aria-label="Close camera options"
+            />,
+            modalRoot
+          )}
+          {createPortal(
+            <div
+              className="pharmacy-camera-options"
+              style={{
+                position: "absolute",
+                top: `${getCameraOptionsPosition().top}px`,
+                left: `${getCameraOptionsPosition().left}px`,
+              }}
+              role="menu"
+              aria-label="Profile picture options"
+            >
+              <button
+                onClick={() => {
+                  document.getElementById("upload-photo").click();
+                  toggleMenu();
+                }}
+                role="menuitem"
+              >
+                Upload
+              </button>
+              <button
+                onClick={() => {
+                  handleDeleteAvatar();
+                  toggleMenu();
+                }}
+                role="menuitem"
+              >
+                Delete
+              </button>
+            </div>,
+            modalRoot
+          )}
+        </>
+      )}
+
+      {/* Existing modals */}
       {showEditForm &&
         modalRoot &&
         createPortal(
@@ -1226,6 +1482,20 @@ const PharmacyProfile = () => {
             handlePasswordChange={handlePasswordChange}
             handlePasswordSubmit={handlePasswordSubmit}
             setShowPasswordForm={setShowPasswordForm}
+          />,
+          modalRoot
+        )}
+      {showReviewForm &&
+        modalRoot &&
+        createPortal(
+          <ReviewFormModal
+            showReviewForm={showReviewForm}
+            setShowReviewForm={setShowReviewForm}
+            handleReviewSubmit={handleReviewSubmit}
+            comment={comment}
+            setComment={setComment}
+            rating={rating}
+            setRating={setRating}
           />,
           modalRoot
         )}
