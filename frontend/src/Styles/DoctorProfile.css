@@ -1882,3 +1882,58 @@
     min-width: 100px;
   }
 }
+
+.star-rating-input {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 2rem;
+  user-select: none;
+}
+
+.star-wrapper {
+  display: flex;
+  position: relative;
+}
+
+.star {
+  color: #e5e7eb;
+  cursor: pointer;
+  transition: color 0.2s;
+  position: relative;
+  z-index: 1;
+  font-size: 2rem;
+  padding: 0 1px;
+}
+
+.star.full {
+  color: #fbbf24;
+}
+
+.star.half {
+  color: #fbbf24;
+  position: relative;
+}
+
+.star.half::before {
+  content: '\2605';
+  color: #fbbf24;
+  position: absolute;
+  left: 0;
+  width: 50%;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.star-rating-value {
+  font-size: 1.1rem;
+  color: #374151;
+  margin-left: 10px;
+  font-weight: 500;
+}
+
+.star:hover,
+.star:focus {
+  color: #f59e42;
+  outline: none;
+}

@@ -18,6 +18,7 @@ import Swal from "sweetalert2";
 import "../Styles/DoctorProfile.css";
 import LocationPicker from "../Pages/LocationPicker";
 import ReactDOM from "react-dom";
+import { Rating } from "react-simple-star-rating";
 
 const DoctorProfile = () => {
   const { id } = useParams();
@@ -36,7 +37,7 @@ const DoctorProfile = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [comment, setComment] = useState("");
-  const [rating, setRating] = useState(5);
+  const [rating, setRating] = useState(0);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [showAvailabilityModal, setShowAvailabilityModal] = useState(false);
@@ -554,7 +555,7 @@ const DoctorProfile = () => {
         body: JSON.stringify({
           reviewedEntityId: id,
           entityType: "Doctor",
-          rating,
+          rating: rating,
           comment,
         }),
       });
@@ -1419,19 +1420,21 @@ const DoctorProfile = () => {
                   <div className="form-row">
                     <div className="doctor-form-group">
                       <label>Rating</label>
-                      <div className="rating-input-container">
-                        <input
-                          type="number"
-                          value={rating}
-                          onChange={(e) =>
-                            setRating(Number.parseFloat(e.target.value))
-                          }
-                          step="0.1"
-                          min="1"
-                          max="5"
-                          required
+                      <div className="star-rating-input">
+                        <Rating
+                          onClick={(newRating) => setRating(newRating)}
+                          precision={0.1} // This allows for 0.1 increments
+                          initialValue={rating} // Use initialValue instead of ratingValue
+                          size={32}
+                          transition
+                          fillColor="#fbbf24"
+                          emptyColor="#e5e7eb"
+                          allowHover
+                          showTooltip={false}
+                          allowHalfIcon={true}
+                          label={false}
                         />
-                        <span className="rating-star">⭐️</span>
+                        <span className="star-rating-value">{rating}</span>
                       </div>
                     </div>
                   </div>
