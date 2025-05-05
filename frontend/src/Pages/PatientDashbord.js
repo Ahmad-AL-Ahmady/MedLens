@@ -265,12 +265,6 @@ export default function PatientDashboard() {
           <div className="patient-dashboard-card__content">
             <p className="patient-dashboard-card__value">{scanCount}</p>
             <p className="patient-dashboard-card__subtext">Scans this month</p>
-            <div className="patient-dashboard-progress-bar">
-              <div
-                className="patient-dashboard-progress-bar__fill"
-                style={{ width: `${Math.min((scanCount / 10) * 100, 100)}%` }}
-              ></div>
-            </div>
           </div>
         </div>
       </div>

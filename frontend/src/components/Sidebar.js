@@ -135,7 +135,7 @@ export default function Sidebar({
       onMouseLeave={() => !isMobile && setIsExpanded(false)}
     >
       <div className="sidebar-header">
-        <div className="sidebar-logo-container">
+        <div className="sidebar-logo-container" onClick={() => navigate("/")} style={{ cursor: 'pointer' }}>
           <img src={Final} alt="MedLens Logo" className="sidebar-info-logo" />
           <span className="sidebar-logo-text">MedLens</span>
         </div>

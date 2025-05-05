@@ -135,7 +135,7 @@ export default function HomePage() {
     <div className="home-main-container">
       <nav className="home-navbar">
         <div className="home-nav-content">
-          <div className="home-logo" onClick={() => navigate("/")}>
+          <div className="home-logo" onClick={() => window.location.reload()}>
             <img src={WhiteLogo} alt="MedLens Logo" className="home-logo-img" />
             <span className="home-logo-text">MedLens</span>
           </div>
