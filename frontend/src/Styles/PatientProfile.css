@@ -92,28 +92,24 @@
 }
 
 .patient-camera-options {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background-color: #ffffff;
+  background: white;
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  z-index: 1000;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
   min-width: 120px;
 }
 
 .patient-camera-options button {
-  padding: 8px 12px;
+  padding: 10px 16px;
   background-color: transparent;
-  color: #4b5563;
+  color: #1e40af;
   border: none;
-  border-radius: 4px;
   font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: left;
@@ -122,7 +118,10 @@
 
 .patient-camera-options button:hover {
   background-color: #f3f4f6;
-  color: #2563eb;
+}
+
+.patient-camera-options button:active {
+  background-color: #e5e7eb;
 }
 
 .patient-profile-edit-btn {
@@ -535,8 +534,6 @@
   align-items: center;
 }
 
-/* Working Hours */
-
 /* Delete Appointment Button */
 .delete-appointment-button {
   background: none;
@@ -629,7 +626,6 @@
 }
 
 /* Responsive Styles */
-
 @media (min-width: 992px) and (max-width: 1199px) {
   .profile-buttons {
     position: static;
@@ -757,9 +753,9 @@
   .patient-profile-data-table td {
     padding: 10px 12px;
     font-size: 12px;
-    font-size: 9px;
   }
 }
+
 @media (max-width: 480px) {
   .patient-profile-scan-section {
     margin: 20px 0;
@@ -774,7 +770,7 @@
   .patient-profile-data-table th,
   .patient-profile-data-table td {
     padding: 10px 12px;
-    font-size: 4px;
+    font-size: 12px;
   }
 
   .scan-preview-image {
@@ -795,5 +791,13 @@
   .edit-doctor-profile-form input[type="password"] {
     padding: 6px 10px;
     font-size: 10px;
+  }
+
+  .patient-camera-options {
+    min-width: 90px;
+  }
+  .patient-camera-options button {
+    padding: 6px 10px;
+    font-size: 12px;
   }
 }
