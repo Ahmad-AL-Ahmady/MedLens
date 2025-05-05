@@ -9,6 +9,7 @@ import {
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "../Styles/LocationPicker.css";
+import { createPortal } from "react-dom";
 
 const customMarker = new L.Icon({
   iconUrl: "https://cdn-icons-png.flaticon.com/128/684/684908.png",
@@ -89,7 +90,8 @@ const LocationPicker = ({ onSelect, onClose }) => {
     }
   };
 
-  return (
+  // Render the LocationPicker in a portal at the root level
+  return createPortal(
     <div className="map-overlay">
       <div className="map-container" ref={overlayRef}>
         <div className="map-header">
@@ -130,7 +132,7 @@ const LocationPicker = ({ onSelect, onClose }) => {
               My Location
             </button>
             <button type="button" className="close-button" onClick={onClose}>
-              &times;
+              ×
             </button>
           </div>
         </div>
@@ -143,13 +145,14 @@ const LocationPicker = ({ onSelect, onClose }) => {
             <MapInstance />
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             />
             <LocationMarker />
           </MapContainer>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body // Render at the root of the DOM
   );
 };
 
