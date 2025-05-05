@@ -1677,8 +1677,8 @@
   .book-appointment-button {
     width: 100%;
   }
-  .working-hours-modal-content{
-    top: 55% ;
+  .working-hours-modal-content {
+    top: 55%;
     overflow: visible;
     transform: scale(0.9);
     transform-origin: center;
@@ -1700,7 +1700,7 @@
   }
 
   /* Adjust Sunday card on mobile */
-  .operating-hours-grid>div:last-child {
+  .operating-hours-grid > div:last-child {
     width: 100%;
   }
 
@@ -1719,5 +1719,3 @@
     min-width: 100px;
   }
 }
-
-  
