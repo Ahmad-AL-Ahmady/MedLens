@@ -465,6 +465,7 @@ body {
   .info-card,
   .upload-card {
     padding: 1rem;
+    
   }
 
   .upload-area {
@@ -485,6 +486,12 @@ body {
     width: 3rem;
     height: 3rem;
   }
+  .info-content{
+    display: block !important;
+  }
+    
+  }
+  
 
   .file-label {
     width: 100%;
@@ -531,11 +538,15 @@ body {
     padding: 0.15rem 0.5rem;
     font-size: 0.75rem;
   }
-}
+
 
 /* Mobile landscape orientation adjustment */
-@media (max-width: 768px) and (orientation: landscape) {
+@media (max-width: 768px) {
   .preview-image {
     max-height: 200px;
   }
+  .info-content{
+    display: block !important;
+  }
+  
 }
