@@ -13,7 +13,209 @@ import {
   Trash2,
 } from "lucide-react";
 import Swal from "sweetalert2";
+import ReactDOM from "react-dom";
 import "../Styles/PatientProfile.css";
+
+// Component for Update Profile Form
+const UpdateProfileForm = ({
+  isOpen,
+  onClose,
+  formData,
+  handleChange,
+  handleSubmit,
+}) => {
+  if (!isOpen) return null;
+
+  const modalRoot = document.getElementById("modal-root");
+  if (!modalRoot) {
+    console.error("Modal root element not found for UpdateProfileForm");
+    return null;
+  }
+
+  return ReactDOM.createPortal(
+    <div className="edit-doctor-profile-form-overlay">
+      <form onSubmit={handleSubmit} className="edit-doctor-profile-form">
+        <button type="button" className="close-form-btn" onClick={onClose}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+
+        <h2>Update Your Profile</h2>
+
+        <div className="form-section">
+          <div className="form-section-title">
+            <User size={18} />
+            Personal Information
+          </div>
+          <div className="form-row">
+            <div className="doctor-form-group">
+              <label>First Name</label>
+              <input
+                type="text"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
+                placeholder="Enter your first name"
+              />
+            </div>
+            <div className="doctor-form-group">
+              <label>Last Name</label>
+              <input
+                type="text"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
+                placeholder="Enter your last name"
+              />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="doctor-form-group">
+              <label>Age</label>
+              <input
+                type="number"
+                name="age"
+                value={formData.age}
+                onChange={handleChange}
+                placeholder="Enter your age"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="form-btns">
+          <button type="button" onClick={onClose} className="cancel-btn">
+            Cancel
+          </button>
+          <button type="submit" className="save-btn">
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>,
+    modalRoot
+  );
+};
+
+// Component for Update Password Form
+const UpdatePasswordForm = ({
+  isOpen,
+  onClose,
+  passwordData,
+  handlePasswordChange,
+  handlePasswordSubmit,
+}) => {
+  if (!isOpen) return null;
+
+  const modalRoot = document.getElementById("modal-root");
+  if (!modalRoot) {
+    console.error("Modal root element not found for UpdatePasswordForm");
+    return null;
+  }
+
+  return ReactDOM.createPortal(
+    <div className="edit-doctor-profile-form-overlay">
+      <form
+        onSubmit={handlePasswordSubmit}
+        className="edit-doctor-profile-form"
+      >
+        <button type="button" className="close-form-btn" onClick={onClose}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+
+        <h2>Update Password</h2>
+
+        <div className="form-section">
+          <div className="form-section-title">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            Password Details
+          </div>
+          <div className="form-row">
+            <div className="doctor-form-group">
+              <label>Current Password</label>
+              <input
+                type="password"
+                name="currentPassword"
+                value={passwordData.currentPassword}
+                onChange={handlePasswordChange}
+                placeholder="Enter current password"
+                required
+              />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="doctor-form-group">
+              <label>New Password</label>
+              <input
+                type="password"
+                name="newPassword"
+                value={passwordData.newPassword}
+                onChange={handlePasswordChange}
+                placeholder="Enter new password"
+                required
+              />
+            </div>
+            <div className="doctor-form-group">
+              <label>Confirm New Password</label>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={passwordData.confirmPassword}
+                onChange={handlePasswordChange}
+                placeholder="Confirm new password"
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="form-btns">
+          <button type="button" onClick={onClose} className="cancel-btn">
+            Cancel
+          </button>
+          <button type="submit" className="save-btn">
+            Update Password
+          </button>
+        </div>
+      </form>
+    </div>,
+    modalRoot
+  );
+};
 
 export default function PatientProfile() {
   const id = localStorage.getItem("userId") || sessionStorage.getItem("userId");
@@ -521,459 +723,279 @@ export default function PatientProfile() {
 
   return (
     <div className="patient-profile-container">
-      {showEditForm ? (
-        <div className="edit-doctor-profile-form-overlay">
-          <form onSubmit={handleSubmit} className="edit-doctor-profile-form">
-            <button
-              type="button"
-              className="close-form-btn"
-              onClick={() => setShowEditForm(false)}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
+      <UpdateProfileForm
+        isOpen={showEditForm}
+        onClose={() => setShowEditForm(false)}
+        formData={formData}
+        handleChange={handleChange}
+        handleSubmit={handleSubmit}
+      />
+      <UpdatePasswordForm
+        isOpen={showPasswordForm}
+        onClose={() => setShowPasswordForm(false)}
+        passwordData={passwordData}
+        handlePasswordChange={handlePasswordChange}
+        handlePasswordSubmit={handlePasswordSubmit}
+      />
+      <div className="patient-profile">
+        {/* Personal Data */}
+        <div className="patient-profile-header">
+          <div className="patient-header-top">
+            <div className="patient-profile-image-container">
+              <img
+                src={
+                  selectedImage || patientData.avatar
+                    ? `http://localhost:4000/public/uploads/users/${
+                        selectedImage || patientData.avatar
+                      }`
+                    : "http://localhost:4000/public/uploads/users/default.jpg"
+                }
+                alt="Patient"
+                className="patient-profile-image"
+              />
+              {!id && (
+                <div className="patient-camera-menu">
+                  <button onClick={toggleMenu} className="patient-camera-icon">
+                    <img
+                      src="https://img.icons8.com/ios-filled/50/000000/camera.png"
+                      alt="Edit"
+                    />
+                  </button>
 
-            <h2>Update Your Profile</h2>
-
-            <div className="form-section">
-              <div className="form-section-title">
-                <User size={18} />
-                Personal Information
-              </div>
-              <div className="form-row">
-                <div className="doctor-form-group">
-                  <label>First Name</label>
-                  <input
-                    type="text"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleChange}
-                    placeholder="Enter your first name"
-                  />
-                </div>
-                <div className="doctor-form-group">
-                  <label>Last Name</label>
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    placeholder="Enter your last name"
-                  />
-                </div>
-              </div>
-              <div className="form-row">
-                <div className="doctor-form-group">
-                  <label>Age</label>
-                  <input
-                    type="number"
-                    name="age"
-                    value={formData.age}
-                    onChange={handleChange}
-                    placeholder="Enter your age"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="form-btns">
-              <button
-                type="button"
-                onClick={() => setShowEditForm(false)}
-                className="cancel-btn"
-              >
-                Cancel
-              </button>
-              <button type="submit" className="save-btn">
-                Save Changes
-              </button>
-            </div>
-          </form>
-        </div>
-      ) : (
-        <div className="patient-profile">
-          {/* Personal Data */}
-          <div className="patient-profile-header">
-            <div className="patient-header-top">
-              <div className="patient-profile-image-container">
-                <img
-                  src={
-                    selectedImage || patientData.avatar
-                      ? `http://localhost:4000/public/uploads/users/${
-                          selectedImage || patientData.avatar
-                        }`
-                      : "http://localhost:4000/public/uploads/users/default.jpg"
-                  }
-                  alt="Patient"
-                  className="patient-profile-image"
-                />
-                {!id && (
-                  <div className="patient-camera-menu">
-                    <button
-                      onClick={toggleMenu}
-                      className="patient-camera-icon"
-                    >
-                      <img
-                        src="https://img.icons8.com/ios-filled/50/000000/camera.png"
-                        alt="Edit"
-                      />
-                    </button>
-
-                    {menuOpen && (
-                      <>
-                        <div className="overlay" onClick={toggleMenu}></div>
-                        <div className="patient-camera-options">
-                          <button
-                            onClick={() =>
-                              document.getElementById("upload-photo").click()
-                            }
-                          >
-                            Upload
-                          </button>
-                          <button onClick={handleDeleteAvatar}>Delete</button>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                )}
-
-                <input
-                  type="file"
-                  id="upload-photo"
-                  accept="image/*"
-                  capture="user"
-                  style={{ display: "none" }}
-                  onChange={(e) => handlePhotoChange(e)}
-                />
-              </div>
-              <div className="patient-profile-info">
-                <h1>{`${patientData.firstName} ${patientData.lastName}`}</h1>
-                <p className="email">
-                  <Mail size={16} color="#1e56cf" />
-                  {patientData.email}
-                </p>
-                <div className="patient-extra-info">
-                  <p>
-                    <Calendar size={15} color="#505050" />
-                    {patientData.age} years
-                  </p>
-                  <p>
-                    <User size={15} color="#505050" />{" "}
-                    {patientData.gender.charAt(0).toUpperCase() +
-                      patientData.gender.slice(1)}
-                  </p>
-                </div>
-              </div>
-              <div className="profile-buttons">
-                <button
-                  onClick={() => setShowEditForm(true)}
-                  className="edit-patient-profile-button"
-                >
-                  <Edit size={15} color="white" />
-                  Edit Profile
-                </button>
-                <button
-                  onClick={() => setShowPasswordForm(true)}
-                  className="edit-patient-profile-button update-password-btn"
-                >
-                  <Lock size={15} color="white" />
-                  Update Password
-                </button>
-              </div>
-            </div>
-
-            {/* Summary Cards */}
-            <div className="patient-profile-summary-cards">
-              <div className="patient-profile-card">
-                <Stethoscope size={16} color="#1f61a8" />
-                <h3>{appointments.length}</h3>
-                <p>Visits</p>
-              </div>
-              <div className="patient-profile-card">
-                <Calendar size={16} color="#1f61a8" />
-                <h3>
-                  {patientData.profile.createdAt
-                    ? (() => {
-                        const now = new Date();
-                        const createdDate = new Date(
-                          patientData.profile.createdAt
-                        );
-                        const years =
-                          now.getFullYear() - createdDate.getFullYear();
-                        const months = now.getMonth() - createdDate.getMonth();
-
-                        if (years > 0) {
-                          return years === 1 ? "1 year" : `${years} years`;
-                        } else if (months > 0) {
-                          return months === 1 ? "1 month" : `${months} months`;
-                        } else {
-                          return "< 1 month";
-                        }
-                      })()
-                    : "N/A"}
-                </h3>
-                <p>Patient Since</p>
-              </div>
-              <div className="patient-profile-card">
-                <ClipboardList size={16} color="#1f61a8" />
-                <h3>{scans.length}</h3>
-                <p>Reports</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Past Scans */}
-          <div className="patient-profile-scan-section">
-            <h2>
-              <ScanBarcode size={20} color="#1e40af" />
-              Scans
-            </h2>
-            <table className="patient-profile-data-table">
-              <thead>
-                <tr>
-                  <th>Preview</th>
-                  <th>Date</th>
-                  <th>Type</th>
-                  <th>Body Part</th>
-                  <th>Confidence</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {scans.length > 0 ? (
-                  scans.map((scan) => (
-                    <tr key={scan._id}>
-                      <td>
-                        {scan.images && scan.images.length > 0 ? (
-                          <img
-                            src={`http://localhost:4000${scan.images[0]}`}
-                            alt="Scan preview"
-                            className="scan-preview-image"
-                          />
-                        ) : (
-                          "No image"
-                        )}
-                      </td>
-                      <td>
-                        {scan.scanDate
-                          ? new Date(scan.scanDate).toLocaleDateString()
-                          : "N/A"}
-                      </td>
-                      <td>
-                        {scan.aiAnalysis?.classification_result ||
-                          (scan.description &&
-                          scan.description.includes("AI Analysis:")
-                            ? scan.description
-                                .replace("AI Analysis:", "")
-                                .trim()
-                            : "N/A")}
-                      </td>
-                      <td>{scan.bodyPart || "N/A"}</td>
-                      <td className="confidence-cell">
-                        {scan.aiAnalysis &&
-                        typeof scan.aiAnalysis.confidence_score === "number" ? (
-                          <span
-                            className={`confidence-value ${
-                              scan.aiAnalysis.confidence_score >= 90
-                                ? "high-confidence"
-                                : scan.aiAnalysis.confidence_score >= 70
-                                ? "medium-confidence"
-                                : "low-confidence"
-                            }`}
-                          >
-                            {scan.aiAnalysis.confidence_score}%
-                          </span>
-                        ) : (
-                          "N/A"
-                        )}
-                      </td>
-                      <td>
+                  {menuOpen && (
+                    <>
+                      <div className="overlay" onClick={toggleMenu}></div>
+                      <div className="patient-camera-options">
                         <button
-                          className="delete-appointment-button"
-                          onClick={() => handleDeleteScan(scan._id)}
-                          title="Delete Scan"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="6">No scans found for this patient.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Past Appointments */}
-          <div className="patient-profile-scan-section">
-            <h2>
-              <Calendar size={20} color="#1e40af" />
-              Appointments
-            </h2>
-            <table className="patient-profile-data-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Doctor</th>
-                  <th>Department</th>
-                  <th>Notes</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {appointments.length > 0 ? (
-                  appointments.map((appointment) => (
-                    <tr key={appointment?.id}>
-                      <td>{appointment?.date?.split("T")[0] || "N/A"}</td>
-                      <td>
-                        {appointment?.doctor
-                          ? `${appointment.doctor.firstName} ${appointment.doctor.lastName}`
-                          : "N/A"}
-                      </td>
-                      <td>{appointment?.doctor?.specialization || "N/A"}</td>
-                      <td>{appointment?.reason || "N/A"}</td>
-                      <td>
-                        <button
-                          className="delete-appointment-button"
                           onClick={() =>
-                            handleCancelAppointment(appointment._id)
+                            document.getElementById("upload-photo").click()
                           }
-                          title="Cancel Appointment"
                         >
-                          <Trash2 size={18} />
+                          Upload
                         </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="5">No appointments scheduled.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-      {showPasswordForm && (
-        <div className="edit-doctor-profile-form-overlay">
-          <form
-            onSubmit={handlePasswordSubmit}
-            className="edit-doctor-profile-form"
-          >
-            <button
-              type="button"
-              className="close-form-btn"
-              onClick={() => setShowPasswordForm(false)}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
+                        <button onClick={handleDeleteAvatar}>Delete</button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
 
-            <h2>Update Password</h2>
-
-            <div className="form-section">
-              <div className="form-section-title">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <rect
-                    x="3"
-                    y="11"
-                    width="18"
-                    height="11"
-                    rx="2"
-                    ry="2"
-                  ></rect>
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
-                Password Details
-              </div>
-              <div className="form-row">
-                <div className="doctor-form-group">
-                  <label>Current Password</label>
-                  <input
-                    type="password"
-                    name="currentPassword"
-                    value={passwordData.currentPassword}
-                    onChange={handlePasswordChange}
-                    placeholder="Enter current password"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="form-row">
-                <div className="doctor-form-group">
-                  <label>New Password</label>
-                  <input
-                    type="password"
-                    name="newPassword"
-                    value={passwordData.newPassword}
-                    onChange={handlePasswordChange}
-                    placeholder="Enter new password"
-                    required
-                  />
-                </div>
-                <div className="doctor-form-group">
-                  <label>Confirm New Password</label>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    value={passwordData.confirmPassword}
-                    onChange={handlePasswordChange}
-                    placeholder="Confirm new password"
-                    required
-                  />
-                </div>
+              <input
+                type="file"
+                id="upload-photo"
+                accept="image/*"
+                capture="user"
+                style={{ display: "none" }}
+                onChange={(e) => handlePhotoChange(e)}
+              />
+            </div>
+            <div className="patient-profile-info">
+              <h1>{`${patientData.firstName} ${patientData.lastName}`}</h1>
+              <p className="email">
+                <Mail size={16} color="#1e56cf" />
+                {patientData.email}
+              </p>
+              <div className="patient-extra-info">
+                <p>
+                  <Calendar size={15} color="#505050" />
+                  {patientData.age} years
+                </p>
+                <p>
+                  <User size={15} color="#505050" />{" "}
+                  {patientData.gender.charAt(0).toUpperCase() +
+                    patientData.gender.slice(1)}
+                </p>
               </div>
             </div>
-
-            <div className="form-btns">
+            <div className="profile-buttons">
               <button
-                type="button"
-                onClick={() => setShowPasswordForm(false)}
-                className="cancel-btn"
+                onClick={() => setShowEditForm(true)}
+                className="edit-patient-profile-button"
               >
-                Cancel
+                <Edit size={15} color="white" />
+                Edit Profile
               </button>
-              <button type="submit" className="save-btn">
+              <button
+                onClick={() => setShowPasswordForm(true)}
+                className="edit-patient-profile-button update-password-btn"
+              >
+                <Lock size={15} color="white" />
                 Update Password
               </button>
             </div>
-          </form>
+          </div>
+
+          {/* Summary Cards */}
+          <div className="patient-profile-summary-cards">
+            <div className="patient-profile-card">
+              <Stethoscope size={16} color="#1f61a8" />
+              <h3>{appointments.length}</h3>
+              <p>Visits</p>
+            </div>
+            <div className="patient-profile-card">
+              <Calendar size={16} color="#1f61a8" />
+              <h3>
+                {patientData.profile.createdAt
+                  ? (() => {
+                      const now = new Date();
+                      const createdDate = new Date(
+                        patientData.profile.createdAt
+                      );
+                      const years =
+                        now.getFullYear() - createdDate.getFullYear();
+                      const months = now.getMonth() - createdDate.getMonth();
+
+                      if (years > 0) {
+                        return years === 1 ? "1 year" : `${years} years`;
+                      } else if (months > 0) {
+                        return months === 1 ? "1 month" : `${months} months`;
+                      } else {
+                        return "< 1 month";
+                      }
+                    })()
+                  : "N/A"}
+              </h3>
+              <p>Patient Since</p>
+            </div>
+            <div className="patient-profile-card">
+              <ClipboardList size={16} color="#1f61a8" />
+              <h3>{scans.length}</h3>
+              <p>Reports</p>
+            </div>
+          </div>
         </div>
-      )}
+
+        {/* Past Scans */}
+        <div className="patient-profile-scan-section">
+          <h2>
+            <ScanBarcode size={20} color="#1e40af" />
+            Scans
+          </h2>
+          <table className="patient-profile-data-table">
+            <thead>
+              <tr>
+                <th>Preview</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Body Part</th>
+                <th>Confidence</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {scans.length > 0 ? (
+                scans.map((scan) => (
+                  <tr key={scan._id}>
+                    <td>
+                      {scan.images && scan.images.length > 0 ? (
+                        <img
+                          src={`http://localhost:4000${scan.images[0]}`}
+                          alt="Scan preview"
+                          className="scan-preview-image"
+                        />
+                      ) : (
+                        "No image"
+                      )}
+                    </td>
+                    <td>
+                      {scan.scanDate
+                        ? new Date(scan.scanDate).toLocaleDateString()
+                        : "N/A"}
+                    </td>
+                    <td>
+                      {scan.aiAnalysis?.classification_result ||
+                        (scan.description &&
+                        scan.description.includes("AI Analysis:")
+                          ? scan.description.replace("AI Analysis:", "").trim()
+                          : "N/A")}
+                    </td>
+                    <td>{scan.bodyPart || "N/A"}</td>
+                    <td className="confidence-cell">
+                      {scan.aiAnalysis &&
+                      typeof scan.aiAnalysis.confidence_score === "number" ? (
+                        <span
+                          className={`confidence-value ${
+                            scan.aiAnalysis.confidence_score >= 90
+                              ? "high-confidence"
+                              : scan.aiAnalysis.confidence_score >= 70
+                              ? "medium-confidence"
+                              : "low-confidence"
+                          }`}
+                        >
+                          {scan.aiAnalysis.confidence_score}%
+                        </span>
+                      ) : (
+                        "N/A"
+                      )}
+                    </td>
+                    <td>
+                      <button
+                        className="delete-appointment-button"
+                        onClick={() => handleDeleteScan(scan._id)}
+                        title="Delete Scan"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6">No scans found for this patient.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Past Appointments */}
+        <div className="patient-profile-scan-section">
+          <h2>
+            <Calendar size={20} color="#1e40af" />
+            Appointments
+          </h2>
+          <table className="patient-profile-data-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Doctor</th>
+                <th>Department</th>
+                <th>Notes</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {appointments.length > 0 ? (
+                appointments.map((appointment) => (
+                  <tr key={appointment?.id}>
+                    <td>{appointment?.date?.split("T")[0] || "N/A"}</td>
+                    <td>
+                      {appointment?.doctor
+                        ? `${appointment.doctor.firstName} ${appointment.doctor.lastName}`
+                        : "N/A"}
+                    </td>
+                    <td>{appointment?.doctor?.specialization || "N/A"}</td>
+                    <td>{appointment?.reason || "N/A"}</td>
+                    <td>
+                      <button
+                        className="delete-appointment-button"
+                        onClick={() => handleCancelAppointment(appointment._id)}
+                        title="Cancel Appointment"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5">No appointments scheduled.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }
