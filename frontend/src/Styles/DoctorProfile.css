@@ -470,22 +470,27 @@
 }
 
 /* Working Hours */
-.modal-content {
+.working-hours-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+}
+
+.working-hours-modal-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   background: white;
   padding: 30px;
   border-radius: 20px;
-  width: max-content;
-  min-width: 320px;
-  max-width: 90vw;
+  z-index: 10000;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
-.modal-content h2 {
+.working-hours-modal-content h2 {
   font-size: 26px;
   font-weight: bold;
   text-align: center;
@@ -550,13 +555,6 @@
   background-color: #fee2e2;
   color: #374151;
   border: 1px solid #fca5a5;
-}
-
-/* Special styling for Sunday (last day) */
-.operating-hours-grid > div:last-child {
-  grid-column: 1 / -1;
-  width: 50%;
-  margin: 0 auto;
 }
 
 .close-btn {
@@ -1060,20 +1058,6 @@
 }
 
 /* Working Hours Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 0;
-  padding: 20px;
-  box-sizing: border-box;
-}
 
 .close-btn {
   position: absolute;
@@ -1113,13 +1097,6 @@
   width: 100%;
   margin: 0 auto;
   padding: 20px;
-}
-
-/* Special styling for Sunday (last day) */
-.operating-hours-grid > div:last-child {
-  grid-column: 1 / -1;
-  width: 50%;
-  margin: 0 auto;
 }
 
 .operating-hours-item {
@@ -1510,6 +1487,17 @@
   .edit-doctor-profile-button {
     margin-bottom: 0;
   }
+
+  .working-hours-modal-content {
+    padding: 0;
+    z-index: 9999;
+  }
+  .operating-hours-item {
+    padding: 10px;
+    font-size: 13px;
+    flex-wrap: wrap;
+    max-width: 190px;
+  }
 }
 
 @media (min-width: 768px) and (max-width: 991px) {
@@ -1519,6 +1507,16 @@
   }
   .edit-doctor-profile-button {
     margin-bottom: 0;
+  }
+
+  .working-hours-modal-content {
+    z-index: 9999;
+  }
+  .operating-hours-item {
+    padding: 9px;
+    font-size: 12px;
+    flex-wrap: wrap;
+    max-width: 190px;
   }
 }
 
@@ -1579,6 +1577,50 @@
   }
   .edit-doctor-profile-button {
     margin-bottom: 0;
+  }
+
+  .operating-hours-title {
+    position: static;
+    margin-top: 10px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .operating-hours-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+
+  .operating-hours-item {
+    font-size: 12px;
+    flex-wrap: wrap;
+  }
+
+  .working-hours-modal-content {
+    padding: 0;
+    z-index: 9999;
+  }
+
+  .working-hours-modal-content h2 {
+    font-size: 11px;
+    margin-bottom: 5px;
+  }
+
+  .day {
+    font-size: 11px;
+    font-weight: bold;
+  }
+
+  .status {
+    font-size: 11px;
+    font-weight: bold;
+  }
+
+  .close-btn {
+    font-size: 15px;
+    top: 2px;
   }
 }
 

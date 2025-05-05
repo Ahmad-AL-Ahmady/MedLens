@@ -1109,10 +1109,10 @@ const DoctorProfile = () => {
                   {isModalOpen && (
                     <>
                       <div
-                        className="modal-overlay"
+                        className="working-hours-modal-overlay"
                         onClick={() => setIsModalOpen(false)}
                       ></div>
-                      <div className="modal-content">
+                      <div className="working-hours-modal-content">
                         <span
                           className="close-btn"
                           onClick={() => setIsModalOpen(false)}

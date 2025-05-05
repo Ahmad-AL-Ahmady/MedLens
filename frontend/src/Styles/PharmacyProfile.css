@@ -637,16 +637,6 @@
     padding: 12px 16px;
     font-size: 14px;
   }
-  .modal-content {
-    padding: 0;
-    z-index: 9999;
-  }
-  .operating-hours-item {
-    padding: 10px;
-    font-size: 13px;
-    flex-wrap: wrap;
-    max-width: 190px;
-  }
 }
 
 @media (min-width: 768px) and (max-width: 991px) {
@@ -670,15 +660,6 @@
   .pharmacy-profile-data-table td {
     padding: 10px 14px;
     font-size: 13px;
-  }
-  .modal-content {
-    z-index: 9999;
-  }
-  .operating-hours-item {
-    padding: 9px;
-    font-size: 12px;
-    flex-wrap: wrap;
-    max-width: 190px;
   }
 }
 @media (max-width: 900px) {
@@ -734,52 +715,6 @@
   .pharmacy-header-top {
     display: grid;
     text-align: center;
-  }
-
-  .operating-hours-title {
-    position: static;
-    margin-top: 10px;
-    width: 100%;
-    text-align: center;
-  }
-
-  .operating-hours-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    margin-bottom: 10px;
-  }
-
-  .operating-hours-item {
-    padding: 6px;
-    font-size: 12px;
-    flex-wrap: wrap;
-    max-width: 190px;
-  }
-
-  .modal-content {
-    padding: 0;
-    z-index: 9999;
-  }
-
-  .modal-content h2 {
-    font-size: 11px;
-    margin-bottom: 5px;
-  }
-
-  .day {
-    font-size: 11px;
-    font-weight: bold;
-  }
-
-  .status {
-    font-size: 11px;
-    font-weight: bold;
-  }
-
-  .close-btn {
-    font-size: 15px;
-    top: 2px;
   }
 
   .pharmacy-profile-stats {
