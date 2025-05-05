@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   Mail,
   Calendar,
@@ -217,8 +217,54 @@ const UpdatePasswordForm = ({
   );
 };
 
+// Component for Avatar Edit Menu
+const AvatarEditMenu = ({
+  isOpen,
+  onClose,
+  onUploadClick,
+  onDelete,
+  avatarPosition,
+}) => {
+  if (!isOpen) return null;
+
+  const modalRoot = document.getElementById("modal-root");
+  if (!modalRoot) {
+    console.error("Modal root element not found for AvatarEditMenu");
+    return null;
+  }
+
+  // Calculate menu position based on avatar container
+  const menuStyle = {
+    position: "absolute",
+    top: avatarPosition
+      ? `${avatarPosition.top + avatarPosition.height + 10}px`
+      : "150px",
+    left: avatarPosition ? `${avatarPosition.left}px` : "50px",
+    background: "white",
+    border: "1px solid #ccc",
+    boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+    zIndex: 1000,
+    display: "flex",
+    flexDirection: "column",
+    borderRadius: "8px",
+    overflow: "hidden",
+  };
+
+  return ReactDOM.createPortal(
+    <>
+      <div className="overlay" onClick={onClose}></div>
+      <div className="patient-camera-options" style={menuStyle}>
+        <button onClick={onUploadClick}>Upload</button>
+        <button onClick={onDelete}>Delete</button>
+      </div>
+    </>,
+    modalRoot
+  );
+};
+
 export default function PatientProfile() {
   const id = localStorage.getItem("userId") || sessionStorage.getItem("userId");
+  console.log("User ID:", id); // Debug: Check id value
   const [selectedImage, setSelectedImage] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [patientData, setPatientData] = useState(null);
@@ -238,9 +284,24 @@ export default function PatientProfile() {
     newPassword: "",
     confirmPassword: "",
   });
+  const fileInputRef = useRef(null); // Ref for file input
+  const avatarContainerRef = useRef(null); // Ref for avatar container
+  const [avatarPosition, setAvatarPosition] = useState(null); // State for avatar position
 
   const token =
     localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
+
+  // Update avatar position when menu opens
+  useEffect(() => {
+    if (menuOpen && avatarContainerRef.current) {
+      const rect = avatarContainerRef.current.getBoundingClientRect();
+      setAvatarPosition({
+        top: rect.top + window.scrollY,
+        left: rect.left + window.scrollX,
+        height: rect.height,
+      });
+    }
+  }, [menuOpen]);
 
   const fetchProfile = async () => {
     try {
@@ -254,7 +315,7 @@ export default function PatientProfile() {
       );
 
       const data = await response.json();
-      console.log("Profile data:", data); // Debugging line
+      console.log("Profile data:", data);
       if (data.status === "success" && data.data) {
         setPatientData(data.data);
         setAppointments(data.data.profile?.appointments || []);
@@ -268,7 +329,7 @@ export default function PatientProfile() {
       }
     } catch (error) {
       console.error("Error fetching profile:", error);
-      throw error; // Let the caller handle the error
+      throw error;
     }
   };
 
@@ -290,46 +351,7 @@ export default function PatientProfile() {
       }
     } catch (error) {
       console.error("Error fetching scans:", error);
-      throw error; // Let the caller handle the error
-    }
-  };
-
-  const handleUpdatePassword = async (currentPassword, newPassword) => {
-    try {
-      const response = await fetch(
-        "http://localhost:4000/api/users/updatePassword",
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            passwordCurrent: currentPassword,
-            password: newPassword,
-            passwordConfirm: newPassword,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (response.ok) {
-        Swal.fire({
-          icon: "success",
-          title: "Password Updated!",
-          text: "Your password has been successfully updated.",
-        });
-      } else {
-        throw new Error(data.message || "Failed to update password");
-      }
-    } catch (error) {
-      console.error("Password update error:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Password Update Failed",
-        text: error.message || "Something went wrong. Please try again later.",
-      });
+      throw error;
     }
   };
 
@@ -359,7 +381,6 @@ export default function PatientProfile() {
           throw new Error("Failed to cancel appointment");
         }
 
-        // Update appointments list
         const updatedAppointments = appointments.filter(
           (appt) => appt._id !== appointmentId
         );
@@ -408,7 +429,6 @@ export default function PatientProfile() {
           throw new Error("Failed to delete scan");
         }
 
-        // Update scans list
         const updatedScans = scans.filter((scan) => scan._id !== scanId);
         setScans(updatedScans);
 
@@ -453,7 +473,7 @@ export default function PatientProfile() {
 
       try {
         await Promise.all([fetchProfile(), fetchScans()]);
-        Swal.close(); // Close the loading pop-up on success
+        Swal.close();
       } catch (error) {
         setError(error.message || "Failed to load data");
         Swal.fire({
@@ -686,10 +706,8 @@ export default function PatientProfile() {
           text: "Password updated successfully",
           confirmButtonColor: "#3b82f6",
         }).then(() => {
-          // Clear tokens from storage
           localStorage.removeItem("authToken");
           sessionStorage.removeItem("authToken");
-          // Redirect to login page
           window.location.href = "/login";
         });
         setShowPasswordForm(false);
@@ -717,9 +735,28 @@ export default function PatientProfile() {
     }
   };
 
-  if (loading) return null; // Swal handles loading
-  if (error) return null; // Swal handles errors
-  if (!patientData) return null; // Swal handles no data
+  const handleUploadClick = () => {
+    console.log("handleUploadClick called"); // Debug
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+      console.log("File input triggered"); // Debug
+    } else {
+      console.error("File input ref not found");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Unable to open file picker. Please try again.",
+      });
+    }
+    setMenuOpen(false);
+  };
+
+  if (loading) return null;
+  if (error) return null;
+  if (!patientData) return null;
+
+  // Assume logged-in user can edit their own profile; adjust logic if needed
+  const canEditAvatar = true; // Replace with actual logic, e.g., compare id with token's user ID
 
   return (
     <div className="patient-profile-container">
@@ -737,11 +774,20 @@ export default function PatientProfile() {
         handlePasswordChange={handlePasswordChange}
         handlePasswordSubmit={handlePasswordSubmit}
       />
+      <AvatarEditMenu
+        isOpen={menuOpen}
+        onClose={toggleMenu}
+        onUploadClick={handleUploadClick}
+        onDelete={handleDeleteAvatar}
+        avatarPosition={avatarPosition}
+      />
       <div className="patient-profile">
-        {/* Personal Data */}
         <div className="patient-profile-header">
           <div className="patient-header-top">
-            <div className="patient-profile-image-container">
+            <div
+              className="patient-profile-image-container"
+              ref={avatarContainerRef}
+            >
               <img
                 src={
                   selectedImage || patientData.avatar
@@ -753,7 +799,7 @@ export default function PatientProfile() {
                 alt="Patient"
                 className="patient-profile-image"
               />
-              {!id && (
+              {canEditAvatar && (
                 <div className="patient-camera-menu">
                   <button onClick={toggleMenu} className="patient-camera-icon">
                     <img
@@ -761,32 +807,16 @@ export default function PatientProfile() {
                       alt="Edit"
                     />
                   </button>
-
-                  {menuOpen && (
-                    <>
-                      <div className="overlay" onClick={toggleMenu}></div>
-                      <div className="patient-camera-options">
-                        <button
-                          onClick={() =>
-                            document.getElementById("upload-photo").click()
-                          }
-                        >
-                          Upload
-                        </button>
-                        <button onClick={handleDeleteAvatar}>Delete</button>
-                      </div>
-                    </>
-                  )}
                 </div>
               )}
-
               <input
                 type="file"
                 id="upload-photo"
                 accept="image/*"
                 capture="user"
                 style={{ display: "none" }}
-                onChange={(e) => handlePhotoChange(e)}
+                onChange={handlePhotoChange}
+                ref={fileInputRef}
               />
             </div>
             <div className="patient-profile-info">
@@ -801,7 +831,7 @@ export default function PatientProfile() {
                   {patientData.age} years
                 </p>
                 <p>
-                  <User size={15} color="#505050" />{" "}
+                  <User size={15} color="#505050" />
                   {patientData.gender.charAt(0).toUpperCase() +
                     patientData.gender.slice(1)}
                 </p>
@@ -825,7 +855,6 @@ export default function PatientProfile() {
             </div>
           </div>
 
-          {/* Summary Cards */}
           <div className="patient-profile-summary-cards">
             <div className="patient-profile-card">
               <Stethoscope size={16} color="#1f61a8" />
@@ -865,7 +894,6 @@ export default function PatientProfile() {
           </div>
         </div>
 
-        {/* Past Scans */}
         <div className="patient-profile-scan-section">
           <h2>
             <ScanBarcode size={20} color="#1e40af" />
@@ -948,7 +976,6 @@ export default function PatientProfile() {
           </table>
         </div>
 
-        {/* Past Appointments */}
         <div className="patient-profile-scan-section">
           <h2>
             <Calendar size={20} color="#1e40af" />
