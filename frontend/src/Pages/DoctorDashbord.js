@@ -6,7 +6,7 @@ import "../Styles/DoctorDashboard.css";
 const DoctorDashboard = () => {
   const [appointments, setAppointments] = useState([]);
   const [doctor, setDoctor] = useState(null);
-  const [scanCount, setScanCount] = useState(0); // State for dynamic scan count
+  const [scans, setScans] = useState([]); // Add scans state
   const [loading, setLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
@@ -59,12 +59,32 @@ const DoctorDashboard = () => {
       if (data.status === "success" && data.data) {
         setDoctor(data.data);
         setAppointments(data.data.profile?.appointments || []);
-        setScanCount(data.data.profile?.scanCount || 0); // Set scan count from API
       } else {
         throw new Error("No appointments found for today.");
       }
+
+      // Fetch scans data
+      const scansResponse = await fetch(
+        "http://localhost:4000/api/medical-scans",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+
+      if (!scansResponse.ok) {
+        throw new Error("Failed to fetch scans");
+      }
+
+      const scansData = await scansResponse.json();
+      if (scansData.status === "success" && scansData.data?.scans) {
+        setScans(scansData.data.scans);
+      }
     } catch (error) {
-      console.error("Error fetching appointments:", error);
+      console.error("Error fetching data:", error);
       Swal.fire({
         icon: "error",
         title: "Oops, something went wrong!",
@@ -123,6 +143,7 @@ const DoctorDashboard = () => {
   }
 
   const nextAppointment = appointments.length > 0 ? appointments[0] : null;
+  const scanCount = scans.length; // Get actual scan count from scans array
 
   return (
     <div className="doctor-dashboard-container">
@@ -198,6 +219,12 @@ const DoctorDashboard = () => {
           <div className="doctor-dashboard-card__content">
             <p className="doctor-dashboard-card__value">{scanCount}</p>
             <p className="doctor-dashboard-card__subtext">Scans this month</p>
+            <div className="doctor-dashboard-progress-bar">
+              <div
+                className="doctor-dashboard-progress-bar__fill"
+                style={{ width: `${Math.min((scanCount / 10) * 100, 100)}%` }}
+              ></div>
+            </div>
           </div>
         </div>
       </div>
