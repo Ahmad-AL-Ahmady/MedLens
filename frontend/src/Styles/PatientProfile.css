@@ -205,7 +205,6 @@
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
   z-index: 1000;
   display: flex;
   align-items: flex-start;
@@ -596,7 +595,7 @@
   font-size: 15px;
   color: #374151;
   padding: 0;
-  -moz-appearance: textfield;
+ 
 }
 
 .rating-input-container input::-webkit-outer-spin-button,
@@ -758,7 +757,7 @@
 
 @media (max-width: 480px) {
   .patient-profile-scan-section {
-    margin: 20px 0;
+    margin: 10px 0;
   }
 
   .patient-profile-scan-section h2 {
@@ -769,8 +768,8 @@
 
   .patient-profile-data-table th,
   .patient-profile-data-table td {
-    padding: 10px 12px;
-    font-size: 12px;
+    padding: 5px 6px;
+    font-size: 9px;
   }
 
   .scan-preview-image {
@@ -799,5 +798,12 @@
   .patient-camera-options button {
     padding: 6px 10px;
     font-size: 12px;
+  }
+}
+@media (max-width: 344px){
+  .patient-profile-data-table th,
+  .patient-profile-data-table td {
+    padding: 5px 4px;
+    font-size: 9px;
   }
 }
