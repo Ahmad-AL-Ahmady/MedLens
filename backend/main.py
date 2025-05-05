@@ -9,10 +9,10 @@ import uvicorn
 from keras.models import load_model
 from ctransformers import AutoModelForCausalLM
 
-# إعداد FastAPI
+# Setup FastAPI
 app = FastAPI()
 
-# تكوين CORS Middleware للسماح بالاتصالات من جميع المصادر
+# Configure CORS Middleware to allow connections from all sources
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -20,17 +20,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# تحميل نموذج GGML/GGUF باستخدام ctransformers
-MODEL_PATH = "Models_ai\\ggml-model-Q8_0.gguf"  # تأكد من وجود المسار الصحيح للملف
+# Load GGML/GGUF model using ctransformers
+MODEL_PATH = "Models_ai\\ggml-model-Q8_0.gguf"  # Make sure the path to the file is correct
 llm = AutoModelForCausalLM.from_pretrained(
     MODEL_PATH,
-    model_type="llama",  # تحديد نوع النموذج (llama, gpt2, gpt-j, etc.)
-    context_length=2048,  # حجم نافذة السياق (مماثل لـ n_ctx)
-    threads=4  # عدد الخيوط للمعالجة - قم بضبطه وفقًا لجهازك
+    model_type="llama",  # Specify model type (llama, gpt2, gpt-j, etc.)
+    context_length=2048,  # Context window size (similar to n_ctx)
+    threads=4  # Number of threads for processing - adjust according to your device
 )
 
 
-# تحميل النماذج المحلية (مثال لنماذج تصنيف الأشعة السينية)
+# Load local models (example for X-ray classification models)
 def load_local_model(model_name: str):
     model_path = f"./{model_name}"
     if os.path.exists(model_path):
@@ -39,11 +39,11 @@ def load_local_model(model_name: str):
     else:
         print(f"Model {model_name} not found locally. Downloading...")
         model = load_model(model_name)
-        model.save(model_path)  # حفظ النموذج محليًا
+        model.save(model_path)  # Save the model locally
         return model
 
 
-# تحميل النماذج
+# Load models
 primary_model = load_local_model("Models_ai/RAy_not_Ray.h5")
 nail_model = load_local_model("Models_ai/nail.h5")
 chest_model = load_local_model("Models_ai/chest.h5")
@@ -55,7 +55,7 @@ lung_model = load_local_model("Models_ai/lung_cancer_1.h5")
 brain_model = load_local_model("Models_ai/Brain_Tumor_1.h5")
 
 
-# تعاريف الأسماء لكل تصنيف
+# Class names definitions for each classification
 CLASS_NAMES = {
     "primary": ["Ray", "Not Ray"],
     "nail": ["Healthy", "Onychomycosis", "Psoriasis"],
@@ -111,25 +111,25 @@ BODY_PART_TO_MODEL = {
 }
 
 
-# دالة لتحويل الصورة إلى شكل قابل للاستخدام
+# Function to convert image to usable format
 def preprocess_image(image: Image.Image) -> np.ndarray:
     image = image.resize((224, 224))
     return np.expand_dims(np.array(image) / 255.0, axis=0)
 
 
-# فئة لتخزين معلومات التشخيص
+# Class for storing diagnosis information
 class DiagnosisInfo:
     def __init__(self):
         self.classification_result = "Unknown"
         self.confidence_score = 0.0
         self.body_part = "Unknown"
-        self.medical_info = ""  # إضافة حقل لتخزين المعلومات الطبية
+        self.medical_info = ""  # Field to store medical information
 
     def update(self, classification, confidence, body_part="Unknown"):
         self.classification_result = classification
         self.confidence_score = confidence
         self.body_part = body_part
-        # تفريغ المعلومات الطبية عند تحديث التشخيص
+        # Clear medical information when updating diagnosis
         self.medical_info = ""
 
     def get_full_description(self):
@@ -143,21 +143,21 @@ class DiagnosisInfo:
 diagnosis = DiagnosisInfo()
 
 
-# دالة لتوليد الاستجابة من نموذج ctransformers
+# Function to generate response from ctransformers model
 def generate_response(prompt: str):
-    # إعداد معلمات التوليد
+    # Setup generation parameters
     response = llm(
         prompt,
         max_new_tokens=512,
         temperature=0.7,
         top_p=0.95,
-        stop=["Human:", "User:"]  # تحديد الكلمات التي تنهي الرد
+        stop=["Human:", "User:"]  # Words that end the response
     )
 
-    # تنظيف الاستجابة من أي توجيهات غير مرغوبة
+    # Clean response from any unwanted directives
     cleaned_response = response.strip()
 
-    # إزالة أي توجيهات مثل "Use appropriate language level..."
+    # Remove any directives like "Use appropriate language level..."
     unwanted_phrases = [
         "Use appropriate language level for an adult audience.",
         "Provide sources to support the information provided in the response.",
@@ -170,16 +170,16 @@ def generate_response(prompt: str):
         if cleaned_response.startswith(phrase):
             cleaned_response = cleaned_response[len(phrase):].strip()
 
-    # إزالة أي تنسيقات رمزية غير مرغوبة
+    # Remove any unwanted symbolic formatting
     if cleaned_response.startswith("<"):
-        # محاولة حذف أي وسوم XML أو HTML في بداية الاستجابة
+        # Try to delete any XML or HTML tags at the beginning of the response
         import re
         cleaned_response = re.sub(r"^<[^>]+>", "", cleaned_response).strip()
 
     return cleaned_response
 
 
-# دالة جديدة للحصول على المعلومات الطبية تلقائيًا بعد التشخيص
+# New function to get medical information automatically after diagnosis
 def get_medical_info(condition_name):
     prompt = (
         f"Provide medical information about {condition_name}. "
@@ -190,7 +190,7 @@ def get_medical_info(condition_name):
     return generate_response(prompt)
 
 
-# API للتنبؤ باستخدام نموذج الصور
+# API for prediction using image model
 @app.post("/predict/")
 async def predict(file: UploadFile = File(...), bodyPart: str = Form("Chest")):
     global diagnosis
@@ -199,13 +199,13 @@ async def predict(file: UploadFile = File(...), bodyPart: str = Form("Chest")):
         img = Image.open(io.BytesIO(image_data)).convert("RGB")
         processed_img = preprocess_image(img)
 
-        # تصنيف الصورة باستخدام النموذج الأول
+        # Classify image using primary model
         primary_pred = primary_model.predict(processed_img)
         primary_class_idx = np.argmax(primary_pred[0])
         primary_class = CLASS_NAMES["primary"][primary_class_idx]
         primary_confidence = float(np.max(primary_pred[0]))
 
-        # التحقق من جزء الجسم واختيار النموذج المناسب
+        # Check body part and select appropriate model
         if primary_class == "Ray" and bodyPart in BODY_PART_TO_MODEL:
             model_key = BODY_PART_TO_MODEL[bodyPart]
 
@@ -255,9 +255,9 @@ async def predict(file: UploadFile = File(...), bodyPart: str = Form("Chest")):
 
             diagnosis.update(classification_result, confidence_score, bodyPart)
 
-            # توليد المعلومات الطبية بشكل تلقائي بعد التشخيص
+            # Automatically generate medical information after diagnosis
             if classification_result.lower() != "normal" and classification_result.lower() != "normal anatomy":
-                # فقط إذا كان هناك تشخيص لمرض أو حالة غير طبيعية
+                # Only if there is a diagnosis of a disease or abnormal condition
                 diagnosis.medical_info = get_medical_info(
                     diagnosis.get_full_description())
         else:
@@ -272,7 +272,7 @@ async def predict(file: UploadFile = File(...), bodyPart: str = Form("Chest")):
             "body_part": diagnosis.body_part,
         }
 
-        # إضافة المعلومات الطبية للاستجابة إذا كانت متاحة
+        # Add medical information to the response if available
         if diagnosis.medical_info:
             response_data["medical_info"] = diagnosis.medical_info
 
@@ -282,7 +282,7 @@ async def predict(file: UploadFile = File(...), bodyPart: str = Form("Chest")):
         return {"error": str(e)}
 
 
-# فئة لتمثيل طلبات المحادثة مع النموذج
+# Class for representing chat requests with the model
 class ChatRequest(BaseModel):
     message: str
 
@@ -291,25 +291,41 @@ class ChatRequest(BaseModel):
 async def chat(request: ChatRequest):
     global diagnosis
     
-    # التحقق من سؤال المستخدم عن هوية البرنامج
+    # Keywords to recognize questions about the development team
+    team_keywords = ["who created you", "who created this", "who developed you", "who made you", 
+                    "development team", "creators", "developers", "من طورك", "من صنعك", "من انشأك", 
+                    "فريق التطوير", "المطورين", "من صمم", "من برمج", "مين عملك", "الفريق"]
+    
+    # Check if user is asking about the development team
+    if any(keyword in request.message.lower() for keyword in team_keywords):
+        return {
+            "response": """The development team at MedLens:
+- Ahmed Alahmady (Backend Developer)
+- Ahmed Alashmawy (Frontend Developer)
+- Ola Tarek (Frontend Developer)
+- Alzahraa El Sayed (Frontend Developer)
+- Karim Osama (AI Developer)"""
+        }
+
+    # Check if user is asking about the identity of the program
     if any(keyword in request.message.lower() for keyword in ["who are you", "من انت", "انت مين", "اسمك", "what are you", "your name", "ما اسمك"]):
         return {
             "response": "I am MedLens AI, your medical imaging analysis assistant. I can help diagnose medical conditions from X-ray images and provide valuable medical information."
         }
 
-    # ✅ رسالة ترحيب تلقائية عند استقبال start أو hello أو hi أو السلام عليكم
+    # Automatic welcome message when receiving start or hello or hi or السلام عليكم
     if request.message.strip().lower() in ["start", "hello", "hi", "ابدأ", "مرحبا", "السلام عليكم"]:
         return {
             "response": "👋 Hello and welcome! I'm MedLens AI, here to help answer your medical imaging questions. Just ask away! 😊"
         }
 
-    # التحقق من صلاحية صورة الأشعة
+    # Check X-ray image validity
     if diagnosis.classification_result == "No abnormalities detected" or diagnosis.classification_result == "Not a valid x-ray image":
         return {
             "response": "🚨 The image you uploaded is not a valid x-ray. Please upload a medical x-ray so I can provide an accurate medical analysis."
         }
 
-    # إذا المستخدم طلب معلومات طبية فقط
+    # If user requests medical information only
     if request.message.strip().lower() == "provide medical information about it":
         disease_name = diagnosis.get_full_description()
         if not diagnosis.medical_info:
@@ -325,7 +341,7 @@ async def chat(request: ChatRequest):
             response = diagnosis.medical_info
         return {"response": response}
 
-    # لو طلب معلومات محددة
+    # If specific information is requested
     is_info_request = request.message.lower().startswith("provide information")
 
     if is_info_request:
@@ -357,6 +373,6 @@ async def chat(request: ChatRequest):
     return {"response": response}
 
 
-# تشغيل السيرفر
+# Run the server
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
