@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Activity, Plus, Edit2, X, Mail, Trash2, Package } from "lucide-react";
 import Swal from "sweetalert2";
 import "../Styles/PharmacyDashboard.css";
+import { createPortal } from "react-dom";
 
 export default function PharmacyDashboard() {
   const [showAddForm, setShowAddForm] = useState(false);
@@ -413,6 +414,221 @@ export default function PharmacyDashboard() {
     return <p>No pharmacy profile found.</p>;
   }
 
+  const renderEditForm = () => (
+    <div className="pharmacy-dashboard-form-overlay">
+      <div className="pharmacy-dashboard-form-container">
+        <div className="pharmacy-dashboard-form-header">
+          <h2>Edit {editingMedicine.medication?.name || "Medicine"}</h2>
+          <button
+            className="pharmacy-dashboard-form-close"
+            onClick={() => setEditingMedicine(null)}
+          >
+            <X size={24} />
+          </button>
+        </div>
+        <form
+          className="pharmacy-dashboard-form-content"
+          onSubmit={handleEditSubmit}
+        >
+          <div className="pharmacy-dashboard-form-column">
+            <div className="pharmacy-dashboard-form-group">
+              <label>Price ($)</label>
+              <input
+                type="number"
+                step="0.01"
+                name="price"
+                defaultValue={editingMedicine.price}
+                required
+              />
+            </div>
+            <div className="pharmacy-dashboard-form-group">
+              <label>Stock Quantity</label>
+              <input
+                type="number"
+                name="stock"
+                defaultValue={editingMedicine.stock}
+                disabled={editingMedicine.stock === 0}
+                required
+              />
+            </div>
+            <div className="pharmacy-dashboard-form-group">
+              <label>Expiry Date</label>
+              <input
+                type="date"
+                name="expiryDate"
+                defaultValue={
+                  editingMedicine.expiryDate
+                    ? new Date(editingMedicine.expiryDate)
+                        .toISOString()
+                        .split("T")[0]
+                    : ""
+                }
+              />
+            </div>
+          </div>
+          <div className="pharmacy-dashboard-form-fullwidth">
+            <div className="pharmacy-dashboard-form-group">
+              <label>
+                <input
+                  type="checkbox"
+                  name="available"
+                  defaultChecked={editingMedicine.stock === 0}
+                  onChange={(e) => {
+                    const stockInput = e.target.form.elements.stock;
+                    stockInput.disabled = e.target.checked;
+                    if (e.target.checked) stockInput.value = 0;
+                  }}
+                />
+                Mark as Unavailable
+              </label>
+            </div>
+          </div>
+          <div className="pharmacy-dashboard-form-actions">
+            <button
+              type="button"
+              className="pharmacy-dashboard-form-cancel"
+              onClick={() => setEditingMedicine(null)}
+              disabled={submitting}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="pharmacy-dashboard-form-submit"
+              disabled={submitting}
+            >
+              {submitting ? "Saving..." : "Save Changes"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+
+  const renderAddForm = () => (
+    <div className="pharmacy-dashboard-form-overlay">
+      <div className="pharmacy-dashboard-form-container">
+        <div className="pharmacy-dashboard-form-header">
+          <h2>Add Medicine</h2>
+          <button
+            className="pharmacy-dashboard-form-close"
+            onClick={() => setShowAddForm(false)}
+          >
+            <X size={24} />
+          </button>
+        </div>
+        <form
+          className="pharmacy-dashboard-form-content"
+          onSubmit={handleAddSubmit}
+        >
+          <div className="pharmacy-dashboard-form-group pharmacy-dashboard-form-group--radio">
+            <label>
+              <input
+                type="radio"
+                name="addMode"
+                value="new"
+                checked={addMode === "new"}
+                onChange={() => setAddMode("new")}
+              />
+              <span>Add New Medicine Manually</span>
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="addMode"
+                value="existing"
+                checked={addMode === "existing"}
+                onChange={() => setAddMode("existing")}
+              />
+              <span>Add from Database</span>
+            </label>
+          </div>
+
+          {addMode === "new" && (
+            <>
+              <div className="pharmacy-dashboard-form-column">
+                <div className="pharmacy-dashboard-form-group">
+                  <label>Name</label>
+                  <input type="text" name="name" required />
+                </div>
+                <div className="pharmacy-dashboard-form-group">
+                  <label>Strength (mg)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    name="strength"
+                    placeholder="e.g., 500"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="pharmacy-dashboard-form-group pharmacy-dashboard-form-fullwidth">
+                <label>Description</label>
+                <input type="text" name="description" />
+              </div>
+            </>
+          )}
+
+          {addMode === "existing" && (
+            <>
+              <div className="pharmacy-dashboard-form-group">
+                <label>Medicine</label>
+                <select
+                  name="medicineId"
+                  className="pharmacy-dashboard-select"
+                  required
+                >
+                  <option value="">Select Medicine</option>
+                  {allMedicines.map((med) => (
+                    <option key={med._id} value={med._id}>
+                      {med.name} ({med.strength})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="pharmacy-dashboard-form-column">
+                <div className="pharmacy-dashboard-form-group">
+                  <label>Price</label>
+                  <input type="number" step="0.01" name="price" required />
+                </div>
+                <div className="pharmacy-dashboard-form-group">
+                  <label>Stock</label>
+                  <input type="number" name="stock" required />
+                </div>
+                <div className="pharmacy-dashboard-form-group">
+                  <label>Expiry Date</label>
+                  <input type="date" name="expiryDate" required />
+                </div>
+              </div>
+            </>
+          )}
+
+          <div className="pharmacy-dashboard-form-actions">
+            <button
+              type="button"
+              className="pharmacy-dashboard-form-cancel"
+              onClick={() => setShowAddForm(false)}
+              disabled={submitting}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="pharmacy-dashboard-form-submit"
+              disabled={submitting}
+            >
+              {submitting
+                ? "Processing..."
+                : addMode === "new"
+                ? "Create Medicine"
+                : "Add Medicine"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+
   return (
     <div className="pharmacy-dashboard-container">
       <div className="pharmacy-dashboard-profile-header">
@@ -528,220 +744,8 @@ export default function PharmacyDashboard() {
         </table>
       </div>
 
-      {editingMedicine && (
-        <div className="pharmacy-dashboard-form-overlay">
-          <div className="pharmacy-dashboard-form-container">
-            <div className="pharmacy-dashboard-form-header">
-              <h2>Edit {editingMedicine.medication?.name || "Medicine"}</h2>
-              <button
-                className="pharmacy-dashboard-form-close"
-                onClick={() => setEditingMedicine(null)}
-              >
-                <X size={24} />
-              </button>
-            </div>
-            <form
-              className="pharmacy-dashboard-form-content"
-              onSubmit={handleEditSubmit}
-            >
-              <div className="pharmacy-dashboard-form-column">
-                <div className="pharmacy-dashboard-form-group">
-                  <label>Price ($)</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    name="price"
-                    defaultValue={editingMedicine.price}
-                    required
-                  />
-                </div>
-                <div className="pharmacy-dashboard-form-group">
-                  <label>Stock Quantity</label>
-                  <input
-                    type="number"
-                    name="stock"
-                    defaultValue={editingMedicine.stock}
-                    disabled={editingMedicine.stock === 0}
-                    required
-                  />
-                </div>
-                <div className="pharmacy-dashboard-form-group">
-                  <label>Expiry Date</label>
-                  <input
-                    type="date"
-                    name="expiryDate"
-                    defaultValue={
-                      editingMedicine.expiryDate
-                        ? new Date(editingMedicine.expiryDate)
-                            .toISOString()
-                            .split("T")[0]
-                        : ""
-                    }
-                  />
-                </div>
-              </div>
-              <div className="pharmacy-dashboard-form-fullwidth">
-                <div className="pharmacy-dashboard-form-group">
-                  <label>
-                    <input
-                      type="checkbox"
-                      name="available"
-                      defaultChecked={editingMedicine.stock === 0}
-                      onChange={(e) => {
-                        const stockInput = e.target.form.elements.stock;
-                        stockInput.disabled = e.target.checked;
-                        if (e.target.checked) stockInput.value = 0;
-                      }}
-                    />
-                    Mark as Unavailable
-                  </label>
-                </div>
-              </div>
-              <div className="pharmacy-dashboard-form-actions">
-                <button
-                  type="button"
-                  className="pharmacy-dashboard-form-cancel"
-                  onClick={() => setEditingMedicine(null)}
-                  disabled={submitting}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="pharmacy-dashboard-form-submit"
-                  disabled={submitting}
-                >
-                  {submitting ? "Saving..." : "Save Changes"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {showAddForm && (
-        <div className="pharmacy-dashboard-form-overlay">
-          <div className="pharmacy-dashboard-form-container">
-            <div className="pharmacy-dashboard-form-header">
-              <h2>Add Medicine</h2>
-              <button
-                className="pharmacy-dashboard-form-close"
-                onClick={() => setShowAddForm(false)}
-              >
-                <X size={24} />
-              </button>
-            </div>
-            <form
-              className="pharmacy-dashboard-form-content"
-              onSubmit={handleAddSubmit}
-            >
-              <div className="pharmacy-dashboard-form-group pharmacy-dashboard-form-group--radio">
-                <label>
-                  <input
-                    type="radio"
-                    name="addMode"
-                    value="new"
-                    checked={addMode === "new"}
-                    onChange={() => setAddMode("new")}
-                  />
-                  <span>Add New Medicine Manually</span>
-                </label>
-                <label>
-                  <input
-                    type="radio"
-                    name="addMode"
-                    value="existing"
-                    checked={addMode === "existing"}
-                    onChange={() => setAddMode("existing")}
-                  />
-                  <span>Add from Database</span>
-                </label>
-              </div>
-
-              {addMode === "new" && (
-                <>
-                  <div className="pharmacy-dashboard-form-column">
-                    <div className="pharmacy-dashboard-form-group">
-                      <label>Name</label>
-                      <input type="text" name="name" required />
-                    </div>
-                    <div className="pharmacy-dashboard-form-group">
-                      <label>Strength (mg)</label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        name="strength"
-                        placeholder="e.g., 500"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="pharmacy-dashboard-form-group pharmacy-dashboard-form-fullwidth">
-                    <label>Description</label>
-                    <input type="text" name="description" />
-                  </div>
-                </>
-              )}
-
-              {addMode === "existing" && (
-                <>
-                  <div className="pharmacy-dashboard-form-group">
-                    <label>Medicine</label>
-                    <select
-                      name="medicineId"
-                      className="pharmacy-dashboard-select"
-                      required
-                    >
-                      <option value="">Select Medicine</option>
-                      {allMedicines.map((med) => (
-                        <option key={med._id} value={med._id}>
-                          {med.name} ({med.strength})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="pharmacy-dashboard-form-column">
-                    <div className="pharmacy-dashboard-form-group">
-                      <label>Price</label>
-                      <input type="number" step="0.01" name="price" required />
-                    </div>
-                    <div className="pharmacy-dashboard-form-group">
-                      <label>Stock</label>
-                      <input type="number" name="stock" required />
-                    </div>
-                    <div className="pharmacy-dashboard-form-group">
-                      <label>Expiry Date</label>
-                      <input type="date" name="expiryDate" required />
-                    </div>
-                  </div>
-                </>
-              )}
-
-              <div className="pharmacy-dashboard-form-actions">
-                <button
-                  type="button"
-                  className="pharmacy-dashboard-form-cancel"
-                  onClick={() => setShowAddForm(false)}
-                  disabled={submitting}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="pharmacy-dashboard-form-submit"
-                  disabled={submitting}
-                >
-                  {submitting
-                    ? "Processing..."
-                    : addMode === "new"
-                    ? "Create Medicine"
-                    : "Add Medicine"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {editingMedicine && createPortal(renderEditForm(), document.body)}
+      {showAddForm && createPortal(renderAddForm(), document.body)}
     </div>
   );
 }
