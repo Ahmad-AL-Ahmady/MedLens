@@ -6,7 +6,7 @@ import "../Styles/DoctorDashboard.css";
 const DoctorDashboard = () => {
   const [appointments, setAppointments] = useState([]);
   const [doctor, setDoctor] = useState(null);
-  const [scans, setScans] = useState([]); // Add scans state
+  const [scans, setScans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
@@ -42,6 +42,7 @@ const DoctorDashboard = () => {
         });
       }
 
+      // Fetch doctor profile and appointments
       const response = await fetch(
         "http://localhost:4000/api/doctors/profile",
         {
@@ -56,9 +57,11 @@ const DoctorDashboard = () => {
       }
 
       const data = await response.json();
+      console.log("Fetched Doctor Profile Data:", data); // Log doctor profile data
       if (data.status === "success" && data.data) {
         setDoctor(data.data);
         setAppointments(data.data.profile?.appointments || []);
+        console.log("Appointments:", data.data.profile?.appointments || []); // Log appointments
       } else {
         throw new Error("No appointments found for today.");
       }
@@ -80,8 +83,10 @@ const DoctorDashboard = () => {
       }
 
       const scansData = await scansResponse.json();
+      console.log("Fetched Scans Data:", scansData); // Log scans data
       if (scansData.status === "success" && scansData.data?.scans) {
         setScans(scansData.data.scans);
+        console.log("Scans:", scansData.data.scans); // Log scans array
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -143,7 +148,7 @@ const DoctorDashboard = () => {
   }
 
   const nextAppointment = appointments.length > 0 ? appointments[0] : null;
-  const scanCount = scans.length; // Get actual scan count from scans array
+  const scanCount = scans.length;
 
   return (
     <div className="doctor-dashboard-container">
