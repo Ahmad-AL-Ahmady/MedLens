@@ -45,9 +45,11 @@ export default function ChatBot({ classificationResult }) {
     }
   }, [showAttention]);
 
-  // ✅ Send welcome message when chat opens
+  // Send welcome message when chat opens
   useEffect(() => {
     if (isOpen && messages.length === 0) {
+      setLoading(true); // Show loading indicator first
+      
       fetch("http://127.0.0.1:8000/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -56,10 +58,15 @@ export default function ChatBot({ classificationResult }) {
         .then((res) => res.json())
         .then((data) => {
           if (data.response) {
+            setLoading(false); // Hide loading indicator
             setMessages([
               { text: data.response, isBot: true, timestamp: new Date() },
             ]);
           }
+        })
+        .catch((error) => {
+          console.error("Error loading welcome message:", error);
+          setLoading(false);
         });
 
       if (classificationResult) {
@@ -95,6 +102,19 @@ export default function ChatBot({ classificationResult }) {
     try {
       const diagnosisResponse = await fetch("http://127.0.0.1:8000/current-diagnosis");
       const diagnosisData = await diagnosisResponse.json();
+      
+      // Check if it's a not ray image
+      if (diagnosisData.classification_result === "Not a valid X-ray image") {
+        setMessages([
+          { 
+            text: "🚨 The image you uploaded is not a valid x-ray. Please upload a medical x-ray so I can provide an accurate medical analysis.", 
+            isBot: true, 
+            timestamp: new Date() 
+          }
+        ]);
+        setLoading(false);
+        return;
+      }
 
       const response = await fetch("http://127.0.0.1:8000/chat", {
         method: "POST",
@@ -116,15 +136,6 @@ export default function ChatBot({ classificationResult }) {
           ...prev,
           {
             text: `Sorry, I couldn't get information about this condition: ${data.error}.`,
-            isBot: true,
-            timestamp: new Date(),
-          },
-        ]);
-      } else {
-        setMessages((prev) => [
-          ...prev,
-          {
-            text: "I'm having trouble getting information about this condition. Please try asking a specific question.",
             isBot: true,
             timestamp: new Date(),
           },
