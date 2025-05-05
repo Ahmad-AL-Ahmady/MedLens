@@ -290,11 +290,17 @@ class ChatRequest(BaseModel):
 @app.post("/chat")
 async def chat(request: ChatRequest):
     global diagnosis
+    
+    # التحقق من سؤال المستخدم عن هوية البرنامج
+    if any(keyword in request.message.lower() for keyword in ["who are you", "من انت", "انت مين", "اسمك", "what are you", "your name", "ما اسمك"]):
+        return {
+            "response": "I am MedLens AI, your medical imaging analysis assistant. I can help diagnose medical conditions from X-ray images and provide valuable medical information."
+        }
 
     # ✅ رسالة ترحيب تلقائية عند استقبال start أو hello أو hi أو السلام عليكم
     if request.message.strip().lower() in ["start", "hello", "hi", "ابدأ", "مرحبا", "السلام عليكم"]:
         return {
-            "response": "👋 Hello and welcome! I'm here to help answer your questions. Just ask away! 😊"
+            "response": "👋 Hello and welcome! I'm MedLens AI, here to help answer your medical imaging questions. Just ask away! 😊"
         }
 
     # التحقق من صلاحية صورة الأشعة
