@@ -6,14 +6,12 @@ import "../Styles/DoctorDashboard.css";
 const DoctorDashboard = () => {
   const [appointments, setAppointments] = useState([]);
   const [doctor, setDoctor] = useState(null);
+  const [scanCount, setScanCount] = useState(0); // State for dynamic scan count
   const [loading, setLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const token =
     localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
-
-  // Hardcoded scan count (replace with API fetch if needed)
-  const scanCount = 28;
 
   // Helper function to format date to "DD MMMM YYYY"
   const formatDate = (dateString) => {
@@ -61,6 +59,7 @@ const DoctorDashboard = () => {
       if (data.status === "success" && data.data) {
         setDoctor(data.data);
         setAppointments(data.data.profile?.appointments || []);
+        setScanCount(data.data.profile?.scanCount || 0); // Set scan count from API
       } else {
         throw new Error("No appointments found for today.");
       }
