@@ -381,7 +381,6 @@
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(4px);
   z-index: 999;
   animation: fadeIn 0.2s ease-out;
 }
@@ -1004,22 +1003,86 @@ input[type="file"] {
   }
 }
 
-@media (min-width: 768px) and (max-width: 991px) {
+@media (min-width: 830px) and (max-width: 1024px) {
   .profile-buttons {
     position: static;
     flex-direction: column;
     margin-top: 15px;
   }
 
-  .edit-pharmacy-profile-button,
-  .pharmacy-profile-update-password-button {
-    font-size: 13px;
-    padding: 9px 18px;
+  .edit-pharmacy-profile-button{
+    margin-bottom: 10px;
+  }
+  .pharmacy-profile-update-password-button{
+    margin-left: 10px;
   }
 
   .pharmacy-profile-scan-section {
     margin: 25px 0;
   }
+
+  .pharmacy-profile-image-container{
+  margin-bottom: 170px;
+  }
+
+  .pharmacy-profile-action-buttons{
+    display: block;
+    margin-bottom: 60px;
+  }
+
+  .pharmacy-profile-info-text{
+    margin-bottom: 120px;
+  }
+
+  
+
+
+
+  .pharmacy-profile-scan-section h2 {
+    font-size: 20px;
+  }
+
+  .pharmacy-profile-data-table th,
+  .pharmacy-profile-data-table td {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+}
+
+@media (min-width: 820px) and (max-width: 825px) {
+  .profile-buttons {
+    position: static;
+    flex-direction: column;
+    margin-top: 15px;
+  }
+
+  
+  .pharmacy-profile-update-password-button{
+    margin-left: 10px;
+    
+  }
+
+  .pharmacy-profile-scan-section {
+    margin: 25px 0;
+  }
+
+  .pharmacy-profile-image-container{
+  margin-bottom: 330px;
+  }
+
+  .pharmacy-profile-action-buttons{
+    display: flex;
+    
+   
+  }
+
+  .pharmacy-profile-info-text{
+    margin-bottom: 120px;
+  }
+
+  
+
+
 
   .pharmacy-profile-scan-section h2 {
     font-size: 20px;
@@ -1037,7 +1100,7 @@ input[type="file"] {
     margin: 15px;
     padding: 15px;
   }
-
+  
   .pharmacy-header-top {
     flex-direction: column;
     align-items: center;
@@ -1062,11 +1125,17 @@ input[type="file"] {
     margin-top: 15px;
   }
 
+  .pharmacy-profile-info-text{
+    display: block;
+    
+  
+  }
+
   .edit-pharmacy-profile-button,
   .pharmacy-profile-update-password-button {
     font-size: 12px;
-    padding: 8px 16px;
-    min-width: 100%;
+    padding: 8px 8px;
+    min-width: 70%;
     height: auto;
     flex-direction: column;
     gap: 4px;
@@ -1088,8 +1157,8 @@ input[type="file"] {
 
   .pharmacy-profile-data-table th,
   .pharmacy-profile-data-table td {
-    padding: 10px 12px;
-    font-size: 12px;
+    padding: 10px 10px;
+    font-size: 10px;
   }
 }
 
@@ -1106,8 +1175,8 @@ input[type="file"] {
 
   .pharmacy-profile-data-table th,
   .pharmacy-profile-data-table td {
-    padding: 10px 12px;
-    font-size: 12px;
+    padding: 5px 4px;
+    font-size: 9px;
   }
 
   .pharmacy-profile-scan-preview-image {
@@ -1115,6 +1184,31 @@ input[type="file"] {
     height: 30px;
   }
 
+ .pharmacy-profile-action-buttons{
+   display: block;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+   text-align: center;
+   width: 80%;
+   max-width: 300px;
+   margin:5px 0;
+   margin-left: 10px;
+   
+
+
+}
+ .pharmacy-profile-update-password-button{
+  margin-bottom: 30px;
+  margin-left: 10px;
+  
+
+}
+.edit-pharmacy-profile-button{
+  margin-top: 20px;
+  margin-bottom: 10px;
+ 
+}
   .pharmacy-profile-confidence-value {
     font-weight: 200;
     padding: 4px 8px;
@@ -1135,4 +1229,22 @@ input[type="file"] {
     padding: 6px 10px;
     font-size: 12px;
   }
+}
+@media (max-width: 360px){
+  .pharmacy-profile-data-table th,
+  .pharmacy-profile-data-table td {
+    padding: 5px 3.5px;
+    font-size: 9px;
+  }
+  .pharmacy-profile-action-buttons{
+  margin-right: 20px;
+}
+@media (max-width: 344px){
+  .pharmacy-profile-data-table th,
+  .pharmacy-profile-data-table td {
+    padding: 5px 1px;
+    font-size: 9px;
+}
+}
+
 }
