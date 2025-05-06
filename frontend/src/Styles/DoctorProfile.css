@@ -1888,7 +1888,7 @@
   align-items: center;
   gap: 2px;
   font-size: 2rem;
-  user-select: none;
+  
 }
 
 .star-wrapper {
@@ -2061,7 +2061,7 @@
 
   .doctor-profile-data-table th,
   .doctor-profile-data-table td {
-    padding: 8px 10px;
+    padding: 8px 5px;
     font-size: 11px;
   }
 
@@ -2073,5 +2073,19 @@
   .confidence-value {
     font-size: 11px;
     padding: 2px 4px;
+  }
+}
+@media (max-width: 360px) {
+  .doctor-profile-data-table th,
+  .doctor-profile-data-table td {
+    padding: 8px 3px;
+    font-size: 11px;
+  }
+}
+@media (max-width: 344px) {
+  .doctor-profile-data-table th,
+  .doctor-profile-data-table td {
+    padding: 8px 2px;
+    font-size: 11px;
   }
 }
