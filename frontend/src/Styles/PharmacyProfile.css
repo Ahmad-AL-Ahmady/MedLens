@@ -1034,10 +1034,6 @@ input[type="file"] {
     margin-bottom: 120px;
   }
 
-  
-
-
-
   .pharmacy-profile-scan-section h2 {
     font-size: 20px;
   }
@@ -1055,13 +1051,18 @@ input[type="file"] {
     flex-direction: column;
     margin-top: 15px;
   }
-
-  
+   .pharmacy-profile-info-row{
+   display: flex;
+   flex-direction: row;
+    flex-wrap: nowrap;
+   }
   .pharmacy-profile-update-password-button{
     margin-left: 10px;
     
   }
-
+   .edit-pharmacy-profile-button{
+    margin-bottom: 10px;
+   }
   .pharmacy-profile-scan-section {
     margin: 25px 0;
   }
@@ -1071,18 +1072,15 @@ input[type="file"] {
   }
 
   .pharmacy-profile-action-buttons{
-    display: flex;
-    
-   
+    display: block;
+    margin-bottom: 50px;
+    position: relative;
+    top: -80px;
   }
 
   .pharmacy-profile-info-text{
-    margin-bottom: 120px;
+    margin-bottom: 230px;
   }
-
-  
-
-
 
   .pharmacy-profile-scan-section h2 {
     font-size: 20px;
@@ -1107,15 +1105,11 @@ input[type="file"] {
     text-align: center;
   }
 
-  .pharmacy-profile-info {
-    align-items: center;
-    text-align: center;
-  }
-
-  .pharmacy-extra-info {
-    flex-direction: column;
-    gap: 10px;
-    align-items: center;
+  .pharmacy-profile-info-row{
+    display:block;
+    align-items: center !important;
+    text-align: center !important;
+    justify-content: center;
   }
 
   .profile-buttons {
@@ -1125,20 +1119,28 @@ input[type="file"] {
     margin-top: 15px;
   }
 
-  .pharmacy-profile-info-text{
-    display: block;
-    
-  
+  .pharmacy-profile-info{
+    align-items: center;
+    text-align: center;
+  }
+
+  .pharmacy-profile-action-buttons{
+    flex-direction: column;
+    gap: 10px;
   }
 
   .edit-pharmacy-profile-button,
   .pharmacy-profile-update-password-button {
     font-size: 12px;
-    padding: 8px 8px;
+    padding: 8px 9px;
     min-width: 70%;
     height: auto;
     flex-direction: column;
     gap: 4px;
+  }
+
+  .edit-pharmacy-profile-button{
+    margin-bottom: 0;
   }
 
   .pharmacy-profile-summary-cards {
@@ -1157,7 +1159,7 @@ input[type="file"] {
 
   .pharmacy-profile-data-table th,
   .pharmacy-profile-data-table td {
-    padding: 10px 10px;
+    padding: 10px 8px;
     font-size: 10px;
   }
 }
@@ -1175,8 +1177,13 @@ input[type="file"] {
 
   .pharmacy-profile-data-table th,
   .pharmacy-profile-data-table td {
-    padding: 5px 4px;
+    padding: 5px 1px;
     font-size: 9px;
+  }
+
+  .pharmacy-profile-info-text{
+    display: block;
+    padding: 30px;
   }
 
   .pharmacy-profile-scan-preview-image {
@@ -1187,22 +1194,11 @@ input[type="file"] {
  .pharmacy-profile-action-buttons{
    display: block;
    flex-direction: column;
-   align-items: center;
-   justify-content: center;
-   text-align: center;
-   width: 80%;
-   max-width: 300px;
-   margin:5px 0;
-   margin-left: 10px;
-   
-
-
+   padding: 28px;
 }
  .pharmacy-profile-update-password-button{
   margin-bottom: 30px;
   margin-left: 10px;
-  
-
 }
 .edit-pharmacy-profile-button{
   margin-top: 20px;
@@ -1233,7 +1229,7 @@ input[type="file"] {
 @media (max-width: 360px){
   .pharmacy-profile-data-table th,
   .pharmacy-profile-data-table td {
-    padding: 5px 3.5px;
+    padding: 5px 0.1px;
     font-size: 9px;
   }
   .pharmacy-profile-action-buttons{
@@ -1242,9 +1238,8 @@ input[type="file"] {
 @media (max-width: 344px){
   .pharmacy-profile-data-table th,
   .pharmacy-profile-data-table td {
-    padding: 5px 1px;
+    padding: 5px 0.1px;
     font-size: 9px;
 }
 }
-
 }
