@@ -1,3 +1,10 @@
+/**
+ * pharmacyRoutes.js
+ *
+ * This file defines the API routes for pharmacy-related operations in the HealthVision backend.
+ * It includes routes for creating, updating, and retrieving pharmacy profiles, as well as managing pharmacy inventory.
+ */
+
 const express = require("express");
 const pharmacyController = require("../controllers/pharmacyController");
 const authController = require("../controllers/authController");

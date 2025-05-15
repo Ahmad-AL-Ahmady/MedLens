@@ -1,3 +1,11 @@
+/**
+ * userModel.js
+ *
+ * This file defines the Mongoose schema for the User model in the HealthVision backend.
+ * It includes fields for user details such as name, email, password, user type, and profile information.
+ * The schema also includes methods for password comparison and user creation.
+ */
+
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
@@ -8,26 +16,26 @@ const userSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
-      required: [true, "Please provide your first name"],
+      required: [true, "First name is required"],
       minlength: 2,
       trim: true,
     },
     lastName: {
       type: String,
-      required: [true, "Please provide your last name"],
+      required: [true, "Last name is required"],
       minlength: 2,
       trim: true,
     },
     email: {
       type: String,
-      required: [true, "Please provide your email"],
+      required: [true, "Email is required"],
       unique: true,
       lowercase: true,
       validate: [validator.isEmail, "Please provide a valid email"],
     },
     password: {
       type: String,
-      required: true,
+      required: [true, "Password is required"],
       minlength: 8,
       select: false,
     },
@@ -42,7 +50,7 @@ const userSchema = new mongoose.Schema(
     },
     userType: {
       type: String,
-      required: true,
+      required: [true, "User type is required"],
       enum: ["Doctor", "Pharmacy", "Patient", "Admin"],
     },
     profileCompleted: {

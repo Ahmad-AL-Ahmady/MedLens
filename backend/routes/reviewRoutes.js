@@ -1,3 +1,10 @@
+/**
+ * reviewRoutes.js
+ *
+ * This file defines the API routes for review-related operations in the HealthVision backend.
+ * It includes routes for creating, updating, and retrieving reviews, as well as managing review ratings.
+ */
+
 const express = require("express");
 const reviewController = require("../controllers/reviewController");
 const authController = require("../controllers/authController");

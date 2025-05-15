@@ -1,3 +1,22 @@
+/**
+ * profileController.js
+ *
+ * This file handles profile management functionality for different user types in the HealthVision backend.
+ * It provides endpoints for managing patient, doctor, and pharmacy profiles with their specific data.
+ *
+ * Features:
+ * - Get user profiles with type-specific populated data
+ * - Update profile information based on user type
+ * - Automatic profile creation for new users
+ * - Type-specific data validation and filtering
+ * - Related data population (appointments, reviews, inventory)
+ *
+ * The controller handles three types of profiles:
+ * - Patient profiles with medical history and appointments
+ * - Doctor profiles with availability and specialization
+ * - Pharmacy profiles with inventory and operating hours
+ */
+
 const User = require("../models/userModel");
 const PatientProfile = require("../models/patientProfileModel");
 const DoctorProfile = require("../models/doctorProfileModel");

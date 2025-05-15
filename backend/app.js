@@ -1,3 +1,12 @@
+/**
+ * app.js
+ *
+ * This file configures the Express application for the HealthVision backend.
+ * It sets up middleware (JSON parsing, logging, CORS, cookie parsing, passport),
+ * serves static files, and mounts API routes for users, profiles, doctors, appointments,
+ * medications, pharmacies, patients, medical scans, and reviews.
+ */
+
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");

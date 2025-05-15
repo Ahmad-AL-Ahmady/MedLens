@@ -1,3 +1,10 @@
+/**
+ * userRoutes.js
+ *
+ * This file defines the API routes for user-related operations in the HealthVision backend.
+ * It includes routes for user registration, login, profile updates, and other user management tasks.
+ */
+
 const express = require("express");
 const passport = require("passport");
 const authController = require("../controllers/authController");

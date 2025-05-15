@@ -1,3 +1,21 @@
+/**
+ * authController.js
+ *
+ * This file handles all authentication-related functionality for the HealthVision backend.
+ * It manages user authentication, authorization, and account management operations.
+ *
+ * Features:
+ * - User registration and email verification
+ * - Login with JWT token generation
+ * - Password reset and update
+ * - Google OAuth authentication
+ * - Account deletion and data export
+ * - Session management
+ *
+ * The controller uses JWT for authentication and includes security features
+ * such as password hashing, email verification, and secure cookie handling.
+ */
+
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
 const User = require("../models/userModel");

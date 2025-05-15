@@ -1,3 +1,10 @@
+/**
+ * patientProfileModel.js
+ *
+ * This file defines the Mongoose schema for the PatientProfile model in the HealthVision backend.
+ * It includes fields for patient details such as user reference.
+ */
+
 const mongoose = require("mongoose");
 
 const patientProfileSchema = new mongoose.Schema(

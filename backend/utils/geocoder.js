@@ -1,3 +1,18 @@
+/**
+ * geocoder.js
+ *
+ * This file provides geocoding functionality for the HealthVision backend using NodeGeocoder.
+ * It includes functions for both forward geocoding (address to coordinates) and reverse geocoding
+ * (coordinates to address). The service uses OpenStreetMap as the provider and includes special
+ * handling for Arabic location names, particularly for Egyptian addresses.
+ *
+ * Features:
+ * - Forward geocoding: Converts addresses to coordinates
+ * - Reverse geocoding: Converts coordinates to formatted addresses
+ * - Arabic to English location name mapping
+ * - Special handling for Egyptian states and cities
+ */
+
 const NodeGeocoder = require("node-geocoder");
 const AppError = require("./appError");
 

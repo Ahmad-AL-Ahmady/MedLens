@@ -1,3 +1,20 @@
+/**
+ * userController.js
+ *
+ * This file handles user profile management functionality for the HealthVision backend.
+ * It provides endpoints for managing user profiles, avatars, and account settings.
+ *
+ * Features:
+ * - Get current user profile with populated data
+ * - Update user information
+ * - Account deactivation
+ * - Avatar management (upload, update, delete)
+ * - Profile data filtering and validation
+ *
+ * The controller includes proper file handling for avatars and ensures
+ * data consistency across user profiles and related entities.
+ */
+
 const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");

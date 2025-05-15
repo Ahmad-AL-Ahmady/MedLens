@@ -1,3 +1,10 @@
+/**
+ * appointmentModel.js
+ *
+ * This file defines the Mongoose schema for the Appointment model in the HealthVision backend.
+ * It includes fields for appointment details such as patient, doctor, date, time, status, and notes.
+ */
+
 const mongoose = require("mongoose");
 
 const appointmentSchema = new mongoose.Schema(

@@ -1,3 +1,10 @@
+/**
+ * pharmacyProfileModel.js
+ *
+ * This file defines the Mongoose schema for the PharmacyProfile model in the HealthVision backend.
+ * It includes fields for pharmacy details such as user reference, name, location, operating hours, and inventory.
+ */
+
 const mongoose = require("mongoose");
 
 // Define a schema for opening/closing hours

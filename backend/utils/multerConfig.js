@@ -1,3 +1,19 @@
+/**
+ * multerConfig.js
+ *
+ * This file configures Multer for file uploads in the HealthVision backend.
+ * It provides configurations for different types of file uploads (avatars, medical scans)
+ * including storage settings, file filters, and post-upload processing.
+ *
+ * Features:
+ * - Separate storage configurations for avatars and medical scans
+ * - File type validation (images and PDFs for scans)
+ * - Automatic directory creation
+ * - File size limits
+ * - Post-upload image compression
+ * - Custom filename generation
+ */
+
 const multer = require("multer");
 const AppError = require("./appError");
 const fs = require("fs");

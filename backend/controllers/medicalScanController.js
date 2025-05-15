@@ -1,3 +1,24 @@
+/**
+ * medicalScanController.js
+ *
+ * This file handles medical scan management functionality for the HealthVision backend.
+ * It provides endpoints for uploading, managing, and analyzing medical scans using AI.
+ *
+ * Features:
+ * - Upload and store medical scan images
+ * - AI-powered scan analysis and classification
+ * - View and manage scan history
+ * - Filter scans by body part and date
+ * - Secure file handling and storage
+ *
+ * The controller includes:
+ * - Integration with AI service for scan analysis
+ * - Automatic file cleanup
+ * - Pagination and filtering
+ * - Authorization checks
+ * - Error handling for file operations
+ */
+
 const MedicalScan = require("../models/medicalScanModel");
 const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");

@@ -1,3 +1,26 @@
+/**
+ * doctorController.js
+ *
+ * This file handles doctor-specific functionality for the HealthVision backend.
+ * It provides endpoints for managing doctor profiles, availability, and professional
+ * information.
+ *
+ * Features:
+ * - Get and update doctor profiles
+ * - Manage doctor availability and schedule
+ * - Handle location and address information
+ * - View doctor's appointments and reviews
+ * - Update professional information
+ * - Manage doctor's services and specializations
+ *
+ * The controller includes:
+ * - Automatic profile creation for new doctors
+ * - Geocoding integration for location management
+ * - Appointment history tracking
+ * - Review management
+ * - Professional information validation
+ */
+
 const User = require("../models/userModel");
 const DoctorProfile = require("../models/doctorProfileModel");
 const geocoder = require("../utils/geocoder");

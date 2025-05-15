@@ -1,3 +1,24 @@
+/**
+ * medicationController.js
+ *
+ * This file handles medication management functionality for the HealthVision backend.
+ * It provides endpoints for managing medications and their availability in pharmacies.
+ *
+ * Features:
+ * - Create and manage medication records
+ * - Search medications by name and strength
+ * - Find pharmacies with specific medications
+ * - Track medication inventory
+ * - Location-based pharmacy search
+ *
+ * The controller includes:
+ * - Duplicate medication prevention
+ * - Inventory dependency checks
+ * - Pagination and filtering
+ * - Geospatial queries for nearby pharmacies
+ * - Medication availability tracking
+ */
+
 const Medication = require("../models/medicationModel");
 const PharmacyInventory = require("../models/pharmacyInventoryModel");
 const catchAsync = require("../utils/catchAsync");

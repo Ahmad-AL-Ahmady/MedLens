@@ -1,3 +1,10 @@
+/**
+ * appointmentRoutes.js
+ *
+ * This file defines the API routes for appointment-related operations in the HealthVision backend.
+ * It includes routes for creating, updating, and retrieving appointments, as well as managing appointment status.
+ */
+
 const express = require("express");
 const appointmentController = require("../controllers/appointmentController");
 const authController = require("../controllers/authController");

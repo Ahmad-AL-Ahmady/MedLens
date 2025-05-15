@@ -1,3 +1,24 @@
+/**
+ * patientController.js
+ *
+ * This file handles patient management functionality for the HealthVision backend.
+ * It provides endpoints for managing patient profiles and accessing patient-specific data.
+ *
+ * Features:
+ * - Get and update patient profiles
+ * - View appointment history and upcoming appointments
+ * - Access patient dashboard data
+ * - Track medical history
+ * - Manage personal information
+ *
+ * The controller includes:
+ * - Automatic profile creation for new patients
+ * - Appointment statistics and tracking
+ * - Dashboard data aggregation
+ * - Profile data validation
+ * - Related data population
+ */
+
 const User = require("../models/userModel");
 const PatientProfile = require("../models/patientProfileModel");
 const Appointment = require("../models/appointmentModel");

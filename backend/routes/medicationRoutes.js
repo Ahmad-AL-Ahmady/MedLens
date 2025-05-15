@@ -1,3 +1,10 @@
+/**
+ * medicationRoutes.js
+ *
+ * This file defines the API routes for medication-related operations in the HealthVision backend.
+ * It includes routes for creating, updating, and retrieving medications, as well as managing medication inventory.
+ */
+
 const express = require("express");
 const medicationController = require("../controllers/medicationController");
 const authController = require("../controllers/authController");

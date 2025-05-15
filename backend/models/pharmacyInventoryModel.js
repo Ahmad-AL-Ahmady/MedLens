@@ -1,3 +1,12 @@
+/**
+ * pharmacyInventoryModel.js
+ *
+ * This file defines the Mongoose schema for the PharmacyInventory model in the HealthVision backend.
+ * It includes fields for tracking medication inventory in pharmacies such as stock levels,
+ * expiry dates, and pricing information. The schema maintains a unique compound index
+ * to ensure each pharmacy-medication combination is unique.
+ */
+
 const mongoose = require("mongoose");
 
 const pharmacyInventorySchema = new mongoose.Schema(

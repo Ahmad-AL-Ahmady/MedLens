@@ -1,3 +1,25 @@
+/**
+ * reviewController.js
+ *
+ * This file handles review management functionality for the HealthVision backend.
+ * It provides endpoints for creating, managing, and retrieving reviews for doctors
+ * and pharmacies.
+ *
+ * Features:
+ * - Create reviews for doctors and pharmacies
+ * - View reviews for specific entities
+ * - Manage user's own reviews
+ * - Mark reviews as helpful
+ * - Update and delete reviews
+ *
+ * The controller includes:
+ * - Rating validation (1-5 scale)
+ * - Duplicate review prevention
+ * - Pagination and sorting
+ * - Review helpfulness tracking
+ * - Entity-specific review aggregation
+ */
+
 const Review = require("../models/reviewModel");
 const User = require("../models/userModel");
 const DoctorProfile = require("../models/doctorProfileModel");

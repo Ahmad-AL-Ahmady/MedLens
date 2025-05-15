@@ -1,3 +1,10 @@
+/**
+ * medicalScanRoutes.js
+ *
+ * This file defines the API routes for medical scan-related operations in the HealthVision backend.
+ * It includes routes for creating, updating, and retrieving medical scans, as well as managing scan results.
+ */
+
 const express = require("express");
 const medicalScanController = require("../controllers/medicalScanController");
 const authController = require("../controllers/authController");

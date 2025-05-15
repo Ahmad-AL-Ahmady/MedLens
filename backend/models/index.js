@@ -1,3 +1,16 @@
+/**
+ * index.js
+ *
+ * This file serves as the central registry for all Mongoose models in the HealthVision backend.
+ * It ensures proper model registration order to handle dependencies between models correctly.
+ * The file exports all models as a single object for easy access throughout the application.
+ *
+ * Registration order:
+ * 1. Profile models (Patient, Doctor, Pharmacy)
+ * 2. User model (which depends on profile models)
+ * 3. Other models (MedicalScan, Appointment, Medication, etc.)
+ */
+
 // This file ensures proper model registration order
 const mongoose = require("mongoose");
 

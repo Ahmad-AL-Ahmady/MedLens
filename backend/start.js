@@ -1,3 +1,11 @@
+/**
+ * start.js
+ *
+ * This file orchestrates the startup of the HealthVision backend services.
+ * It checks if the required ports are available, then starts both the Node.js backend
+ * and the Python AI service. It also sets up handlers for graceful shutdown and error handling.
+ */
+
 const { spawn } = require("child_process");
 const path = require("path");
 const net = require("net");

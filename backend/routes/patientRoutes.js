@@ -1,3 +1,10 @@
+/**
+ * patientRoutes.js
+ *
+ * This file defines the API routes for patient-related operations in the HealthVision backend.
+ * It includes routes for creating, updating, and retrieving patient profiles, as well as managing patient records.
+ */
+
 const express = require("express");
 const patientController = require("../controllers/patientController");
 const authController = require("../controllers/authController");

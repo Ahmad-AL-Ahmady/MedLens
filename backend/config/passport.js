@@ -1,3 +1,14 @@
+/**
+ * passport.js
+ *
+ * This file configures Passport.js authentication for the HealthVision backend.
+ * It sets up Google OAuth 2.0 authentication strategy and handles user serialization.
+ * The configuration includes:
+ * - Google OAuth strategy setup with client credentials
+ * - User lookup/creation logic for Google authentication
+ * - User serialization/deserialization for session management
+ */
+
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const User = require("../models/userModel");

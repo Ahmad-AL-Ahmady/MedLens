@@ -1,3 +1,19 @@
+/**
+ * imageProcessor.js
+ *
+ * This file provides image processing functionality for the HealthVision backend using Sharp.
+ * It includes functions for compressing and resizing images, with specific optimizations
+ * for different types of images (avatars, medical scans). The processor handles various
+ * image formats and maintains quality standards appropriate for each use case.
+ *
+ * Features:
+ * - Image compression with quality control
+ * - Resizing with aspect ratio preservation
+ * - Format conversion (JPEG, PNG, WebP)
+ * - Specialized processing for avatars and medical scans
+ * - Automatic cleanup of temporary files
+ */
+
 const sharp = require("sharp");
 const fs = require("fs").promises;
 const path = require("path");

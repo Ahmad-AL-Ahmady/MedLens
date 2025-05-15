@@ -1,3 +1,17 @@
+/**
+ * fixDoctorProfiles.js
+ *
+ * This file contains a utility function to fix doctor profiles in the HealthVision backend.
+ * It connects to the MongoDB database, loads the User and DoctorProfile models,
+ * and then checks each doctor user. If a doctor does not have a corresponding profile,
+ * it creates a new profile with default availability settings.
+ *
+ * @async
+ * @function fixDoctorProfiles
+ * @throws {Error} If there's an error accessing the database or creating profiles
+ * @returns {Promise<void>} Resolves when all profiles are checked/created
+ */
+
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const path = require("path");
@@ -24,7 +38,6 @@ require("./models");
 const User = mongoose.model("User");
 const DoctorProfile = mongoose.model("DoctorProfile");
 
-// Function to fix doctor profiles
 /**
  * Fixes doctor profiles by creating missing profiles for doctors in the database.
  * This function finds all users with userType "Doctor" and ensures each has a corresponding DoctorProfile.

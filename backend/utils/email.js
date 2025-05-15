@@ -1,3 +1,16 @@
+/**
+ * email.js
+ *
+ * This file provides email functionality for the HealthVision backend using Nodemailer.
+ * It configures a Gmail SMTP transporter and provides a function to send emails.
+ * The email service is used for notifications, verification, and password reset functionality.
+ *
+ * Configuration:
+ * - Uses Gmail SMTP server
+ * - Requires Gmail username and app password from environment variables
+ * - Supports HTML email templates
+ */
+
 const nodemailer = require("nodemailer");
 
 const sendEmail = async (options) => {

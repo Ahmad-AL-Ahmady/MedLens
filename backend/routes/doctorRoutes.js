@@ -1,3 +1,10 @@
+/**
+ * doctorRoutes.js
+ *
+ * This file defines the API routes for doctor-related operations in the HealthVision backend.
+ * It includes routes for creating, updating, and retrieving doctor profiles, as well as managing doctor availability.
+ */
+
 const express = require("express");
 const doctorController = require("../controllers/doctorController");
 const authController = require("../controllers/authController");

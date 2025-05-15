@@ -1,3 +1,10 @@
+/**
+ * profileRoutes.js
+ *
+ * This file defines the API routes for profile-related operations in the HealthVision backend.
+ * It includes routes for creating, updating, and retrieving user profiles.
+ */
+
 const express = require("express");
 const authController = require("../controllers/authController");
 const profileController = require("../controllers/profileController");

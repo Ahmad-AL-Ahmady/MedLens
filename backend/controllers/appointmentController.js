@@ -1,3 +1,26 @@
+/**
+ * appointmentController.js
+ *
+ * This file handles appointment management functionality for the HealthVision backend.
+ * It provides endpoints for scheduling, managing, and tracking medical appointments
+ * between patients and doctors.
+ *
+ * Features:
+ * - Get available time slots for doctors
+ * - Create new appointments
+ * - Update appointment status and details
+ * - Cancel appointments
+ * - View appointment history
+ * - Time slot availability checking
+ *
+ * The controller includes validation for:
+ * - Doctor availability
+ * - Time slot conflicts
+ * - Past date prevention
+ * - User type restrictions
+ * - Appointment status transitions
+ */
+
 const Appointment = require("../models/appointmentModel");
 const User = require("../models/userModel");
 const DoctorProfile = require("../models/doctorProfileModel");

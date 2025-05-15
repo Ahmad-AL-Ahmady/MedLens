@@ -1,3 +1,25 @@
+/**
+ * pharmacyController.js
+ *
+ * This file handles pharmacy management functionality for the HealthVision backend.
+ * It provides endpoints for managing pharmacy profiles, inventory, and operations.
+ *
+ * Features:
+ * - Get and update pharmacy profiles
+ * - Manage medication inventory
+ * - Handle location and address information
+ * - Track operating hours
+ * - Process medication orders
+ * - View pharmacy reviews and ratings
+ *
+ * The controller includes:
+ * - Automatic profile creation for new pharmacies
+ * - Geocoding integration for location management
+ * - Inventory tracking and updates
+ * - Order processing and validation
+ * - Review management
+ */
+
 const User = require("../models/userModel");
 const PharmacyProfile = require("../models/pharmacyProfileModel");
 const PharmacyInventory = require("../models/pharmacyInventoryModel");

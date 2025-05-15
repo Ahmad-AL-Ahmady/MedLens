@@ -1,3 +1,10 @@
+/**
+ * setupUpload.js
+ *
+ * This file sets up the necessary directories for file uploads in the HealthVision backend.
+ * It ensures that the default avatar exists and creates required upload directories if they don't.
+ */
+
 const fs = require("fs").promises;
 const path = require("path");
 

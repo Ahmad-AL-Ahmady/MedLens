@@ -1,3 +1,11 @@
+/**
+ * server.js
+ *
+ * This file sets up the main server for the HealthVision backend.
+ * It loads environment variables, connects to the MongoDB database,
+ * and starts the Express application on the specified port.
+ */
+
 const dotenv = require("dotenv");
 dotenv.config();
 

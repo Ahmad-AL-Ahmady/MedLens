@@ -1,3 +1,10 @@
+/**
+ * reviewModel.js
+ *
+ * This file defines the Mongoose schema for the Review model in the HealthVision backend.
+ * It includes fields for review details such as user reference, entity being reviewed, rating, and comment.
+ */
+
 const mongoose = require("mongoose");
 const DoctorProfile = require("./doctorProfileModel");
 const PharmacyProfile = require("./pharmacyProfileModel");

@@ -1,3 +1,10 @@
+/**
+ * medicalScanModel.js
+ *
+ * This file defines the Mongoose schema for the MedicalScan model in the HealthVision backend.
+ * It includes fields for scan details such as patient reference, scan type, image URL, and results.
+ */
+
 const mongoose = require("mongoose");
 
 const medicalScanSchema = new mongoose.Schema(

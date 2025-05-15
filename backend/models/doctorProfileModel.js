@@ -1,3 +1,10 @@
+/**
+ * doctorProfileModel.js
+ *
+ * This file defines the Mongoose schema for the DoctorProfile model in the HealthVision backend.
+ * It includes fields for doctor details such as user reference, specialization, availability, and contact information.
+ */
+
 const mongoose = require("mongoose");
 
 const availabilitySchema = new mongoose.Schema(
