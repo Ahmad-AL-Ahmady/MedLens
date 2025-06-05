@@ -136,20 +136,30 @@ MedLens/
 │       ├── App.js          # Main application file
 │       └── utils/          # Utility functions
 │
-└── backend/                # Backend services
-    ├── fast_api/           # FastAPI application
-    ├── Models_ai/          # AI model files
-    ├── config/             # Configuration files
-    ├── controllers/        # Business logic
-    ├── models/             # Data models
-    ├── routes/             # Express routes
-    ├── scripts/            # Utility scripts
-    ├── utils/              # Utility functions
-    ├── app.js              # Main application file
-    ├── server.js           # Server configuration
-    ├── start.js            # Application starter
-    ├── package.json        # Backend dependencies
-    └── requirements.txt    # Python dependencies
+├── backend/                # Backend services
+│   ├── fast_api/           # FastAPI application
+│   ├── Models_ai/          # AI model files
+│   ├── config/             # Configuration files
+│   ├── controllers/        # Business logic
+│   ├── models/             # Data models
+│   ├── routes/             # Express routes
+│   ├── scripts/            # Utility scripts
+│   ├── utils/              # Utility functions
+│   ├── app.js              # Main application file
+│   ├── server.js           # Server configuration
+│   ├── start.js            # Application starter
+│   ├── package.json        # Backend dependencies
+│   └── requirements.txt    # Python dependencies
+│
+└── ai_notebooks/           # Jupyter notebooks for AI development
+    ├── bone_notebook.ipynb         # Bone analysis notebook (313 KB)
+    ├── brain_notebook.ipynb        # Brain scan analysis notebook (400 KB)
+    ├── chest_notebook.ipynb        # Chest X-ray analysis notebook (384 KB)
+    ├── eye_notebook.ipynb          # Eye examination notebook (720 KB)
+    ├── kidney_notebook.ipynb       # Kidney analysis notebook (342 KB)
+    ├── lung_notebook.ipynb         # Lung analysis notebook (405 KB)
+    ├── Nail_model.ipynb           # Nail analysis model (569 KB)
+    └── skin_notebook.ipynb        # Skin condition analysis notebook (558 KB)
 ```
 
 ## Contributing
